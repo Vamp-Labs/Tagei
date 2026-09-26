@@ -1,0 +1,357 @@
+{
+  "_comment": "BNB PLAY deploy config for BSC testnet (chainId 97). Lanes: docs/spec/F1e-lanes.md (laneVersion 1); disabled tiers carry the closest research/lane-params.json candidate for reference only. Big numbers are decimal strings (18-decimal tUSD).",
+  "chainId": 97,
+  "supra": {
+    "pull": "0x6Cd59830AAD978446e6cc7f6cc173aF7656Fb917",
+    "storage": "0x004d42225631F6bec6503a281Ed4c233810CBC29",
+    "committeeVerifier": "0x8694E798112a9Df06d9Ccc772967A5AeCfb24320",
+    "owner": "0xaF90E04a87743312000607d0F6a0519892454B7A",
+    "futureToleranceMs": 3000,
+    "pairs": [
+      0,
+      1,
+      3,
+      10,
+      49
+    ]
+  },
+  "delays": {
+    "entryDelaySec": 3,
+    "exitDelaySec": 2,
+    "stallAfterSec": 60,
+    "defaultDurationSec": 30
+  },
+  "limits": {
+    "maxUtilizationBps": 8000,
+    "maxPayoutPerRound": "1000000000000000000000"
+  },
+  "house": {
+    "seed": "1000000000000000000000000"
+  },
+  "faucet": {
+    "dripAmount": "100000000000000000000",
+    "cooldownSec": 82800,
+    "maxPerAddress": "2000000000000000000000"
+  },
+  "addresses": {
+    "deployer": "0xcA5391C789fdabf872BdB447d73D9739bBF006f3",
+    "relayer": "0x18E82917289AF4E518AC7dd705008033870d6410",
+    "recorder": "0xB9Bf2913bfc2C8eE30Ab7CBa539B21c500963C71",
+    "ops": "0xeeC1c0a3044b8554430ad9139686b192b1DE0005"
+  },
+  "roles": {
+    "admin": "0xcA5391C789fdabf872BdB447d73D9739bBF006f3",
+    "config": [
+      "0xcA5391C789fdabf872BdB447d73D9739bBF006f3",
+      "0xeeC1c0a3044b8554430ad9139686b192b1DE0005"
+    ],
+    "pauser": [
+      "0xcA5391C789fdabf872BdB447d73D9739bBF006f3",
+      "0xeeC1c0a3044b8554430ad9139686b192b1DE0005"
+    ],
+    "treasury": [
+      "0xcA5391C789fdabf872BdB447d73D9739bBF006f3"
+    ],
+    "faucetOperator": [
+      "0xeeC1c0a3044b8554430ad9139686b192b1DE0005"
+    ],
+    "priceSigners": [
+      "0xB9Bf2913bfc2C8eE30Ab7CBa539B21c500963C71"
+    ]
+  },
+  "signedBackup": {
+    "deploy": true
+  },
+  "assets": [
+    {
+      "assetId": 0,
+      "symbol": "BNB",
+      "pairId": 49,
+      "maxJumpPpm": 15000,
+      "gapMarginPpm": 38,
+      "enabled": true,
+      "lanes": [
+        {
+          "tier": 0,
+          "label": "CRUISE",
+          "targetPpm": 226,
+          "stopPpm": 434,
+          "multiplierBps": 15000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": true,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 1,
+          "label": "BOOST",
+          "targetPpm": 291,
+          "stopPpm": 262,
+          "multiplierBps": 20000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": true,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 2,
+          "label": "HYPER",
+          "targetPpm": 718,
+          "stopPpm": 276,
+          "multiplierBps": 30000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": false,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 3,
+          "label": "WARP",
+          "targetPpm": 1526,
+          "stopPpm": 276,
+          "multiplierBps": 50000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": false,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        }
+      ]
+    },
+    {
+      "assetId": 1,
+      "symbol": "BTC",
+      "pairId": 0,
+      "maxJumpPpm": 10000,
+      "gapMarginPpm": 31,
+      "enabled": true,
+      "lanes": [
+        {
+          "tier": 0,
+          "label": "CRUISE",
+          "targetPpm": 207,
+          "stopPpm": 397,
+          "multiplierBps": 15000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": true,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 1,
+          "label": "BOOST",
+          "targetPpm": 241,
+          "stopPpm": 217,
+          "multiplierBps": 20000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": false,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 2,
+          "label": "HYPER",
+          "targetPpm": 626,
+          "stopPpm": 217,
+          "multiplierBps": 30000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": false,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 3,
+          "label": "WARP",
+          "targetPpm": 1399,
+          "stopPpm": 228,
+          "multiplierBps": 50000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": false,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        }
+      ]
+    },
+    {
+      "assetId": 2,
+      "symbol": "ETH",
+      "pairId": 1,
+      "maxJumpPpm": 15000,
+      "gapMarginPpm": 46,
+      "enabled": true,
+      "lanes": [
+        {
+          "tier": 0,
+          "label": "CRUISE",
+          "targetPpm": 265,
+          "stopPpm": 507,
+          "multiplierBps": 15000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": true,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 1,
+          "label": "BOOST",
+          "targetPpm": 358,
+          "stopPpm": 323,
+          "multiplierBps": 20000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": true,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 2,
+          "label": "HYPER",
+          "targetPpm": 840,
+          "stopPpm": 323,
+          "multiplierBps": 30000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": false,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 3,
+          "label": "WARP",
+          "targetPpm": 1786,
+          "stopPpm": 323,
+          "multiplierBps": 50000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": false,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        }
+      ]
+    },
+    {
+      "assetId": 3,
+      "symbol": "SOL",
+      "pairId": 10,
+      "maxJumpPpm": 20000,
+      "gapMarginPpm": 66,
+      "enabled": true,
+      "lanes": [
+        {
+          "tier": 0,
+          "label": "CRUISE",
+          "targetPpm": 240,
+          "stopPpm": 461,
+          "multiplierBps": 15000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": true,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 1,
+          "label": "BOOST",
+          "targetPpm": 511,
+          "stopPpm": 461,
+          "multiplierBps": 20000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": true,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 2,
+          "label": "HYPER",
+          "targetPpm": 1200,
+          "stopPpm": 485,
+          "multiplierBps": 30000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": false,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 3,
+          "label": "WARP",
+          "targetPpm": 2425,
+          "stopPpm": 485,
+          "multiplierBps": 50000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": false,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        }
+      ]
+    },
+    {
+      "assetId": 4,
+      "symbol": "DOGE",
+      "pairId": 3,
+      "maxJumpPpm": 40000,
+      "gapMarginPpm": 102,
+      "enabled": true,
+      "lanes": [
+        {
+          "tier": 0,
+          "label": "CRUISE",
+          "targetPpm": 374,
+          "stopPpm": 717,
+          "multiplierBps": 15000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": true,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 1,
+          "label": "BOOST",
+          "targetPpm": 794,
+          "stopPpm": 717,
+          "multiplierBps": 20000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": true,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 2,
+          "label": "HYPER",
+          "targetPpm": 1775,
+          "stopPpm": 717,
+          "multiplierBps": 30000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": false,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        },
+        {
+          "tier": 3,
+          "label": "WARP",
+          "targetPpm": 3772,
+          "stopPpm": 754,
+          "multiplierBps": 50000,
+          "feeBps": 100,
+          "durationSec": 30,
+          "enabled": false,
+          "minStake": "5000000000000000000",
+          "maxStake": "50000000000000000000"
+        }
+      ]
+    }
+  ]
+}

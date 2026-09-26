@@ -1,23 +1,37 @@
 {
   "name": "bnb-play",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
+  "packageManager": "pnpm@11.4.0",
+  "engines": {
+    "node": ">=22.12"
+  },
   "scripts": {
     "dev": "vite",
+    "dev:server": "pnpm --filter @bnbplay/server dev",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "typecheck:all": "pnpm typecheck && pnpm -r --if-present typecheck",
+    "test": "vitest run",
+    "test:all": "pnpm test && pnpm -r --if-present test",
+    "vectors": "pnpm --filter @bnbplay/shared gen:vectors",
+    "check:ownership": "node tools/check-ownership.ts"
   },
   "dependencies": {
+    "@bnbplay/shared": "workspace:*",
+    "@tanstack/react-query": "^5.103.2",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "lucide-react": "^1.16.0",
     "motion": "^13.4.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tailwind-merge": "^3.0.2"
+    "tailwind-merge": "^3.0.2",
+    "viem": "^2.56.9",
+    "wagmi": "^2.19.5",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.9",

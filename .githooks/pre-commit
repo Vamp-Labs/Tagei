@@ -1,0 +1,4 @@
+#!/bin/sh
+# Skip silently on checkouts that predate the ownership tool (e.g. the baseline main tree).
+[ -f tools/check-ownership.ts ] || exit 0
+exec node tools/check-ownership.ts --staged

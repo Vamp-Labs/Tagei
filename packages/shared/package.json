@@ -1,0 +1,35 @@
+{
+  "name": "@bnbplay/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./constants": "./src/constants.ts",
+    "./enums": "./src/enums.ts",
+    "./assets": "./src/assets.ts",
+    "./chain": "./src/chain.ts",
+    "./lane": "./src/lane.ts",
+    "./path": "./src/path.ts",
+    "./eip712": "./src/eip712.ts",
+    "./dto": "./src/dto.ts",
+    "./sse": "./src/sse.ts",
+    "./progression": "./src/progression.ts",
+    "./pix": "./src/pix.ts",
+    "./vectors/*": "./vectors/*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "gen:vectors": "node scripts/gen-vectors.ts"
+  },
+  "dependencies": {
+    "viem": "^2.56.9",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "typescript": "~5.7.3",
+    "vitest": "^3.2.7"
+  }
+}

@@ -1,0 +1,31 @@
+name: ci
+on:
+  push:
+    branches: [main, integration]
+  pull_request:
+
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck:all
+      - run: pnpm test:all
+      - run: pnpm --filter @bnbplay/shared exec node scripts/gen-vectors.ts --check
+      - run: pnpm build
+      - if: github.event_name == 'pull_request'
+        run: OWNERSHIP_BRANCH=${{ github.head_ref }} node tools/check-ownership.ts --base origin/${{ github.base_ref }}
+
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - name: forge test
+        run: |
+          if [ -d contracts ]; then cd contracts && forge soldeer install && forge test; else echo "no contracts yet"; fi

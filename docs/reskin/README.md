@@ -45,8 +45,8 @@ This re-skin rebuilds every BNB PLAY screen in the **Lucky Games** design system
 
 | Epic | Doc | Branch | Worktree (`Tagei-worktrees/…`) | Port | Status |
 |---|---|---|---|---|---|
-| E0a Foundation: look | [E0a-foundation-look.md](E0a-foundation-look.md) | `feat/lucky-reskin` | `reskin-integrate` | 5180 | todo |
-| E0b Foundation: tooling | [E0b-foundation-tooling.md](E0b-foundation-tooling.md) | `reskin/e0b-tooling` | `reskin-e0b` | 5188 | todo |
+| E0a Foundation: look | [E0a-foundation-look.md](E0a-foundation-look.md) | `feat/lucky-reskin` | `reskin-integrate` | 5180 | done (G0 passed) |
+| E0b Foundation: tooling | [E0b-foundation-tooling.md](E0b-foundation-tooling.md) | `reskin/e0b-tooling` | `reskin-e0b` | 5188 | done (G0 passed) |
 | E1 Home & Landing | [E1-home.md](E1-home.md) | `reskin/e1-home` | `reskin-e1` | 5181 | todo |
 | E2 Trade flow | [E2-trade.md](E2-trade.md) | `reskin/e2-trade` | `reskin-e2` | 5182 | todo |
 | E3 Outcome, settlement, result | [E3-outcome.md](E3-outcome.md) | `reskin/e3-outcome` | `reskin-e3` | 5183 | todo |

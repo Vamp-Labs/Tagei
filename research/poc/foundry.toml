@@ -1,0 +1,10 @@
+# Standalone PoC build (no dependencies). `forge build --root research/poc`
+[profile.default]
+src = "src"
+out = "out"
+cache_path = "cache"
+libs = []
+solc_version = "0.8.28"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 200

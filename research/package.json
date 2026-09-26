@@ -1,0 +1,23 @@
+{
+  "name": "bnb-play-research",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "A1 spike: Supra DORA-2 pull oracle on BSC testnet (97) + lane calibration. Standalone; not part of the root workspace.",
+  "scripts": {
+    "record": "node scripts/record-supra.mjs",
+    "analyze": "node scripts/analyze-recording.mjs",
+    "fixture": "node scripts/capture-fixture.mjs",
+    "onchain-tests": "node scripts/onchain-tests.mjs",
+    "check-merkle": "node scripts/check-merkle-encoding.mjs",
+    "fetch-binance": "node scripts/fetch-binance-1s.mjs",
+    "calibrate": "node scripts/calibrate-lanes.mjs",
+    "calibrate:robust": "node scripts/calibrate-lanes.mjs --sigma-mode robust",
+    "rtt": "node scripts/measure-rtt.mjs",
+    "report-tables": "node scripts/report-tables.mjs --fill",
+    "poc:build": "forge build --root poc"
+  },
+  "dependencies": {
+    "viem": "^2.37.0"
+  }
+}

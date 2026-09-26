@@ -1,0 +1,7699 @@
+{
+ "generatedAt": "2026-09-26T10:17:57.997Z",
+ "dataWindow": {
+  "source": "https://data-api.binance.vision/api/v3/klines interval=1s (spot, close price)",
+  "startMs": 1789809840000,
+  "endMs": 1790414640000,
+  "seconds": 604800,
+  "fetchedAt": "2026-09-26T09:25:07.940Z",
+  "symbols": {
+   "BNB": {
+    "rows": 604800,
+    "missing": 0,
+    "first": 767.24,
+    "chunks": 605
+   },
+   "BTC": {
+    "rows": 604800,
+    "missing": 0,
+    "first": 81452.85,
+    "chunks": 605
+   },
+   "ETH": {
+    "rows": 604800,
+    "missing": 0,
+    "first": 2651.03,
+    "chunks": 605
+   },
+   "SOL": {
+    "rows": 604800,
+    "missing": 0,
+    "first": 112.07,
+    "chunks": 605
+   },
+   "DOGE": {
+    "rows": 604800,
+    "missing": 0,
+    "first": 0.08737,
+    "chunks": 605
+   }
+  }
+ },
+ "assets": {
+  "BNB": {
+   "pairId": 49,
+   "sigma1sPlainPpm": 63.54616903298609,
+   "sigma1sMadPpm": 0,
+   "sigma1sBipowerPpm": 44.87793073241959,
+   "acf1s": {
+    "1": 0.09913008493029375,
+    "2": 0.03860797219259933,
+    "3": 0.01995869689889745,
+    "4": 0.01922745801691922,
+    "5": 0.016410887196519182,
+    "6": 0.010757892444098993,
+    "7": 0.012892027037024535,
+    "8": 0.0021755408169002754,
+    "9": 0.0034931532179650953,
+    "10": 0.00751147826230376
+   },
+   "varianceRatio": {
+    "5": 1.228608775555846,
+    "20": 1.3965259195265856,
+    "30": 1.4342365846453102,
+    "60": 1.479891083907678
+   },
+   "sigmaEffFromHorizonPpm": {
+    "5": 70.43624252724123,
+    "20": 75.09549320515383,
+    "30": 76.10264860555888,
+    "60": 77.30440653938507
+   },
+   "varianceRatio20": 1.3965259195265856,
+   "zeroReturnPct": 54.48669723329569,
+   "approxTickPpm": 12.387736141208926,
+   "absReturnPpm": {
+    "p50": 0,
+    "p99": 260.535400247619,
+    "p999": 537.6963551867453,
+    "p9999": 985.4990848938705,
+    "max": 5888.271903998765
+   },
+   "meanPpm": 0.010102457638843943,
+   "gapMarginPpm": 26.145882444707656,
+   "maxJumpPpm": 15000,
+   "hourVolPpm": [
+    59.02,
+    73.38,
+    67.51,
+    59.14,
+    48.1,
+    48.74,
+    48.19,
+    50.17,
+    67.13,
+    68.95,
+    52.77,
+    60.25,
+    66.06,
+    73.51,
+    108.57,
+    80.8,
+    73.76,
+    63.73,
+    56.64,
+    46.37,
+    49.14,
+    50.89,
+    68.6,
+    46.18
+   ],
+   "quartileOfHourUTC": [
+    1,
+    3,
+    2,
+    1,
+    0,
+    0,
+    0,
+    1,
+    2,
+    3,
+    1,
+    2,
+    2,
+    3,
+    3,
+    3,
+    3,
+    2,
+    1,
+    0,
+    0,
+    1,
+    2,
+    0
+   ]
+  },
+  "BTC": {
+   "pairId": 0,
+   "sigma1sPlainPpm": 52.672690948409716,
+   "sigma1sMadPpm": 0.17140280695757681,
+   "sigma1sBipowerPpm": 36.10766457744513,
+   "acf1s": {
+    "1": 0.12115300404469098,
+    "2": 0.056100018135150226,
+    "3": 0.032926864905828954,
+    "4": 0.038185337947962465,
+    "5": 0.02161179979978977,
+    "6": 0.021396130766702187,
+    "7": 0.006386545162349781,
+    "8": 0.012026556128291897,
+    "9": 0.004502056643349642,
+    "10": 0.0007067490211769315
+   },
+   "varianceRatio": {
+    "5": 1.3028216223635973,
+    "20": 1.555675128672483,
+    "30": 1.606096015884021,
+    "60": 1.6476420315427052
+   },
+   "sigmaEffFromHorizonPpm": {
+    "5": 60.12124771879447,
+    "20": 65.69691258657099,
+    "30": 66.7530722639916,
+    "60": 67.6109342970641
+   },
+   "varianceRatio20": 1.555675128672483,
+   "zeroReturnPct": 48.00950398396823,
+   "approxTickPpm": 0.11443577565957035,
+   "absReturnPpm": {
+    "p50": 0.11560960944123622,
+    "p99": 232.47428549755256,
+    "p999": 490.08924585680626,
+    "p9999": 887.8013987911881,
+    "max": 2891.4781849767037
+   },
+   "meanPpm": 0.05288427980999453,
+   "gapMarginPpm": 21.03632538281953,
+   "maxJumpPpm": 10000,
+   "hourVolPpm": [
+    47.09,
+    51.55,
+    47.39,
+    40.44,
+    35.95,
+    35.77,
+    33.19,
+    36.58,
+    76.38,
+    72.16,
+    44.19,
+    40.22,
+    56.05,
+    73.52,
+    93.01,
+    68.29,
+    64.94,
+    51.65,
+    41.79,
+    44.36,
+    46.14,
+    36.49,
+    36.34,
+    31.11
+   ],
+   "quartileOfHourUTC": [
+    2,
+    2,
+    2,
+    1,
+    0,
+    0,
+    0,
+    1,
+    3,
+    3,
+    1,
+    1,
+    2,
+    3,
+    3,
+    3,
+    3,
+    2,
+    1,
+    1,
+    2,
+    0,
+    0,
+    0
+   ]
+  },
+  "ETH": {
+   "pairId": 1,
+   "sigma1sPlainPpm": 78.19345023219532,
+   "sigma1sMadPpm": 5.372848740470193,
+   "sigma1sBipowerPpm": 57.10764662481773,
+   "acf1s": {
+    "1": 0.09900955848940231,
+    "2": 0.024865641087260935,
+    "3": 0.019273047700659345,
+    "4": 0.016076383525341013,
+    "5": 0.009454150730448158,
+    "6": 0.007882463660031234,
+    "7": 0.00617861663609985,
+    "8": 0.0026515203576274946,
+    "9": -0.0025382234981078406,
+    "10": -0.002360312153984128
+   },
+   "varianceRatio": {
+    "5": 1.2101158103850878,
+    "20": 1.3237557310945043,
+    "30": 1.3372476530927373,
+    "60": 1.3439261238671298
+   },
+   "sigmaEffFromHorizonPpm": {
+    "5": 86.01691134492053,
+    "20": 89.96514891908623,
+    "30": 90.4224559541924,
+    "60": 90.64796826943372
+   },
+   "varianceRatio20": 1.3237557310945043,
+   "zeroReturnPct": 48.22147523392069,
+   "approxTickPpm": 3.5632585285750284,
+   "absReturnPpm": {
+    "p50": 3.6239368275126083,
+    "p99": 317.22377555309936,
+    "p999": 693.668065071984,
+    "p9999": 1301.6511202030845,
+    "max": 3626.067016345491
+   },
+   "meanPpm": 0.02361066292768469,
+   "gapMarginPpm": 33.27091492361881,
+   "maxJumpPpm": 15000,
+   "hourVolPpm": [
+    93.8,
+    83.53,
+    74.6,
+    66.07,
+    55.83,
+    56.9,
+    53.13,
+    54.3,
+    88.17,
+    98.14,
+    64.21,
+    64.67,
+    76.42,
+    99.7,
+    127.27,
+    98.59,
+    102.13,
+    85.59,
+    66.49,
+    62.24,
+    67.58,
+    62.82,
+    63.52,
+    53.86
+   ],
+   "quartileOfHourUTC": [
+    3,
+    2,
+    2,
+    1,
+    0,
+    0,
+    0,
+    0,
+    2,
+    3,
+    1,
+    1,
+    2,
+    3,
+    3,
+    3,
+    3,
+    2,
+    1,
+    0,
+    2,
+    1,
+    1,
+    0
+   ]
+  },
+  "SOL": {
+   "pairId": 10,
+   "sigma1sPlainPpm": 111.64718238353537,
+   "sigma1sMadPpm": 0,
+   "sigma1sBipowerPpm": 86.93809144052287,
+   "acf1s": {
+    "1": -0.006498902223851301,
+    "2": 0.007648315516233193,
+    "3": 0.012625512865596914,
+    "4": 0.01249138969296954,
+    "5": 0.0122301593144178,
+    "6": 0.0017427454597691533,
+    "7": 0.0029083516532069243,
+    "8": -0.0007883973921982887,
+    "9": -0.0009246607463932685,
+    "10": 0.002257212518228812
+   },
+   "varianceRatio": {
+    "5": 1.0138868364640412,
+    "20": 1.0738246143236385,
+    "30": 1.0906200350507338,
+    "60": 1.1131373546941046
+   },
+   "sigmaEffFromHorizonPpm": {
+    "5": 112.4197226772207,
+    "20": 115.69496117846526,
+    "30": 116.59622862269899,
+    "60": 117.79372232859832
+   },
+   "varianceRatio20": 1.0738246143236385,
+   "zeroReturnPct": 54.76149927496573,
+   "approxTickPpm": 81.36034496778866,
+   "absReturnPpm": {
+    "p50": 0,
+    "p99": 421.3719871901667,
+    "p999": 911.1617312071995,
+    "p9999": 1706.4846416382507,
+    "max": 3163.4446397188485
+   },
+   "meanPpm": 0.12037719109530713,
+   "gapMarginPpm": 50.65013207324862,
+   "maxJumpPpm": 20000,
+   "hourVolPpm": [
+    103.59,
+    115.15,
+    112.5,
+    101.34,
+    89.45,
+    89.84,
+    84.94,
+    87.43,
+    117.59,
+    117.78,
+    92.98,
+    117.55,
+    114.26,
+    140.19,
+    176.31,
+    137.15,
+    139.88,
+    115.57,
+    108.58,
+    98.76,
+    95,
+    97.12,
+    93.05,
+    83.46
+   ],
+   "quartileOfHourUTC": [
+    1,
+    2,
+    2,
+    1,
+    0,
+    0,
+    0,
+    0,
+    3,
+    3,
+    0,
+    2,
+    2,
+    3,
+    3,
+    3,
+    3,
+    2,
+    2,
+    1,
+    1,
+    1,
+    1,
+    0
+   ]
+  },
+  "DOGE": {
+   "pairId": 3,
+   "sigma1sPlainPpm": 173.70801827153306,
+   "sigma1sMadPpm": 0,
+   "sigma1sBipowerPpm": 141.47350385644862,
+   "acf1s": {
+    "1": 0.026214129598614886,
+    "2": -0.00023230543437737986,
+    "3": 0.007305083084387886,
+    "4": 0.005022405706448711,
+    "5": 0.004261999034115881,
+    "6": 0.006193795758841655,
+    "7": 0.0013810890951446986,
+    "8": 0.007210304692772171,
+    "9": -0.0002085141664820523,
+    "10": 0.0017482677693990408
+   },
+   "varianceRatio": {
+    "5": 1.0494263710824192,
+    "20": 1.083556884906894,
+    "30": 1.0845843349548947,
+    "60": 1.0983842127859287
+   },
+   "sigmaEffFromHorizonPpm": {
+    "5": 177.9491231802805,
+    "20": 180.81969139904606,
+    "30": 180.90539948841226,
+    "60": 182.05265073906696
+   },
+   "varianceRatio20": 1.083556884906894,
+   "zeroReturnPct": 57.227773194069435,
+   "approxTickPpm": 94.62528387581494,
+   "absReturnPpm": {
+    "p50": 0,
+    "p99": 616.5861679168216,
+    "p999": 1459.2453616844025,
+    "p9999": 3005.409737527609,
+    "max": 10739.984964021065
+   },
+   "meanPpm": 0.18899283481972828,
+   "gapMarginPpm": 82.42246334676696,
+   "maxJumpPpm": 40000,
+   "hourVolPpm": [
+    161.93,
+    177.06,
+    172.16,
+    163.67,
+    219.01,
+    136.71,
+    122.81,
+    129.15,
+    164.29,
+    174.67,
+    126.5,
+    132.66,
+    152.77,
+    186.21,
+    289.05,
+    244.55,
+    208.46,
+    195.35,
+    172.56,
+    150.84,
+    156.47,
+    151.56,
+    149.92,
+    123.41
+   ],
+   "quartileOfHourUTC": [
+    1,
+    2,
+    2,
+    2,
+    3,
+    0,
+    0,
+    0,
+    2,
+    2,
+    0,
+    0,
+    1,
+    3,
+    3,
+    3,
+    3,
+    3,
+    2,
+    1,
+    1,
+    1,
+    1,
+    0
+   ]
+  }
+ },
+ "durations": {
+  "scores": [
+   {
+    "D": 20,
+    "enabled": 1,
+    "meanTouchRate": 0.565301
+   },
+   {
+    "D": 30,
+    "enabled": 3,
+    "meanTouchRate": 0.6693250000000001
+   }
+  ],
+  "recommended": 30,
+  "perD": {
+   "20": {
+    "BNB": [
+     {
+      "tier": 1,
+      "label": "CRUISE",
+      "multiplierBps": 15000,
+      "targetPpm": 206,
+      "stopPpm": 394,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.271287,
+       "pSL": 0.109845,
+       "pTimeout": 0.618868,
+       "houseEdge": 0.057731,
+       "worstRegimeEdge": 0.044814,
+       "edgeLong": 0.058826,
+       "edgeShort": 0.056636,
+       "expectedPayout": 0.942269,
+       "meanResolveSec": 16.262524,
+       "momentumWorstEdge": 0.03845
+      },
+      "grid": {
+       "T": 205.032187,
+       "S": 394.185323,
+       "houseEdge": 0.056985,
+       "pTP": 0.272918,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.056572,
+         "edgeShort": 0.044814,
+         "pTP": 0.217857,
+         "pTimeout": 0.707179
+        },
+        "volQ2": {
+         "edgeLong": 0.052305,
+         "edgeShort": 0.0527,
+         "pTP": 0.244372,
+         "pTimeout": 0.666438
+        },
+        "volQ3": {
+         "edgeLong": 0.051804,
+         "edgeShort": 0.063636,
+         "pTP": 0.279603,
+         "pTimeout": 0.607804
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.071622,
+         "edgeShort": 0.062431,
+         "pTP": 0.349851,
+         "pTimeout": 0.488051
+        },
+        "weekday": {
+         "edgeLong": 0.062443,
+         "edgeShort": 0.056865,
+         "pTP": 0.295472,
+         "pTimeout": 0.582571
+        },
+        "weekend": {
+         "edgeLong": 0.047155,
+         "edgeShort": 0.053469,
+         "pTP": 0.216527,
+         "pTimeout": 0.704387
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 469539,
+        "houseEdge": 0.03845,
+        "pTP": 0.304277
+       },
+       "momentum:10": {
+        "n": 523930,
+        "houseEdge": 0.041965,
+        "pTP": 0.295068
+       },
+       "momentum:30": {
+        "n": 578311,
+        "houseEdge": 0.051413,
+        "pTP": 0.278971
+       },
+       "contrarian:5": {
+        "n": 469539,
+        "houseEdge": 0.082231,
+        "pTP": 0.276143
+       },
+       "contrarian:10": {
+        "n": 523930,
+        "houseEdge": 0.077251,
+        "pTP": 0.273724
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.03845,
+        "momentum:10": 0.041965,
+        "momentum:30": 0.051413
+       },
+       "3": {
+        "momentum:5": 0.043673,
+        "momentum:10": 0.04565,
+        "momentum:30": 0.053375
+       },
+       "4": {
+        "momentum:5": 0.047504,
+        "momentum:10": 0.048607,
+        "momentum:30": 0.054986
+       },
+       "6": {
+        "momentum:5": 0.052857,
+        "momentum:10": 0.052682,
+        "momentum:30": 0.057123
+       },
+       "10": {
+        "momentum:5": 0.057062,
+        "momentum:10": 0.056149,
+        "momentum:30": 0.058993
+       }
+      },
+      "disabledReason": "P(TP) band [40.0%, 55.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 27.3%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 205,
+       "stopPpm": 394,
+       "pTP": 0.272918,
+       "pSL": 0.109709,
+       "pTimeout": 0.617372,
+       "houseEdge": 0.056985,
+       "worstRegimeEdge": 0.044814
+      }
+     },
+     {
+      "tier": 2,
+      "label": "BOOST",
+      "multiplierBps": 20000,
+      "targetPpm": 206,
+      "stopPpm": 185,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.259209,
+       "pSL": 0.285759,
+       "pTimeout": 0.455032,
+       "houseEdge": 0.02631,
+       "worstRegimeEdge": 0.012837,
+       "edgeLong": 0.030365,
+       "edgeShort": 0.022255,
+       "expectedPayout": 0.97369,
+       "meanResolveSec": 14.191723,
+       "momentumWorstEdge": -0.010491
+      },
+      "grid": {
+       "T": 205.032187,
+       "S": 185.416528,
+       "houseEdge": 0.024879,
+       "pTP": 0.260773,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.035223,
+         "edgeShort": 0.012837,
+         "pTP": 0.212894,
+         "pTimeout": 0.551782
+        },
+        "volQ2": {
+         "edgeLong": 0.024087,
+         "edgeShort": 0.024824,
+         "pTP": 0.236085,
+         "pTimeout": 0.503757
+        },
+        "volQ3": {
+         "edgeLong": 0.019437,
+         "edgeShort": 0.030626,
+         "pTP": 0.267593,
+         "pTimeout": 0.439236
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.03679,
+         "edgeShort": 0.015206,
+         "pTP": 0.326528,
+         "pTimeout": 0.320102
+        },
+        "weekday": {
+         "edgeLong": 0.034047,
+         "edgeShort": 0.017412,
+         "pTP": 0.281014,
+         "pTimeout": 0.411531
+        },
+        "weekend": {
+         "edgeLong": 0.015976,
+         "edgeShort": 0.029527,
+         "pTP": 0.210163,
+         "pTimeout": 0.559217
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 469539,
+        "houseEdge": -0.010491,
+        "pTP": 0.29083
+       },
+       "momentum:10": {
+        "n": 523930,
+        "houseEdge": -0.00295,
+        "pTP": 0.28212
+       },
+       "momentum:30": {
+        "n": 578311,
+        "houseEdge": 0.015139,
+        "pTP": 0.266742
+       },
+       "contrarian:5": {
+        "n": 469539,
+        "houseEdge": 0.064395,
+        "pTP": 0.261329
+       },
+       "contrarian:10": {
+        "n": 523930,
+        "houseEdge": 0.056421,
+        "pTP": 0.260073
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": -0.010491,
+        "momentum:10": -0.00295,
+        "momentum:30": 0.015139
+       },
+       "3": {
+        "momentum:5": -0.001269,
+        "momentum:10": 0.003347,
+        "momentum:30": 0.018433
+       },
+       "4": {
+        "momentum:5": 0.005561,
+        "momentum:10": 0.008473,
+        "momentum:30": 0.021153
+       },
+       "6": {
+        "momentum:5": 0.015154,
+        "momentum:10": 0.015517,
+        "momentum:30": 0.024566
+       },
+       "10": {
+        "momentum:5": 0.021204,
+        "momentum:10": 0.021465,
+        "momentum:30": 0.027718
+       }
+      },
+      "disabledReason": "P(TP) band [30.0%, 45.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 26.1%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 205,
+       "stopPpm": 185,
+       "pTP": 0.260773,
+       "pSL": 0.285504,
+       "pTimeout": 0.453724,
+       "houseEdge": 0.024879,
+       "worstRegimeEdge": 0.012837
+      }
+     },
+     {
+      "tier": 3,
+      "label": "HYPER",
+      "multiplierBps": 30000,
+      "targetPpm": 533,
+      "stopPpm": 185,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.05806,
+       "pSL": 0.297971,
+       "pTimeout": 0.643969,
+       "houseEdge": 0.026211,
+       "worstRegimeEdge": 0.01112,
+       "edgeLong": 0.027528,
+       "edgeShort": 0.024894,
+       "expectedPayout": 0.973789,
+       "meanResolveSec": 16.393356,
+       "momentumWorstEdge": -0.013912
+      },
+      "grid": {
+       "T": 532.99269,
+       "S": 185.416528,
+       "houseEdge": 0.025987,
+       "pTP": 0.058062,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.039219,
+         "edgeShort": 0.019535,
+         "pTP": 0.033479,
+         "pTimeout": 0.726776
+        },
+        "volQ2": {
+         "edgeLong": 0.029572,
+         "edgeShort": 0.030876,
+         "pTP": 0.044243,
+         "pTimeout": 0.687401
+        },
+        "volQ3": {
+         "edgeLong": 0.013568,
+         "edgeShort": 0.037137,
+         "pTP": 0.059375,
+         "pTimeout": 0.635344
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.026871,
+         "edgeShort": 0.01112,
+         "pTP": 0.095158,
+         "pTimeout": 0.526707
+        },
+        "weekday": {
+         "edgeLong": 0.029641,
+         "edgeShort": 0.021918,
+         "pTP": 0.065803,
+         "pTimeout": 0.612007
+        },
+        "weekend": {
+         "edgeLong": 0.021472,
+         "edgeShort": 0.031542,
+         "pTP": 0.038708,
+         "pTimeout": 0.724204
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 469539,
+        "houseEdge": -0.013912,
+        "pTP": 0.069434
+       },
+       "momentum:10": {
+        "n": 523930,
+        "houseEdge": -0.006553,
+        "pTP": 0.066434
+       },
+       "momentum:30": {
+        "n": 578311,
+        "houseEdge": 0.01254,
+        "pTP": 0.061597
+       },
+       "contrarian:5": {
+        "n": 469539,
+        "houseEdge": 0.064454,
+        "pTP": 0.0611
+       },
+       "contrarian:10": {
+        "n": 523930,
+        "houseEdge": 0.057622,
+        "pTP": 0.058901
+       }
+      },
+      "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 5.8%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 533,
+       "stopPpm": 185,
+       "pTP": 0.058062,
+       "pSL": 0.297877,
+       "pTimeout": 0.644061,
+       "houseEdge": 0.025987,
+       "worstRegimeEdge": 0.01112
+      }
+     },
+     {
+      "tier": 4,
+      "label": "WARP",
+      "multiplierBps": 50000,
+      "targetPpm": 1192,
+      "stopPpm": 194,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.004985,
+       "pSL": 0.287723,
+       "pTimeout": 0.707292,
+       "houseEdge": 0.03318,
+       "worstRegimeEdge": 0.008113,
+       "edgeLong": 0.034577,
+       "edgeShort": 0.031783,
+       "expectedPayout": 0.96682,
+       "meanResolveSec": 16.964212,
+       "momentumWorstEdge": -0.007121
+      },
+      "grid": {
+       "T": 1191.54393,
+       "S": 194.977835,
+       "houseEdge": 0.031796,
+       "pTP": 0.004999,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.049408,
+         "edgeShort": 0.031908,
+         "pTP": 0.000949,
+         "pTimeout": 0.771941
+        },
+        "volQ2": {
+         "edgeLong": 0.03987,
+         "edgeShort": 0.040317,
+         "pTP": 0.002907,
+         "pTimeout": 0.74089
+        },
+        "volQ3": {
+         "edgeLong": 0.017808,
+         "edgeShort": 0.041412,
+         "pTP": 0.004871,
+         "pTimeout": 0.70255
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.025528,
+         "edgeShort": 0.008113,
+         "pTP": 0.011268,
+         "pTimeout": 0.620833
+        },
+        "weekday": {
+         "edgeLong": 0.032496,
+         "edgeShort": 0.026588,
+         "pTP": 0.005929,
+         "pTimeout": 0.685331
+        },
+        "weekend": {
+         "edgeLong": 0.0348,
+         "edgeShort": 0.040065,
+         "pTP": 0.002671,
+         "pTimeout": 0.768376
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 469539,
+        "houseEdge": -0.007121,
+        "pTP": 0.006496
+       },
+       "momentum:10": {
+        "n": 523930,
+        "houseEdge": 0.000547,
+        "pTP": 0.006136
+       },
+       "momentum:30": {
+        "n": 578311,
+        "houseEdge": 0.019341,
+        "pTP": 0.005838
+       },
+       "contrarian:5": {
+        "n": 469539,
+        "houseEdge": 0.06879,
+        "pTP": 0.005363
+       },
+       "contrarian:10": {
+        "n": 523930,
+        "houseEdge": 0.062827,
+        "pTP": 0.00497
+       }
+      },
+      "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 0.5%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 1192,
+       "stopPpm": 195,
+       "pTP": 0.004999,
+       "pSL": 0.285945,
+       "pTimeout": 0.709056,
+       "houseEdge": 0.031796,
+       "worstRegimeEdge": 0.008113
+      }
+     }
+    ],
+    "BTC": [
+     {
+      "tier": 1,
+      "label": "CRUISE",
+      "multiplierBps": 15000,
+      "targetPpm": 174,
+      "stopPpm": 333,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.226954,
+       "pSL": 0.100871,
+       "pTimeout": 0.672176,
+       "houseEdge": 0.060328,
+       "worstRegimeEdge": 0.038646,
+       "edgeLong": 0.059649,
+       "edgeShort": 0.061008,
+       "expectedPayout": 0.939672,
+       "meanResolveSec": 16.706463,
+       "momentumWorstEdge": 0.020903
+      },
+      "grid": {
+       "T": 173.470416,
+       "S": 333.506134,
+       "houseEdge": 0.059854,
+       "pTP": 0.227566,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.046661,
+         "edgeShort": 0.048198,
+         "pTP": 0.151567,
+         "pTimeout": 0.794858
+        },
+        "volQ2": {
+         "edgeLong": 0.050668,
+         "edgeShort": 0.058541,
+         "pTP": 0.195079,
+         "pTimeout": 0.730959
+        },
+        "volQ3": {
+         "edgeLong": 0.066036,
+         "edgeShort": 0.055531,
+         "pTP": 0.234272,
+         "pTimeout": 0.666171
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.073333,
+         "edgeShort": 0.079865,
+         "pTP": 0.329359,
+         "pTimeout": 0.495495
+        },
+        "weekday": {
+         "edgeLong": 0.067384,
+         "edgeShort": 0.068581,
+         "pTP": 0.270265,
+         "pTimeout": 0.605444
+        },
+        "weekend": {
+         "edgeLong": 0.038646,
+         "edgeShort": 0.040411,
+         "pTP": 0.120807,
+         "pTimeout": 0.837976
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 439656,
+        "houseEdge": 0.020903,
+        "pTP": 0.277139
+       },
+       "momentum:10": {
+        "n": 493905,
+        "houseEdge": 0.025907,
+        "pTP": 0.267479
+       },
+       "momentum:30": {
+        "n": 562869,
+        "houseEdge": 0.04059,
+        "pTP": 0.245004
+       },
+       "contrarian:5": {
+        "n": 439656,
+        "houseEdge": 0.108687,
+        "pTP": 0.226618
+       },
+       "contrarian:10": {
+        "n": 493905,
+        "houseEdge": 0.102413,
+        "pTP": 0.22739
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.020903,
+        "momentum:10": 0.025907,
+        "momentum:30": 0.04059
+       },
+       "3": {
+        "momentum:5": 0.028847,
+        "momentum:10": 0.031846,
+        "momentum:30": 0.043807
+       },
+       "4": {
+        "momentum:5": 0.035474,
+        "momentum:10": 0.036755,
+        "momentum:30": 0.046659
+       },
+       "6": {
+        "momentum:5": 0.04452,
+        "momentum:10": 0.043893,
+        "momentum:30": 0.050756
+       },
+       "10": {
+        "momentum:5": 0.052776,
+        "momentum:10": 0.051955,
+        "momentum:30": 0.055219
+       }
+      },
+      "disabledReason": "P(TP) band [40.0%, 55.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 22.8%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 173,
+       "stopPpm": 334,
+       "pTP": 0.227566,
+       "pSL": 0.100557,
+       "pTimeout": 0.671877,
+       "houseEdge": 0.059854,
+       "worstRegimeEdge": 0.038646
+      }
+     },
+     {
+      "tier": 2,
+      "label": "BOOST",
+      "multiplierBps": 20000,
+      "targetPpm": 174,
+      "stopPpm": 156,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.216719,
+       "pSL": 0.239732,
+       "pTimeout": 0.543549,
+       "houseEdge": 0.022287,
+       "worstRegimeEdge": 0.009371,
+       "edgeLong": 0.022055,
+       "edgeShort": 0.022519,
+       "expectedPayout": 0.977713,
+       "meanResolveSec": 15.07014,
+       "momentumWorstEdge": -0.054981
+      },
+      "grid": {
+       "T": 173.470416,
+       "S": 156.874307,
+       "houseEdge": 0.021001,
+       "pTP": 0.217424,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.01776,
+         "edgeShort": 0.021734,
+         "pTP": 0.149408,
+         "pTimeout": 0.68172
+        },
+        "volQ2": {
+         "edgeLong": 0.013422,
+         "edgeShort": 0.027726,
+         "pTP": 0.190317,
+         "pTimeout": 0.598056
+        },
+        "volQ3": {
+         "edgeLong": 0.032147,
+         "edgeShort": 0.009371,
+         "pTP": 0.22546,
+         "pTimeout": 0.528578
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.019773,
+         "edgeShort": 0.026078,
+         "pTP": 0.304521,
+         "pTimeout": 0.366791
+        },
+        "weekday": {
+         "edgeLong": 0.021988,
+         "edgeShort": 0.021874,
+         "pTP": 0.256956,
+         "pTimeout": 0.462728
+        },
+        "weekend": {
+         "edgeLong": 0.017744,
+         "edgeShort": 0.019609,
+         "pTP": 0.118581,
+         "pTimeout": 0.746475
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 439656,
+        "houseEdge": -0.054981,
+        "pTP": 0.265549
+       },
+       "momentum:10": {
+        "n": 493905,
+        "houseEdge": -0.045887,
+        "pTP": 0.256319
+       },
+       "momentum:30": {
+        "n": 562869,
+        "houseEdge": -0.018296,
+        "pTP": 0.234627
+       },
+       "contrarian:5": {
+        "n": 439656,
+        "houseEdge": 0.101108,
+        "pTP": 0.212446
+       },
+       "contrarian:10": {
+        "n": 493905,
+        "houseEdge": 0.091704,
+        "pTP": 0.214472
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": -0.054981,
+        "momentum:10": -0.045887,
+        "momentum:30": -0.018296
+       },
+       "3": {
+        "momentum:5": -0.041533,
+        "momentum:10": -0.035495,
+        "momentum:30": -0.012906
+       },
+       "4": {
+        "momentum:5": -0.030062,
+        "momentum:10": -0.026758,
+        "momentum:30": -0.008143
+       },
+       "6": {
+        "momentum:5": -0.014402,
+        "momentum:10": -0.014307,
+        "momentum:30": -0.001067
+       },
+       "10": {
+        "momentum:5": 0.000523,
+        "momentum:10": -0.000223,
+        "momentum:30": 0.007012
+       }
+      },
+      "disabledReason": "P(TP) band [30.0%, 45.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 21.7%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 173,
+       "stopPpm": 157,
+       "pTP": 0.217424,
+       "pSL": 0.238784,
+       "pTimeout": 0.543792,
+       "houseEdge": 0.021001,
+       "worstRegimeEdge": 0.009371
+      }
+     },
+     {
+      "tier": 3,
+      "label": "HYPER",
+      "multiplierBps": 30000,
+      "targetPpm": 475,
+      "stopPpm": 149,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.052121,
+       "pSL": 0.258321,
+       "pTimeout": 0.689558,
+       "houseEdge": 0.023123,
+       "worstRegimeEdge": 0.007528,
+       "edgeLong": 0.022772,
+       "edgeShort": 0.023475,
+       "expectedPayout": 0.976877,
+       "meanResolveSec": 16.786187,
+       "momentumWorstEdge": -0.056899
+      },
+      "grid": {
+       "T": 474.199868,
+       "S": 149.181517,
+       "houseEdge": 0.022506,
+       "pTP": 0.052336,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.026711,
+         "edgeShort": 0.028755,
+         "pTP": 0.022566,
+         "pTimeout": 0.799329
+        },
+        "volQ2": {
+         "edgeLong": 0.021007,
+         "edgeShort": 0.036145,
+         "pTP": 0.032774,
+         "pTimeout": 0.742176
+        },
+        "volQ3": {
+         "edgeLong": 0.033328,
+         "edgeShort": 0.010756,
+         "pTP": 0.049487,
+         "pTimeout": 0.687345
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.007528,
+         "edgeShort": 0.015818,
+         "pTP": 0.104521,
+         "pTimeout": 0.529862
+        },
+        "weekday": {
+         "edgeLong": 0.018997,
+         "edgeShort": 0.018979,
+         "pTP": 0.066188,
+         "pTimeout": 0.630272
+        },
+        "weekend": {
+         "edgeLong": 0.030011,
+         "edgeShort": 0.032594,
+         "pTP": 0.017702,
+         "pTimeout": 0.838228
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 439656,
+        "houseEdge": -0.056899,
+        "pTP": 0.066996
+       },
+       "momentum:10": {
+        "n": 493905,
+        "houseEdge": -0.046801,
+        "pTP": 0.06304
+       },
+       "momentum:30": {
+        "n": 562869,
+        "houseEdge": -0.016346,
+        "pTP": 0.056185
+       },
+       "contrarian:5": {
+        "n": 439656,
+        "houseEdge": 0.099438,
+        "pTP": 0.05707
+       },
+       "contrarian:10": {
+        "n": 493905,
+        "houseEdge": 0.090329,
+        "pTP": 0.055948
+       }
+      },
+      "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 5.2%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 474,
+       "stopPpm": 149,
+       "pTP": 0.052336,
+       "pSL": 0.257981,
+       "pTimeout": 0.689683,
+       "houseEdge": 0.022506,
+       "worstRegimeEdge": 0.007528
+      }
+     },
+     {
+      "tier": 4,
+      "label": "WARP",
+      "multiplierBps": 50000,
+      "targetPpm": 1061,
+      "stopPpm": 149,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.005575,
+       "pSL": 0.259594,
+       "pTimeout": 0.734831,
+       "houseEdge": 0.03396,
+       "worstRegimeEdge": 0.003337,
+       "edgeLong": 0.032777,
+       "edgeShort": 0.035144,
+       "expectedPayout": 0.96604,
+       "meanResolveSec": 17.167617,
+       "momentumWorstEdge": -0.045227
+      },
+      "grid": {
+       "T": 1060.1083,
+       "S": 149.181517,
+       "houseEdge": 0.033514,
+       "pTP": 0.005594,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.042876,
+         "edgeShort": 0.042969,
+         "pTP": 0.001134,
+         "pTimeout": 0.820698
+        },
+        "volQ2": {
+         "edgeLong": 0.038748,
+         "edgeShort": 0.053821,
+         "pTP": 0.001918,
+         "pTimeout": 0.772768
+        },
+        "volQ3": {
+         "edgeLong": 0.044307,
+         "edgeShort": 0.023348,
+         "pTP": 0.004666,
+         "pTimeout": 0.73129
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.003337,
+         "edgeShort": 0.018697,
+         "pTP": 0.014658,
+         "pTimeout": 0.615826
+        },
+        "weekday": {
+         "edgeLong": 0.027425,
+         "edgeShort": 0.030684,
+         "pTP": 0.007436,
+         "pTimeout": 0.687271
+        },
+        "weekend": {
+         "edgeLong": 0.044551,
+         "edgeShort": 0.044774,
+         "pTP": 0.000987,
+         "pTimeout": 0.854859
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 439656,
+        "houseEdge": -0.045227,
+        "pTP": 0.00799
+       },
+       "momentum:10": {
+        "n": 493905,
+        "houseEdge": -0.035337,
+        "pTP": 0.007483
+       },
+       "momentum:30": {
+        "n": 562869,
+        "houseEdge": -0.004819,
+        "pTP": 0.006746
+       },
+       "contrarian:5": {
+        "n": 439656,
+        "houseEdge": 0.106796,
+        "pTP": 0.006205
+       },
+       "contrarian:10": {
+        "n": 493905,
+        "houseEdge": 0.098847,
+        "pTP": 0.005714
+       }
+      },
+      "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 0.6%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 1060,
+       "stopPpm": 149,
+       "pTP": 0.005594,
+       "pSL": 0.259257,
+       "pTimeout": 0.735149,
+       "houseEdge": 0.033514,
+       "worstRegimeEdge": 0.003337
+      }
+     }
+    ],
+    "ETH": [
+     {
+      "tier": 1,
+      "label": "CRUISE",
+      "multiplierBps": 15000,
+      "targetPpm": 225,
+      "stopPpm": 431,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.283766,
+       "pSL": 0.124197,
+       "pTimeout": 0.592037,
+       "houseEdge": 0.059741,
+       "worstRegimeEdge": 0.046506,
+       "edgeLong": 0.061211,
+       "edgeShort": 0.058271,
+       "expectedPayout": 0.940259,
+       "meanResolveSec": 15.8161,
+       "momentumWorstEdge": 0.041211
+      },
+      "grid": {
+       "T": 224.374286,
+       "S": 431.37154,
+       "houseEdge": 0.059273,
+       "pTP": 0.284387,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.051428,
+         "edgeShort": 0.050517,
+         "pTP": 0.224937,
+         "pTimeout": 0.694987
+        },
+        "volQ2": {
+         "edgeLong": 0.046912,
+         "edgeShort": 0.061852,
+         "pTP": 0.242956,
+         "pTimeout": 0.66213
+        },
+        "volQ3": {
+         "edgeLong": 0.068418,
+         "edgeShort": 0.053725,
+         "pTP": 0.294739,
+         "pTimeout": 0.576703
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.076273,
+         "edgeShort": 0.065061,
+         "pTP": 0.374927,
+         "pTimeout": 0.432693
+        },
+        "weekday": {
+         "edgeLong": 0.066457,
+         "edgeShort": 0.061105,
+         "pTP": 0.322032,
+         "pTimeout": 0.532785
+        },
+        "weekend": {
+         "edgeLong": 0.046506,
+         "edgeShort": 0.049496,
+         "pTP": 0.190262,
+         "pTimeout": 0.738772
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 490304,
+        "houseEdge": 0.041211,
+        "pTP": 0.317939
+       },
+       "momentum:10": {
+        "n": 541633,
+        "houseEdge": 0.047053,
+        "pTP": 0.306324
+       },
+       "momentum:30": {
+        "n": 586596,
+        "houseEdge": 0.058541,
+        "pTP": 0.288597
+       },
+       "contrarian:5": {
+        "n": 490304,
+        "houseEdge": 0.083601,
+        "pTP": 0.290944
+       },
+       "contrarian:10": {
+        "n": 541633,
+        "houseEdge": 0.076101,
+        "pTP": 0.288756
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.041211,
+        "momentum:10": 0.047053,
+        "momentum:30": 0.058541
+       },
+       "3": {
+        "momentum:5": 0.047471,
+        "momentum:10": 0.051279,
+        "momentum:30": 0.060537
+       },
+       "4": {
+        "momentum:5": 0.052395,
+        "momentum:10": 0.054802,
+        "momentum:30": 0.062137
+       },
+       "6": {
+        "momentum:5": 0.05766,
+        "momentum:10": 0.058728,
+        "momentum:30": 0.063943
+       },
+       "10": {
+        "momentum:5": 0.061291,
+        "momentum:10": 0.061535,
+        "momentum:30": 0.064628
+       }
+      },
+      "disabledReason": "P(TP) band [40.0%, 55.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 28.4%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 224,
+       "stopPpm": 431,
+       "pTP": 0.284387,
+       "pSL": 0.12398,
+       "pTimeout": 0.591633,
+       "houseEdge": 0.059273,
+       "worstRegimeEdge": 0.046506
+      }
+     },
+     {
+      "tier": 2,
+      "label": "BOOST",
+      "multiplierBps": 20000,
+      "targetPpm": 261,
+      "stopPpm": 235,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.237135,
+       "pSL": 0.264218,
+       "pTimeout": 0.498647,
+       "houseEdge": 0.026713,
+       "worstRegimeEdge": 0.011216,
+       "edgeLong": 0.028984,
+       "edgeShort": 0.024441,
+       "expectedPayout": 0.973287,
+       "meanResolveSec": 14.646972,
+       "momentumWorstEdge": -0.008238
+      },
+      "grid": {
+       "T": 260.90565,
+       "S": 235.944514,
+       "houseEdge": 0.025828,
+       "pTP": 0.237331,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.02504,
+         "edgeShort": 0.024635,
+         "pTP": 0.186316,
+         "pTimeout": 0.603115
+        },
+        "volQ2": {
+         "edgeLong": 0.011216,
+         "edgeShort": 0.038712,
+         "pTP": 0.201637,
+         "pTimeout": 0.572315
+        },
+        "volQ3": {
+         "edgeLong": 0.039701,
+         "edgeShort": 0.012562,
+         "pTP": 0.246071,
+         "pTimeout": 0.480896
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.036322,
+         "edgeShort": 0.018438,
+         "pTP": 0.31531,
+         "pTimeout": 0.340951
+        },
+        "weekday": {
+         "edgeLong": 0.031377,
+         "edgeShort": 0.022605,
+         "pTP": 0.269418,
+         "pTimeout": 0.432734
+        },
+        "weekend": {
+         "edgeLong": 0.019798,
+         "edgeShort": 0.026042,
+         "pTP": 0.157104,
+         "pTimeout": 0.665821
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 490304,
+        "houseEdge": -0.008238,
+        "pTP": 0.266659
+       },
+       "momentum:10": {
+        "n": 541633,
+        "houseEdge": 0.002246,
+        "pTP": 0.256153
+       },
+       "momentum:30": {
+        "n": 586596,
+        "houseEdge": 0.022385,
+        "pTP": 0.240312
+       },
+       "contrarian:5": {
+        "n": 490304,
+        "houseEdge": 0.062789,
+        "pTP": 0.243143
+       },
+       "contrarian:10": {
+        "n": 541633,
+        "houseEdge": 0.051964,
+        "pTP": 0.241839
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": -0.008238,
+        "momentum:10": 0.002246,
+        "momentum:30": 0.022385
+       },
+       "3": {
+        "momentum:5": 0.001961,
+        "momentum:10": 0.009155,
+        "momentum:30": 0.025831
+       },
+       "4": {
+        "momentum:5": 0.009906,
+        "momentum:10": 0.014848,
+        "momentum:30": 0.028407
+       },
+       "6": {
+        "momentum:5": 0.018539,
+        "momentum:10": 0.021489,
+        "momentum:30": 0.031562
+       },
+       "10": {
+        "momentum:5": 0.024884,
+        "momentum:10": 0.026049,
+        "momentum:30": 0.032808
+       }
+      },
+      "disabledReason": "P(TP) band [30.0%, 45.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 23.7%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 261,
+       "stopPpm": 236,
+       "pTP": 0.237331,
+       "pSL": 0.263345,
+       "pTimeout": 0.499325,
+       "houseEdge": 0.025828,
+       "worstRegimeEdge": 0.011216
+      }
+     },
+     {
+      "tier": 3,
+      "label": "HYPER",
+      "multiplierBps": 30000,
+      "targetPpm": 645,
+      "stopPpm": 235,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.05761,
+       "pSL": 0.276816,
+       "pTimeout": 0.665573,
+       "houseEdge": 0.021516,
+       "worstRegimeEdge": 0.002327,
+       "edgeLong": 0.024115,
+       "edgeShort": 0.018916,
+       "expectedPayout": 0.978484,
+       "meanResolveSec": 16.599878,
+       "momentumWorstEdge": -0.01321
+      },
+      "grid": {
+       "T": 644.979471,
+       "S": 235.944514,
+       "houseEdge": 0.020659,
+       "pTP": 0.057636,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.029159,
+         "edgeShort": 0.02688,
+         "pTP": 0.027705,
+         "pTimeout": 0.758151
+        },
+        "volQ2": {
+         "edgeLong": 0.013044,
+         "edgeShort": 0.036042,
+         "pTP": 0.038224,
+         "pTimeout": 0.729223
+        },
+        "volQ3": {
+         "edgeLong": 0.029479,
+         "edgeShort": 0.007003,
+         "pTP": 0.059054,
+         "pTimeout": 0.655605
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.021333,
+         "edgeShort": 0.002327,
+         "pTP": 0.105566,
+         "pTimeout": 0.522774
+        },
+        "weekday": {
+         "edgeLong": 0.023918,
+         "edgeShort": 0.014939,
+         "pTP": 0.068633,
+         "pTimeout": 0.617838
+        },
+        "weekend": {
+         "edgeLong": 0.021593,
+         "edgeShort": 0.025877,
+         "pTP": 0.030139,
+         "pTimeout": 0.78797
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 490304,
+        "houseEdge": -0.01321,
+        "pTP": 0.06652
+       },
+       "momentum:10": {
+        "n": 541633,
+        "houseEdge": -0.002034,
+        "pTP": 0.06194
+       },
+       "momentum:30": {
+        "n": 586596,
+        "houseEdge": 0.019731,
+        "pTP": 0.057235
+       },
+       "contrarian:5": {
+        "n": 490304,
+        "houseEdge": 0.053894,
+        "pTP": 0.064017
+       },
+       "contrarian:10": {
+        "n": 541633,
+        "houseEdge": 0.04345,
+        "pTP": 0.062542
+       }
+      },
+      "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 5.8%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 645,
+       "stopPpm": 236,
+       "pTP": 0.057636,
+       "pSL": 0.275921,
+       "pTimeout": 0.666443,
+       "houseEdge": 0.020659,
+       "worstRegimeEdge": 0.002327
+      }
+     },
+     {
+      "tier": 4,
+      "label": "WARP",
+      "multiplierBps": 50000,
+      "targetPpm": 1442,
+      "stopPpm": 248,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.005965,
+       "pSL": 0.265654,
+       "pTimeout": 0.728381,
+       "houseEdge": 0.026737,
+       "worstRegimeEdge": 0.001891,
+       "edgeLong": 0.028339,
+       "edgeShort": 0.025136,
+       "expectedPayout": 0.973263,
+       "meanResolveSec": 17.191878,
+       "momentumWorstEdge": -0.006466
+      },
+      "grid": {
+       "T": 1441.898525,
+       "S": 248.11138,
+       "houseEdge": 0.026612,
+       "pTP": 0.005967,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.041554,
+         "edgeShort": 0.039368,
+         "pTP": 0.001405,
+         "pTimeout": 0.795536
+        },
+        "volQ2": {
+         "edgeLong": 0.02327,
+         "edgeShort": 0.046976,
+         "pTP": 0.002533,
+         "pTimeout": 0.775668
+        },
+        "volQ3": {
+         "edgeLong": 0.035568,
+         "edgeShort": 0.011828,
+         "pTP": 0.006253,
+         "pTimeout": 0.719921
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.012441,
+         "edgeShort": 0.001891,
+         "pTP": 0.013679,
+         "pTimeout": 0.62287
+        },
+        "weekday": {
+         "edgeLong": 0.027018,
+         "edgeShort": 0.022122,
+         "pTP": 0.007177,
+         "pTimeout": 0.69019
+        },
+        "weekend": {
+         "edgeLong": 0.031186,
+         "edgeShort": 0.032253,
+         "pTP": 0.002943,
+         "pTimeout": 0.824294
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 490304,
+        "houseEdge": -0.006466,
+        "pTP": 0.007351
+       },
+       "momentum:10": {
+        "n": 541633,
+        "houseEdge": 0.00471,
+        "pTP": 0.006927
+       },
+       "momentum:30": {
+        "n": 586596,
+        "houseEdge": 0.025486,
+        "pTP": 0.00656
+       },
+       "contrarian:5": {
+        "n": 490304,
+        "houseEdge": 0.055156,
+        "pTP": 0.006718
+       },
+       "contrarian:10": {
+        "n": 541633,
+        "houseEdge": 0.045954,
+        "pTP": 0.006215
+       }
+      },
+      "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 0.6%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 1442,
+       "stopPpm": 248,
+       "pTP": 0.005967,
+       "pSL": 0.26553,
+       "pTimeout": 0.728502,
+       "houseEdge": 0.026612,
+       "worstRegimeEdge": 0.001891
+      }
+     }
+    ],
+    "SOL": [
+     {
+      "tier": 1,
+      "label": "CRUISE",
+      "multiplierBps": 15000,
+      "targetPpm": 241,
+      "stopPpm": 461,
+      "feeBps": 100,
+      "enabled": true,
+      "stats": {
+       "pTP": 0.399987,
+       "pSL": 0.165314,
+       "pTimeout": 0.434699,
+       "houseEdge": 0.051223,
+       "worstRegimeEdge": 0.041208,
+       "edgeLong": 0.05401,
+       "edgeShort": 0.048435,
+       "expectedPayout": 0.948777,
+       "meanResolveSec": 13.787962,
+       "momentumWorstEdge": 0.036965
+      },
+      "grid": {
+       "T": 240.232256,
+       "S": 461.859333,
+       "houseEdge": 0.050691,
+       "pTP": 0.400021,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.047306,
+         "edgeShort": 0.041208,
+         "pTP": 0.343671,
+         "pTimeout": 0.540728
+        },
+        "volQ2": {
+         "edgeLong": 0.045853,
+         "edgeShort": 0.057233,
+         "pTP": 0.373436,
+         "pTimeout": 0.481703
+        },
+        "volQ3": {
+         "edgeLong": 0.060301,
+         "edgeShort": 0.044997,
+         "pTP": 0.421739,
+         "pTimeout": 0.402388
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.060498,
+         "edgeShort": 0.048135,
+         "pTP": 0.461248,
+         "pTimeout": 0.317443
+        },
+        "weekday": {
+         "edgeLong": 0.054885,
+         "edgeShort": 0.049276,
+         "pTP": 0.437872,
+         "pTimeout": 0.373028
+        },
+        "weekend": {
+         "edgeLong": 0.049999,
+         "edgeShort": 0.044436,
+         "pTP": 0.305385,
+         "pTimeout": 0.591941
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 443665,
+        "houseEdge": 0.036965,
+        "pTP": 0.427347
+       },
+       "momentum:10": {
+        "n": 497572,
+        "houseEdge": 0.039859,
+        "pTP": 0.419995
+       },
+       "momentum:30": {
+        "n": 553216,
+        "houseEdge": 0.043251,
+        "pTP": 0.410601
+       },
+       "contrarian:5": {
+        "n": 443665,
+        "houseEdge": 0.066882,
+        "pTP": 0.404995
+       },
+       "contrarian:10": {
+        "n": 497572,
+        "houseEdge": 0.063482,
+        "pTP": 0.403907
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.036965,
+        "momentum:10": 0.039859,
+        "momentum:30": 0.043251
+       },
+       "3": {
+        "momentum:5": 0.041472,
+        "momentum:10": 0.042751,
+        "momentum:30": 0.045069
+       },
+       "4": {
+        "momentum:5": 0.044891,
+        "momentum:10": 0.045013,
+        "momentum:30": 0.04627
+       },
+       "6": {
+        "momentum:5": 0.049504,
+        "momentum:10": 0.047977,
+        "momentum:30": 0.048167
+       },
+       "10": {
+        "momentum:5": 0.050555,
+        "momentum:10": 0.048898,
+        "momentum:30": 0.049841
+       }
+      }
+     },
+     {
+      "tier": 2,
+      "label": "BOOST",
+      "multiplierBps": 20000,
+      "targetPpm": 398,
+      "stopPpm": 359,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.229486,
+       "pSL": 0.242391,
+       "pTimeout": 0.528123,
+       "houseEdge": 0.020738,
+       "worstRegimeEdge": 0.009885,
+       "edgeLong": 0.022566,
+       "edgeShort": 0.018911,
+       "expectedPayout": 0.979262,
+       "meanResolveSec": 15.321747,
+       "momentumWorstEdge": 0.000616
+      },
+      "grid": {
+       "T": 397.19093,
+       "S": 359.191228,
+       "houseEdge": 0.020353,
+       "pTP": 0.229512,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.024876,
+         "edgeShort": 0.020953,
+         "pTP": 0.17,
+         "pTimeout": 0.647087
+        },
+        "volQ2": {
+         "edgeLong": 0.013423,
+         "edgeShort": 0.031732,
+         "pTP": 0.206194,
+         "pTimeout": 0.572232
+        },
+        "volQ3": {
+         "edgeLong": 0.029247,
+         "edgeShort": 0.011585,
+         "pTP": 0.244739,
+         "pTimeout": 0.497996
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.021125,
+         "edgeShort": 0.009885,
+         "pTP": 0.297123,
+         "pTimeout": 0.396157
+        },
+        "weekday": {
+         "edgeLong": 0.015753,
+         "edgeShort": 0.013263,
+         "pTP": 0.262846,
+         "pTimeout": 0.473477
+        },
+        "weekend": {
+         "edgeLong": 0.038207,
+         "edgeShort": 0.03173,
+         "pTP": 0.146166,
+         "pTimeout": 0.665627
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 443665,
+        "houseEdge": 0.000616,
+        "pTP": 0.251721
+       },
+       "momentum:10": {
+        "n": 497572,
+        "houseEdge": 0.004929,
+        "pTP": 0.245285
+       },
+       "momentum:30": {
+        "n": 553216,
+        "houseEdge": 0.009977,
+        "pTP": 0.236318
+       },
+       "contrarian:5": {
+        "n": 443665,
+        "houseEdge": 0.039568,
+        "pTP": 0.237066
+       },
+       "contrarian:10": {
+        "n": 497572,
+        "houseEdge": 0.035683,
+        "pTP": 0.235037
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.000616,
+        "momentum:10": 0.004929,
+        "momentum:30": 0.009977
+       },
+       "3": {
+        "momentum:5": 0.006429,
+        "momentum:10": 0.008423,
+        "momentum:30": 0.012352
+       },
+       "4": {
+        "momentum:5": 0.01105,
+        "momentum:10": 0.011443,
+        "momentum:30": 0.013785
+       },
+       "6": {
+        "momentum:5": 0.016834,
+        "momentum:10": 0.015335,
+        "momentum:30": 0.016091
+       },
+       "10": {
+        "momentum:5": 0.017558,
+        "momentum:10": 0.015842,
+        "momentum:30": 0.018264
+       }
+      },
+      "disabledReason": "P(TP) band [30.0%, 45.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 23.0%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 397,
+       "stopPpm": 359,
+       "pTP": 0.229512,
+       "pSL": 0.242116,
+       "pTimeout": 0.528372,
+       "houseEdge": 0.020353,
+       "worstRegimeEdge": 0.009885
+      }
+     },
+     {
+      "tier": 3,
+      "label": "HYPER",
+      "multiplierBps": 30000,
+      "targetPpm": 934,
+      "stopPpm": 359,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.046885,
+       "pSL": 0.250879,
+       "pTimeout": 0.702236,
+       "houseEdge": 0.021723,
+       "worstRegimeEdge": 0.005604,
+       "edgeLong": 0.020881,
+       "edgeShort": 0.022565,
+       "expectedPayout": 0.978277,
+       "meanResolveSec": 17.179468,
+       "momentumWorstEdge": 0.00051
+      },
+      "grid": {
+       "T": 933.737776,
+       "S": 359.191228,
+       "houseEdge": 0.021431,
+       "pTP": 0.046948,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.035437,
+         "edgeShort": 0.033746,
+         "pTP": 0.019365,
+         "pTimeout": 0.795595
+        },
+        "volQ2": {
+         "edgeLong": 0.015211,
+         "edgeShort": 0.038192,
+         "pTP": 0.032437,
+         "pTimeout": 0.741554
+        },
+        "volQ3": {
+         "edgeLong": 0.026043,
+         "edgeShort": 0.010554,
+         "pTP": 0.049044,
+         "pTimeout": 0.685771
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.005604,
+         "edgeShort": 0.006657,
+         "pTP": 0.086949,
+         "pTimeout": 0.586877
+        },
+        "weekday": {
+         "edgeLong": 0.011762,
+         "edgeShort": 0.016312,
+         "pTP": 0.057023,
+         "pTimeout": 0.668493
+        },
+        "weekend": {
+         "edgeLong": 0.042606,
+         "edgeShort": 0.037231,
+         "pTP": 0.021756,
+         "pTimeout": 0.787363
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 443665,
+        "houseEdge": 0.00051,
+        "pTP": 0.054656
+       },
+       "momentum:10": {
+        "n": 497572,
+        "houseEdge": 0.003406,
+        "pTP": 0.052073
+       },
+       "momentum:30": {
+        "n": 553216,
+        "houseEdge": 0.010236,
+        "pTP": 0.048482
+       },
+       "contrarian:5": {
+        "n": 443665,
+        "houseEdge": 0.039024,
+        "pTP": 0.051652
+       },
+       "contrarian:10": {
+        "n": 497572,
+        "houseEdge": 0.036883,
+        "pTP": 0.049876
+       }
+      },
+      "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 4.7%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 934,
+       "stopPpm": 359,
+       "pTP": 0.046948,
+       "pSL": 0.250599,
+       "pTimeout": 0.702453,
+       "houseEdge": 0.021431,
+       "worstRegimeEdge": 0.005604
+      }
+     },
+     {
+      "tier": 4,
+      "label": "WARP",
+      "multiplierBps": 50000,
+      "targetPpm": 1986,
+      "stopPpm": 359,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.004345,
+       "pSL": 0.251663,
+       "pTimeout": 0.743991,
+       "houseEdge": 0.027386,
+       "worstRegimeEdge": 0.002481,
+       "edgeLong": 0.02658,
+       "edgeShort": 0.028192,
+       "expectedPayout": 0.972614,
+       "meanResolveSec": 17.506913,
+       "momentumWorstEdge": 0.005292
+      },
+      "grid": {
+       "T": 1985.07507,
+       "S": 359.191228,
+       "houseEdge": 0.027006,
+       "pTP": 0.004364,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.045813,
+         "edgeShort": 0.044216,
+         "pTP": 0.000847,
+         "pTimeout": 0.814094
+        },
+        "volQ2": {
+         "edgeLong": 0.024752,
+         "edgeShort": 0.045121,
+         "pTP": 0.001941,
+         "pTimeout": 0.771822
+        },
+        "volQ3": {
+         "edgeLong": 0.031775,
+         "edgeShort": 0.014026,
+         "pTP": 0.004772,
+         "pTimeout": 0.729269
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.002481,
+         "edgeShort": 0.007862,
+         "pTP": 0.009895,
+         "pTimeout": 0.661814
+        },
+        "weekday": {
+         "edgeLong": 0.016107,
+         "edgeShort": 0.021942,
+         "pTP": 0.005375,
+         "pTimeout": 0.719131
+        },
+        "weekend": {
+         "edgeLong": 0.051457,
+         "edgeShort": 0.04247,
+         "pTP": 0.001835,
+         "pTimeout": 0.807064
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 443665,
+        "houseEdge": 0.005292,
+        "pTP": 0.005482
+       },
+       "momentum:10": {
+        "n": 497572,
+        "houseEdge": 0.00855,
+        "pTP": 0.005157
+       },
+       "momentum:30": {
+        "n": 553216,
+        "houseEdge": 0.016325,
+        "pTP": 0.004984
+       },
+       "contrarian:5": {
+        "n": 443665,
+        "houseEdge": 0.043051,
+        "pTP": 0.00504
+       },
+       "contrarian:10": {
+        "n": 497572,
+        "houseEdge": 0.041803,
+        "pTP": 0.004604
+       }
+      },
+      "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 0.4%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 1985,
+       "stopPpm": 359,
+       "pTP": 0.004364,
+       "pSL": 0.251384,
+       "pTimeout": 0.744252,
+       "houseEdge": 0.027006,
+       "worstRegimeEdge": 0.002481
+      }
+     }
+    ],
+    "DOGE": [
+     {
+      "tier": 1,
+      "label": "CRUISE",
+      "multiplierBps": 15000,
+      "targetPpm": 372,
+      "stopPpm": 714,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.362513,
+       "pSL": 0.158617,
+       "pTimeout": 0.47887,
+       "houseEdge": 0.055429,
+       "worstRegimeEdge": 0.044916,
+       "edgeLong": 0.0552,
+       "edgeShort": 0.055658,
+       "expectedPayout": 0.944571,
+       "meanResolveSec": 14.366691,
+       "momentumWorstEdge": 0.049918
+      },
+      "grid": {
+       "T": 371.757318,
+       "S": 714.723286,
+       "houseEdge": 0.05514,
+       "pTP": 0.362552,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.046568,
+         "edgeShort": 0.045463,
+         "pTP": 0.301111,
+         "pTimeout": 0.588165
+        },
+        "volQ2": {
+         "edgeLong": 0.044916,
+         "edgeShort": 0.065585,
+         "pTP": 0.344967,
+         "pTimeout": 0.514745
+        },
+        "volQ3": {
+         "edgeLong": 0.059495,
+         "edgeShort": 0.051937,
+         "pTP": 0.372847,
+         "pTimeout": 0.462942
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.068704,
+         "edgeShort": 0.05845,
+         "pTP": 0.431283,
+         "pTimeout": 0.350771
+        },
+        "weekday": {
+         "edgeLong": 0.058327,
+         "edgeShort": 0.058565,
+         "pTP": 0.415773,
+         "pTimeout": 0.392639
+        },
+        "weekend": {
+         "edgeLong": 0.046404,
+         "edgeShort": 0.047343,
+         "pTP": 0.229483,
+         "pTimeout": 0.695474
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 467264,
+        "houseEdge": 0.049918,
+        "pTP": 0.388956
+       },
+       "momentum:10": {
+        "n": 518237,
+        "houseEdge": 0.052065,
+        "pTP": 0.378009
+       },
+       "momentum:30": {
+        "n": 561896,
+        "houseEdge": 0.055903,
+        "pTP": 0.367707
+       },
+       "contrarian:5": {
+        "n": 467264,
+        "houseEdge": 0.064843,
+        "pTP": 0.376798
+       },
+       "contrarian:10": {
+        "n": 518237,
+        "houseEdge": 0.061126,
+        "pTP": 0.371926
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.049918,
+        "momentum:10": 0.052065,
+        "momentum:30": 0.055903
+       },
+       "3": {
+        "momentum:5": 0.051783,
+        "momentum:10": 0.054077,
+        "momentum:30": 0.056759
+       },
+       "4": {
+        "momentum:5": 0.054024,
+        "momentum:10": 0.055794,
+        "momentum:30": 0.057511
+       },
+       "6": {
+        "momentum:5": 0.058059,
+        "momentum:10": 0.057961,
+        "momentum:30": 0.058407
+       },
+       "10": {
+        "momentum:5": 0.06083,
+        "momentum:10": 0.058196,
+        "momentum:30": 0.058269
+       }
+      },
+      "disabledReason": "P(TP) band [40.0%, 55.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 36.3%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 372,
+       "stopPpm": 715,
+       "pTP": 0.362552,
+       "pSL": 0.158292,
+       "pTimeout": 0.479156,
+       "houseEdge": 0.05514,
+       "worstRegimeEdge": 0.044916
+      }
+     },
+     {
+      "tier": 2,
+      "label": "BOOST",
+      "multiplierBps": 20000,
+      "targetPpm": 615,
+      "stopPpm": 584,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.207986,
+       "pSL": 0.229547,
+       "pTimeout": 0.562467,
+       "houseEdge": 0.021718,
+       "worstRegimeEdge": 0.008058,
+       "edgeLong": 0.021112,
+       "edgeShort": 0.022324,
+       "expectedPayout": 0.978282,
+       "meanResolveSec": 15.659535,
+       "momentumWorstEdge": 0.012233
+      },
+      "grid": {
+       "T": 614.649497,
+       "S": 584.508364,
+       "houseEdge": 0.021317,
+       "pTP": 0.208231,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.023287,
+         "edgeShort": 0.021861,
+         "pTP": 0.150794,
+         "pTimeout": 0.675152
+        },
+        "volQ2": {
+         "edgeLong": 0.008058,
+         "edgeShort": 0.038119,
+         "pTP": 0.185225,
+         "pTimeout": 0.606528
+        },
+        "volQ3": {
+         "edgeLong": 0.027049,
+         "edgeShort": 0.015619,
+         "pTP": 0.216255,
+         "pTimeout": 0.546845
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.02441,
+         "edgeShort": 0.012133,
+         "pTP": 0.280651,
+         "pTimeout": 0.421257
+        },
+        "weekday": {
+         "edgeLong": 0.022235,
+         "edgeShort": 0.023194,
+         "pTP": 0.248369,
+         "pTimeout": 0.479238
+        },
+        "weekend": {
+         "edgeLong": 0.016866,
+         "edgeShort": 0.018782,
+         "pTP": 0.107874,
+         "pTimeout": 0.770488
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 467264,
+        "houseEdge": 0.012233,
+        "pTP": 0.229506
+       },
+       "momentum:10": {
+        "n": 518237,
+        "houseEdge": 0.016005,
+        "pTP": 0.220615
+       },
+       "momentum:30": {
+        "n": 561896,
+        "houseEdge": 0.021409,
+        "pTP": 0.212502
+       },
+       "contrarian:5": {
+        "n": 467264,
+        "houseEdge": 0.032122,
+        "pTP": 0.220869
+       },
+       "contrarian:10": {
+        "n": 518237,
+        "houseEdge": 0.027946,
+        "pTP": 0.215924
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.012233,
+        "momentum:10": 0.016005,
+        "momentum:30": 0.021409
+       },
+       "3": {
+        "momentum:5": 0.014746,
+        "momentum:10": 0.018592,
+        "momentum:30": 0.022468
+       },
+       "4": {
+        "momentum:5": 0.0177,
+        "momentum:10": 0.02126,
+        "momentum:30": 0.023206
+       },
+       "6": {
+        "momentum:5": 0.02347,
+        "momentum:10": 0.023937,
+        "momentum:30": 0.024546
+       },
+       "10": {
+        "momentum:5": 0.02692,
+        "momentum:10": 0.023821,
+        "momentum:30": 0.024174
+       }
+      },
+      "disabledReason": "P(TP) band [30.0%, 45.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 20.8%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 615,
+       "stopPpm": 585,
+       "pTP": 0.208231,
+       "pSL": 0.229323,
+       "pTimeout": 0.562446,
+       "houseEdge": 0.021317,
+       "worstRegimeEdge": 0.008058
+      }
+     },
+     {
+      "tier": 3,
+      "label": "HYPER",
+      "multiplierBps": 30000,
+      "targetPpm": 1445,
+      "stopPpm": 584,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.045597,
+       "pSL": 0.238392,
+       "pTimeout": 0.716012,
+       "houseEdge": 0.025079,
+       "worstRegimeEdge": 0.009449,
+       "edgeLong": 0.022554,
+       "edgeShort": 0.027603,
+       "expectedPayout": 0.974921,
+       "meanResolveSec": 17.289746,
+       "momentumWorstEdge": 0.015906
+      },
+      "grid": {
+       "T": 1444.951057,
+       "S": 584.508364,
+       "houseEdge": 0.024899,
+       "pTP": 0.045598,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.032982,
+         "edgeShort": 0.032732,
+         "pTP": 0.022864,
+         "pTimeout": 0.800218
+        },
+        "volQ2": {
+         "edgeLong": 0.009449,
+         "edgeShort": 0.040511,
+         "pTP": 0.036733,
+         "pTimeout": 0.74954
+        },
+        "volQ3": {
+         "edgeLong": 0.02191,
+         "edgeShort": 0.020942,
+         "pTP": 0.047371,
+         "pTimeout": 0.707283
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.025142,
+         "edgeShort": 0.01552,
+         "pTP": 0.075423,
+         "pTimeout": 0.607761
+        },
+        "weekday": {
+         "edgeLong": 0.018876,
+         "edgeShort": 0.025998,
+         "pTP": 0.058146,
+         "pTimeout": 0.657567
+        },
+        "weekend": {
+         "edgeLong": 0.031107,
+         "edgeShort": 0.030998,
+         "pTP": 0.014223,
+         "pTimeout": 0.862802
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 467264,
+        "houseEdge": 0.015906,
+        "pTP": 0.052191
+       },
+       "momentum:10": {
+        "n": 518237,
+        "houseEdge": 0.019789,
+        "pTP": 0.049088
+       },
+       "momentum:30": {
+        "n": 561896,
+        "houseEdge": 0.026335,
+        "pTP": 0.045871
+       },
+       "contrarian:5": {
+        "n": 467264,
+        "houseEdge": 0.031396,
+        "pTP": 0.051727
+       },
+       "contrarian:10": {
+        "n": 518237,
+        "houseEdge": 0.029117,
+        "pTP": 0.04945
+       }
+      },
+      "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 4.6%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 1445,
+       "stopPpm": 585,
+       "pTP": 0.045598,
+       "pSL": 0.238201,
+       "pTimeout": 0.716201,
+       "houseEdge": 0.024899,
+       "worstRegimeEdge": 0.009449
+      }
+     },
+     {
+      "tier": 4,
+      "label": "WARP",
+      "multiplierBps": 50000,
+      "targetPpm": 3072,
+      "stopPpm": 584,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.004757,
+       "pSL": 0.239319,
+       "pTimeout": 0.755924,
+       "houseEdge": 0.0306,
+       "worstRegimeEdge": 0.016545,
+       "edgeLong": 0.028116,
+       "edgeShort": 0.033083,
+       "expectedPayout": 0.9694,
+       "meanResolveSec": 17.612961,
+       "momentumWorstEdge": 0.021037
+      },
+      "grid": {
+       "T": 3071.886341,
+       "S": 584.508364,
+       "houseEdge": 0.030415,
+       "pTP": 0.004758,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.041451,
+         "edgeShort": 0.042871,
+         "pTP": 0.001032,
+         "pTimeout": 0.821948
+        },
+        "volQ2": {
+         "edgeLong": 0.018874,
+         "edgeShort": 0.045655,
+         "pTP": 0.003684,
+         "pTimeout": 0.781951
+        },
+        "volQ3": {
+         "edgeLong": 0.025912,
+         "edgeShort": 0.026543,
+         "pTP": 0.004478,
+         "pTimeout": 0.749312
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.025466,
+         "edgeShort": 0.016545,
+         "pTP": 0.009838,
+         "pTimeout": 0.67124
+        },
+        "weekday": {
+         "edgeLong": 0.022878,
+         "edgeShort": 0.030737,
+         "pTP": 0.00626,
+         "pTimeout": 0.708177
+        },
+        "weekend": {
+         "edgeLong": 0.040546,
+         "edgeShort": 0.038321,
+         "pTP": 0.001001,
+         "pTimeout": 0.875967
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 467264,
+        "houseEdge": 0.021037,
+        "pTP": 0.005815
+       },
+       "momentum:10": {
+        "n": 518237,
+        "houseEdge": 0.025314,
+        "pTP": 0.005196
+       },
+       "momentum:30": {
+        "n": 561896,
+        "houseEdge": 0.032449,
+        "pTP": 0.005156
+       },
+       "contrarian:5": {
+        "n": 467264,
+        "houseEdge": 0.035443,
+        "pTP": 0.005453
+       },
+       "contrarian:10": {
+        "n": 518237,
+        "houseEdge": 0.033834,
+        "pTP": 0.005326
+       }
+      },
+      "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 0.5%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 3072,
+       "stopPpm": 585,
+       "pTP": 0.004758,
+       "pSL": 0.239129,
+       "pTimeout": 0.756113,
+       "houseEdge": 0.030415,
+       "worstRegimeEdge": 0.016545
+      }
+     }
+    ]
+   },
+   "30": {
+    "BNB": [
+     {
+      "tier": 1,
+      "label": "CRUISE",
+      "multiplierBps": 15000,
+      "targetPpm": 227,
+      "stopPpm": 435,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.322357,
+       "pSL": 0.139107,
+       "pTimeout": 0.538535,
+       "houseEdge": 0.059889,
+       "worstRegimeEdge": 0.044701,
+       "edgeLong": 0.062162,
+       "edgeShort": 0.057615,
+       "expectedPayout": 0.940111,
+       "meanResolveSec": 22.789062,
+       "momentumWorstEdge": 0.042726
+      },
+      "grid": {
+       "T": 226.723035,
+       "S": 435.887135,
+       "houseEdge": 0.059385,
+       "pTP": 0.322583,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.061151,
+         "edgeShort": 0.044701,
+         "pTP": 0.266736,
+         "pTimeout": 0.633482
+        },
+        "volQ2": {
+         "edgeLong": 0.058066,
+         "edgeShort": 0.05447,
+         "pTP": 0.293833,
+         "pTimeout": 0.590741
+        },
+        "volQ3": {
+         "edgeLong": 0.052251,
+         "edgeShort": 0.067281,
+         "pTP": 0.329653,
+         "pTimeout": 0.527897
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.075123,
+         "edgeShort": 0.062038,
+         "pTP": 0.400126,
+         "pTimeout": 0.402639
+        },
+        "weekday": {
+         "edgeLong": 0.06495,
+         "edgeShort": 0.056747,
+         "pTP": 0.34784,
+         "pTimeout": 0.49989
+        },
+        "weekend": {
+         "edgeLong": 0.053388,
+         "edgeShort": 0.058061,
+         "pTP": 0.259429,
+         "pTimeout": 0.63573
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 469532,
+        "houseEdge": 0.042726,
+        "pTP": 0.355756
+       },
+       "momentum:10": {
+        "n": 523920,
+        "houseEdge": 0.045873,
+        "pTP": 0.346169
+       },
+       "momentum:30": {
+        "n": 578301,
+        "houseEdge": 0.054708,
+        "pTP": 0.329289
+       },
+       "contrarian:5": {
+        "n": 469532,
+        "houseEdge": 0.08153,
+        "pTP": 0.329332
+       },
+       "contrarian:10": {
+        "n": 523920,
+        "houseEdge": 0.077152,
+        "pTP": 0.327042
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.042726,
+        "momentum:10": 0.045873,
+        "momentum:30": 0.054708
+       },
+       "3": {
+        "momentum:5": 0.047435,
+        "momentum:10": 0.049328,
+        "momentum:30": 0.056487
+       },
+       "4": {
+        "momentum:5": 0.050956,
+        "momentum:10": 0.052309,
+        "momentum:30": 0.057964
+       },
+       "6": {
+        "momentum:5": 0.055815,
+        "momentum:10": 0.056252,
+        "momentum:30": 0.059878
+       },
+       "10": {
+        "momentum:5": 0.060192,
+        "momentum:10": 0.060023,
+        "momentum:30": 0.061899
+       }
+      },
+      "disabledReason": "P(TP) band [40.0%, 55.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 32.3%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 227,
+       "stopPpm": 436,
+       "pTP": 0.322583,
+       "pSL": 0.138721,
+       "pTimeout": 0.538697,
+       "houseEdge": 0.059385,
+       "worstRegimeEdge": 0.044701
+      }
+     },
+     {
+      "tier": 2,
+      "label": "BOOST",
+      "multiplierBps": 20000,
+      "targetPpm": 216,
+      "stopPpm": 185,
+      "feeBps": 100,
+      "enabled": true,
+      "stats": {
+       "pTP": 0.311346,
+       "pSL": 0.353863,
+       "pTimeout": 0.334792,
+       "houseEdge": 0.039104,
+       "worstRegimeEdge": 0.022166,
+       "edgeLong": 0.045715,
+       "edgeShort": 0.032493,
+       "expectedPayout": 0.960896,
+       "meanResolveSec": 18.355026,
+       "momentumWorstEdge": 0.00542
+      },
+      "grid": {
+       "T": 215.605009,
+       "S": 185.416528,
+       "houseEdge": 0.038242,
+       "pTP": 0.312133,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.051345,
+         "edgeShort": 0.022166,
+         "pTP": 0.267824,
+         "pTimeout": 0.425208
+        },
+        "volQ2": {
+         "edgeLong": 0.042735,
+         "edgeShort": 0.033004,
+         "pTP": 0.290198,
+         "pTimeout": 0.378261
+        },
+        "volQ3": {
+         "edgeLong": 0.032008,
+         "edgeShort": 0.045458,
+         "pTP": 0.319167,
+         "pTimeout": 0.318495
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.053432,
+         "edgeShort": 0.02579,
+         "pTP": 0.371353,
+         "pTimeout": 0.215023
+        },
+        "weekday": {
+         "edgeLong": 0.050188,
+         "edgeShort": 0.028088,
+         "pTP": 0.333216,
+         "pTimeout": 0.291324
+        },
+        "weekend": {
+         "edgeLong": 0.031606,
+         "edgeShort": 0.040398,
+         "pTP": 0.259414,
+         "pTimeout": 0.441593
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 469532,
+        "houseEdge": 0.00542,
+        "pTP": 0.342897
+       },
+       "momentum:10": {
+        "n": 523920,
+        "houseEdge": 0.012501,
+        "pTP": 0.334251
+       },
+       "momentum:30": {
+        "n": 578301,
+        "houseEdge": 0.029763,
+        "pTP": 0.318497
+       },
+       "contrarian:5": {
+        "n": 469532,
+        "houseEdge": 0.074579,
+        "pTP": 0.312982
+       },
+       "contrarian:10": {
+        "n": 523920,
+        "houseEdge": 0.067112,
+        "pTP": 0.312523
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.00542,
+        "momentum:10": 0.012501,
+        "momentum:30": 0.029763
+       },
+       "3": {
+        "momentum:5": 0.014183,
+        "momentum:10": 0.018675,
+        "momentum:30": 0.032992
+       },
+       "4": {
+        "momentum:5": 0.020592,
+        "momentum:10": 0.023883,
+        "momentum:30": 0.035719
+       },
+       "6": {
+        "momentum:5": 0.029761,
+        "momentum:10": 0.030969,
+        "momentum:30": 0.039009
+       },
+       "10": {
+        "momentum:5": 0.037015,
+        "momentum:10": 0.037502,
+        "momentum:30": 0.042257
+       }
+      }
+     },
+     {
+      "tier": 3,
+      "label": "HYPER",
+      "multiplierBps": 30000,
+      "targetPpm": 533,
+      "stopPpm": 185,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.09397,
+       "pSL": 0.376458,
+       "pTimeout": 0.529572,
+       "houseEdge": 0.022883,
+       "worstRegimeEdge": 0.002719,
+       "edgeLong": 0.026768,
+       "edgeShort": 0.018999,
+       "expectedPayout": 0.977117,
+       "meanResolveSec": 22.290666,
+       "momentumWorstEdge": -0.01548
+      },
+      "grid": {
+       "T": 532.99269,
+       "S": 185.416528,
+       "houseEdge": 0.022684,
+       "pTP": 0.093975,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.041507,
+         "edgeShort": 0.012257,
+         "pTP": 0.062851,
+         "pTimeout": 0.619616
+        },
+        "volQ2": {
+         "edgeLong": 0.027547,
+         "edgeShort": 0.022883,
+         "pTP": 0.075542,
+         "pTimeout": 0.576415
+        },
+        "volQ3": {
+         "edgeLong": 0.008348,
+         "edgeShort": 0.037291,
+         "pTP": 0.096968,
+         "pTimeout": 0.51787
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.028917,
+         "edgeShort": 0.002719,
+         "pTP": 0.14055,
+         "pTimeout": 0.404816
+        },
+        "weekday": {
+         "edgeLong": 0.030563,
+         "edgeShort": 0.017323,
+         "pTP": 0.104405,
+         "pTimeout": 0.493177
+        },
+        "weekend": {
+         "edgeLong": 0.016619,
+         "edgeShort": 0.022452,
+         "pTP": 0.067897,
+         "pTimeout": 0.620973
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 469532,
+        "houseEdge": -0.01548,
+        "pTP": 0.109914
+       },
+       "momentum:10": {
+        "n": 523920,
+        "houseEdge": -0.008421,
+        "pTP": 0.10585
+       },
+       "momentum:30": {
+        "n": 578301,
+        "houseEdge": 0.010523,
+        "pTP": 0.098798
+       },
+       "contrarian:5": {
+        "n": 469532,
+        "houseEdge": 0.059653,
+        "pTP": 0.097855
+       },
+       "contrarian:10": {
+        "n": 523920,
+        "houseEdge": 0.053061,
+        "pTP": 0.095127
+       }
+      },
+      "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 9.4%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 533,
+       "stopPpm": 185,
+       "pTP": 0.093975,
+       "pSL": 0.376339,
+       "pTimeout": 0.529686,
+       "houseEdge": 0.022684,
+       "worstRegimeEdge": 0.002719
+      }
+     },
+     {
+      "tier": 4,
+      "label": "WARP",
+      "multiplierBps": 50000,
+      "targetPpm": 1192,
+      "stopPpm": 185,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.010357,
+       "pSL": 0.379113,
+       "pTimeout": 0.61053,
+       "houseEdge": 0.034762,
+       "worstRegimeEdge": 0.003861,
+       "edgeLong": 0.03769,
+       "edgeShort": 0.031833,
+       "expectedPayout": 0.965238,
+       "meanResolveSec": 23.359475,
+       "momentumWorstEdge": -0.005677
+      },
+      "grid": {
+       "T": 1191.54393,
+       "S": 185.416528,
+       "houseEdge": 0.034407,
+       "pTP": 0.01038,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.057907,
+         "edgeShort": 0.033031,
+         "pTP": 0.003032,
+         "pTimeout": 0.679101
+        },
+        "volQ2": {
+         "edgeLong": 0.045411,
+         "edgeShort": 0.040994,
+         "pTP": 0.00622,
+         "pTimeout": 0.644514
+        },
+        "volQ3": {
+         "edgeLong": 0.015508,
+         "edgeShort": 0.047992,
+         "pTP": 0.010651,
+         "pTimeout": 0.601729
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.030544,
+         "edgeShort": 0.003861,
+         "pTP": 0.021618,
+         "pTimeout": 0.517143
+        },
+        "weekday": {
+         "edgeLong": 0.038574,
+         "edgeShort": 0.02929,
+         "pTP": 0.012264,
+         "pTimeout": 0.582036
+        },
+        "weekend": {
+         "edgeLong": 0.034265,
+         "edgeShort": 0.036923,
+         "pTP": 0.005669,
+         "pTimeout": 0.682115
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 469532,
+        "houseEdge": -0.005677,
+        "pTP": 0.013256
+       },
+       "momentum:10": {
+        "n": 523920,
+        "houseEdge": 0.002316,
+        "pTP": 0.012479
+       },
+       "momentum:30": {
+        "n": 578301,
+        "houseEdge": 0.021768,
+        "pTP": 0.011639
+       },
+       "contrarian:5": {
+        "n": 469532,
+        "houseEdge": 0.069605,
+        "pTP": 0.011113
+       },
+       "contrarian:10": {
+        "n": 523920,
+        "houseEdge": 0.063752,
+        "pTP": 0.010492
+       }
+      },
+      "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 1.0%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 1192,
+       "stopPpm": 185,
+       "pTP": 0.01038,
+       "pSL": 0.378994,
+       "pTimeout": 0.610626,
+       "houseEdge": 0.034407,
+       "worstRegimeEdge": 0.003861
+      }
+     }
+    ],
+    "BTC": [
+     {
+      "tier": 1,
+      "label": "CRUISE",
+      "multiplierBps": 15000,
+      "targetPpm": 213,
+      "stopPpm": 407,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.253463,
+       "pSL": 0.109218,
+       "pTimeout": 0.637319,
+       "houseEdge": 0.058984,
+       "worstRegimeEdge": 0.040642,
+       "edgeLong": 0.058653,
+       "edgeShort": 0.059316,
+       "expectedPayout": 0.941016,
+       "meanResolveSec": 24.391525,
+       "momentumWorstEdge": 0.024533
+      },
+      "grid": {
+       "T": 212.115606,
+       "S": 407.803574,
+       "houseEdge": 0.058207,
+       "pTP": 0.254413,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.047408,
+         "edgeShort": 0.047787,
+         "pTP": 0.175274,
+         "pTimeout": 0.766078
+        },
+        "volQ2": {
+         "edgeLong": 0.05061,
+         "edgeShort": 0.057645,
+         "pTP": 0.221167,
+         "pTimeout": 0.6971
+        },
+        "volQ3": {
+         "edgeLong": 0.067676,
+         "edgeShort": 0.051926,
+         "pTP": 0.260761,
+         "pTimeout": 0.629977
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.066011,
+         "edgeShort": 0.0766,
+         "pTP": 0.360472,
+         "pTimeout": 0.454181
+        },
+        "weekday": {
+         "edgeLong": 0.064838,
+         "edgeShort": 0.065049,
+         "pTP": 0.300231,
+         "pTimeout": 0.565713
+        },
+        "weekend": {
+         "edgeLong": 0.040642,
+         "edgeShort": 0.042086,
+         "pTP": 0.139848,
+         "pTimeout": 0.814699
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 439652,
+        "houseEdge": 0.024533,
+        "pTP": 0.301511
+       },
+       "momentum:10": {
+        "n": 493897,
+        "houseEdge": 0.028525,
+        "pTP": 0.293245
+       },
+       "momentum:30": {
+        "n": 562859,
+        "houseEdge": 0.041449,
+        "pTP": 0.271299
+       },
+       "contrarian:5": {
+        "n": 439652,
+        "houseEdge": 0.10096,
+        "pTP": 0.257051
+       },
+       "contrarian:10": {
+        "n": 493897,
+        "houseEdge": 0.095823,
+        "pTP": 0.256863
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.024533,
+        "momentum:10": 0.028525,
+        "momentum:30": 0.041449
+       },
+       "3": {
+        "momentum:5": 0.031443,
+        "momentum:10": 0.033816,
+        "momentum:30": 0.044307
+       },
+       "4": {
+        "momentum:5": 0.037095,
+        "momentum:10": 0.03829,
+        "momentum:30": 0.046859
+       },
+       "6": {
+        "momentum:5": 0.045006,
+        "momentum:10": 0.04473,
+        "momentum:30": 0.050457
+       },
+       "10": {
+        "momentum:5": 0.052787,
+        "momentum:10": 0.051893,
+        "momentum:30": 0.054124
+       }
+      },
+      "disabledReason": "P(TP) band [40.0%, 55.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 25.4%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 212,
+       "stopPpm": 408,
+       "pTP": 0.254413,
+       "pSL": 0.108744,
+       "pTimeout": 0.636843,
+       "houseEdge": 0.058207,
+       "worstRegimeEdge": 0.040642
+      }
+     },
+     {
+      "tier": 2,
+      "label": "BOOST",
+      "multiplierBps": 20000,
+      "targetPpm": 165,
+      "stopPpm": 149,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.286167,
+       "pSL": 0.306276,
+       "pTimeout": 0.407557,
+       "houseEdge": 0.020566,
+       "worstRegimeEdge": 0.001609,
+       "edgeLong": 0.022067,
+       "edgeShort": 0.019066,
+       "expectedPayout": 0.979434,
+       "meanResolveSec": 19.51758,
+       "momentumWorstEdge": -0.05981
+      },
+      "grid": {
+       "T": 164.963788,
+       "S": 149.181517,
+       "houseEdge": 0.020278,
+       "pTP": 0.286237,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.016453,
+         "edgeShort": 0.022904,
+         "pTP": 0.218251,
+         "pTimeout": 0.544716
+        },
+        "volQ2": {
+         "edgeLong": 0.013578,
+         "edgeShort": 0.02675,
+         "pTP": 0.266819,
+         "pTimeout": 0.446505
+        },
+        "volQ3": {
+         "edgeLong": 0.03873,
+         "edgeShort": 0.001609,
+         "pTP": 0.297292,
+         "pTimeout": 0.38625
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.018379,
+         "edgeShort": 0.023824,
+         "pTP": 0.362602,
+         "pTimeout": 0.253916
+        },
+        "weekday": {
+         "edgeLong": 0.022909,
+         "edgeShort": 0.018999,
+         "pTP": 0.328628,
+         "pTimeout": 0.321564
+        },
+        "weekend": {
+         "edgeLong": 0.018975,
+         "edgeShort": 0.018202,
+         "pTP": 0.18024,
+         "pTimeout": 0.623618
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 439652,
+        "houseEdge": -0.05981,
+        "pTP": 0.340274
+       },
+       "momentum:10": {
+        "n": 493897,
+        "houseEdge": -0.051103,
+        "pTP": 0.331685
+       },
+       "momentum:30": {
+        "n": 562859,
+        "houseEdge": -0.024508,
+        "pTP": 0.309605
+       },
+       "contrarian:5": {
+        "n": 439652,
+        "houseEdge": 0.101842,
+        "pTP": 0.276928
+       },
+       "contrarian:10": {
+        "n": 493897,
+        "houseEdge": 0.093197,
+        "pTP": 0.279267
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": -0.05981,
+        "momentum:10": -0.051103,
+        "momentum:30": -0.024508
+       },
+       "3": {
+        "momentum:5": -0.046151,
+        "momentum:10": -0.04043,
+        "momentum:30": -0.018813
+       },
+       "4": {
+        "momentum:5": -0.034607,
+        "momentum:10": -0.031371,
+        "momentum:30": -0.013848
+       },
+       "6": {
+        "momentum:5": -0.018505,
+        "momentum:10": -0.018612,
+        "momentum:30": -0.006592
+       },
+       "10": {
+        "momentum:5": -0.002865,
+        "momentum:10": -0.004245,
+        "momentum:30": 0.001216
+       }
+      },
+      "disabledReason": "P(TP) band [30.0%, 45.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 28.6%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 165,
+       "stopPpm": 149,
+       "pTP": 0.286237,
+       "pSL": 0.305909,
+       "pTimeout": 0.407854,
+       "houseEdge": 0.020278,
+       "worstRegimeEdge": 0.001609
+      }
+     },
+     {
+      "tier": 3,
+      "label": "HYPER",
+      "multiplierBps": 30000,
+      "targetPpm": 499,
+      "stopPpm": 156,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.073311,
+       "pSL": 0.321911,
+       "pTimeout": 0.604778,
+       "houseEdge": 0.026571,
+       "worstRegimeEdge": 0.005024,
+       "edgeLong": 0.027341,
+       "edgeShort": 0.025801,
+       "expectedPayout": 0.973429,
+       "meanResolveSec": 23.493401,
+       "momentumWorstEdge": -0.050412
+      },
+      "grid": {
+       "T": 498.652762,
+       "S": 156.874307,
+       "houseEdge": 0.025283,
+       "pTP": 0.073477,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.027434,
+         "edgeShort": 0.02817,
+         "pTP": 0.035159,
+         "pTimeout": 0.729117
+        },
+        "volQ2": {
+         "edgeLong": 0.022511,
+         "edgeShort": 0.038346,
+         "pTP": 0.050718,
+         "pTimeout": 0.659094
+        },
+        "volQ3": {
+         "edgeLong": 0.042117,
+         "edgeShort": 0.005024,
+         "pTP": 0.072821,
+         "pTimeout": 0.597619
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.012506,
+         "edgeShort": 0.026155,
+         "pTP": 0.135222,
+         "pTimeout": 0.436604
+        },
+        "weekday": {
+         "edgeLong": 0.024366,
+         "edgeShort": 0.021949,
+         "pTP": 0.091946,
+         "pTimeout": 0.536162
+        },
+        "weekend": {
+         "edgeLong": 0.030586,
+         "edgeShort": 0.030611,
+         "pTP": 0.027296,
+         "pTimeout": 0.779285
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 439652,
+        "houseEdge": -0.050412,
+        "pTP": 0.092182
+       },
+       "momentum:10": {
+        "n": 493897,
+        "houseEdge": -0.041685,
+        "pTP": 0.087486
+       },
+       "momentum:30": {
+        "n": 562859,
+        "houseEdge": -0.013408,
+        "pTP": 0.079016
+       },
+       "contrarian:5": {
+        "n": 439652,
+        "houseEdge": 0.101721,
+        "pTP": 0.079381
+       },
+       "contrarian:10": {
+        "n": 493897,
+        "houseEdge": 0.093495,
+        "pTP": 0.078184
+       }
+      },
+      "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 7.3%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 499,
+       "stopPpm": 157,
+       "pTP": 0.073477,
+       "pSL": 0.320906,
+       "pTimeout": 0.605617,
+       "houseEdge": 0.025283,
+       "worstRegimeEdge": 0.005024
+      }
+     },
+     {
+      "tier": 4,
+      "label": "WARP",
+      "multiplierBps": 50000,
+      "targetPpm": 1115,
+      "stopPpm": 156,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.009356,
+       "pSL": 0.324501,
+       "pTimeout": 0.666143,
+       "houseEdge": 0.035411,
+       "worstRegimeEdge": 0.002005,
+       "edgeLong": 0.034567,
+       "edgeShort": 0.036256,
+       "expectedPayout": 0.964589,
+       "meanResolveSec": 24.340834,
+       "momentumWorstEdge": -0.042809
+      },
+      "grid": {
+       "T": 1114.774524,
+       "S": 156.874307,
+       "houseEdge": 0.034264,
+       "pTP": 0.009362,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.042482,
+         "edgeShort": 0.042417,
+         "pTP": 0.002474,
+         "pTimeout": 0.761673
+        },
+        "volQ2": {
+         "edgeLong": 0.041253,
+         "edgeShort": 0.057681,
+         "pTP": 0.003208,
+         "pTimeout": 0.70586
+        },
+        "volQ3": {
+         "edgeLong": 0.048269,
+         "edgeShort": 0.015537,
+         "pTP": 0.00832,
+         "pTimeout": 0.660202
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.002005,
+         "edgeShort": 0.02446,
+         "pTP": 0.02345,
+         "pTimeout": 0.540805
+        },
+        "weekday": {
+         "edgeLong": 0.028292,
+         "edgeShort": 0.03132,
+         "pTP": 0.012297,
+         "pTimeout": 0.612277
+        },
+        "weekend": {
+         "edgeLong": 0.046535,
+         "edgeShort": 0.044286,
+         "pTP": 0.002023,
+         "pTimeout": 0.804327
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 439652,
+        "houseEdge": -0.042809,
+        "pTP": 0.013154
+       },
+       "momentum:10": {
+        "n": 493897,
+        "houseEdge": -0.03292,
+        "pTP": 0.012411
+       },
+       "momentum:30": {
+        "n": 562859,
+        "houseEdge": -0.004206,
+        "pTP": 0.011136
+       },
+       "contrarian:5": {
+        "n": 439652,
+        "houseEdge": 0.107016,
+        "pTP": 0.010495
+       },
+       "contrarian:10": {
+        "n": 493897,
+        "houseEdge": 0.099129,
+        "pTP": 0.009723
+       }
+      },
+      "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 0.9%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 1115,
+       "stopPpm": 157,
+       "pTP": 0.009362,
+       "pSL": 0.323497,
+       "pTimeout": 0.667141,
+       "houseEdge": 0.034264,
+       "worstRegimeEdge": 0.002005
+      }
+     }
+    ],
+    "ETH": [
+     {
+      "tier": 1,
+      "label": "CRUISE",
+      "multiplierBps": 15000,
+      "targetPpm": 261,
+      "stopPpm": 501,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.322269,
+       "pSL": 0.142485,
+       "pTimeout": 0.535246,
+       "houseEdge": 0.058827,
+       "worstRegimeEdge": 0.048649,
+       "edgeLong": 0.061566,
+       "edgeShort": 0.056089,
+       "expectedPayout": 0.941173,
+       "meanResolveSec": 22.542067,
+       "momentumWorstEdge": 0.043193
+      },
+      "grid": {
+       "T": 260.90565,
+       "S": 501.605038,
+       "houseEdge": 0.058546,
+       "pTP": 0.32238,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.051407,
+         "edgeShort": 0.049841,
+         "pTP": 0.261782,
+         "pTimeout": 0.641865
+        },
+        "volQ2": {
+         "edgeLong": 0.048649,
+         "edgeShort": 0.061416,
+         "pTP": 0.281581,
+         "pTimeout": 0.606677
+        },
+        "volQ3": {
+         "edgeLong": 0.07074,
+         "edgeShort": 0.050899,
+         "pTP": 0.334332,
+         "pTimeout": 0.517305
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.07429,
+         "edgeShort": 0.061126,
+         "pTP": 0.411844,
+         "pTimeout": 0.375766
+        },
+        "weekday": {
+         "edgeLong": 0.065687,
+         "edgeShort": 0.058121,
+         "pTP": 0.361429,
+         "pTimeout": 0.473133
+        },
+        "weekend": {
+         "edgeLong": 0.050228,
+         "edgeShort": 0.050067,
+         "pTP": 0.224741,
+         "pTimeout": 0.691133
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 490297,
+        "houseEdge": 0.043193,
+        "pTP": 0.354314
+       },
+       "momentum:10": {
+        "n": 541623,
+        "houseEdge": 0.049265,
+        "pTP": 0.342375
+       },
+       "momentum:30": {
+        "n": 586586,
+        "houseEdge": 0.059379,
+        "pTP": 0.324994
+       },
+       "contrarian:5": {
+        "n": 490297,
+        "houseEdge": 0.079076,
+        "pTP": 0.332829
+       },
+       "contrarian:10": {
+        "n": 541623,
+        "houseEdge": 0.071729,
+        "pTP": 0.33111
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.043193,
+        "momentum:10": 0.049265,
+        "momentum:30": 0.059379
+       },
+       "3": {
+        "momentum:5": 0.048792,
+        "momentum:10": 0.053211,
+        "momentum:30": 0.061265
+       },
+       "4": {
+        "momentum:5": 0.053164,
+        "momentum:10": 0.056483,
+        "momentum:30": 0.062692
+       },
+       "6": {
+        "momentum:5": 0.058272,
+        "momentum:10": 0.060231,
+        "momentum:30": 0.064365
+       },
+       "10": {
+        "momentum:5": 0.062101,
+        "momentum:10": 0.062371,
+        "momentum:30": 0.064737
+       }
+      },
+      "disabledReason": "P(TP) band [40.0%, 55.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 32.2%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 261,
+       "stopPpm": 502,
+       "pTP": 0.32238,
+       "pSL": 0.142209,
+       "pTimeout": 0.535411,
+       "houseEdge": 0.058546,
+       "worstRegimeEdge": 0.048649
+      }
+     },
+     {
+      "tier": 2,
+      "label": "BOOST",
+      "multiplierBps": 20000,
+      "targetPpm": 261,
+      "stopPpm": 235,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.298775,
+       "pSL": 0.328579,
+       "pTimeout": 0.372647,
+       "houseEdge": 0.02845,
+       "worstRegimeEdge": 0.007839,
+       "edgeLong": 0.032681,
+       "edgeShort": 0.024219,
+       "expectedPayout": 0.97155,
+       "meanResolveSec": 19.021609,
+       "momentumWorstEdge": -0.004793
+      },
+      "grid": {
+       "T": 260.90565,
+       "S": 235.944514,
+       "houseEdge": 0.027514,
+       "pTP": 0.299021,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.025847,
+         "edgeShort": 0.02693,
+         "pTP": 0.251184,
+         "pTimeout": 0.470103
+        },
+        "volQ2": {
+         "edgeLong": 0.012702,
+         "edgeShort": 0.04096,
+         "pTP": 0.267523,
+         "pTimeout": 0.437388
+        },
+        "volQ3": {
+         "edgeLong": 0.047862,
+         "edgeShort": 0.007839,
+         "pTP": 0.310301,
+         "pTimeout": 0.349772
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.040426,
+         "edgeShort": 0.017545,
+         "pTP": 0.36709,
+         "pTimeout": 0.235599
+        },
+        "weekday": {
+         "edgeLong": 0.034773,
+         "edgeShort": 0.023248,
+         "pTP": 0.332391,
+         "pTimeout": 0.304287
+        },
+        "weekend": {
+         "edgeLong": 0.024045,
+         "edgeShort": 0.023497,
+         "pTP": 0.215581,
+         "pTimeout": 0.54559
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 490297,
+        "houseEdge": -0.004793,
+        "pTP": 0.329052
+       },
+       "momentum:10": {
+        "n": 541623,
+        "houseEdge": 0.00612,
+        "pTP": 0.31817
+       },
+       "momentum:30": {
+        "n": 586586,
+        "houseEdge": 0.024959,
+        "pTP": 0.301814
+       },
+       "contrarian:5": {
+        "n": 490297,
+        "houseEdge": 0.062737,
+        "pTP": 0.304081
+       },
+       "contrarian:10": {
+        "n": 541623,
+        "houseEdge": 0.051499,
+        "pTP": 0.304298
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": -0.004793,
+        "momentum:10": 0.00612,
+        "momentum:30": 0.024959
+       },
+       "3": {
+        "momentum:5": 0.005381,
+        "momentum:10": 0.013056,
+        "momentum:30": 0.028361
+       },
+       "4": {
+        "momentum:5": 0.012961,
+        "momentum:10": 0.018876,
+        "momentum:30": 0.03094
+       },
+       "6": {
+        "momentum:5": 0.021607,
+        "momentum:10": 0.025721,
+        "momentum:30": 0.034213
+       },
+       "10": {
+        "momentum:5": 0.028823,
+        "momentum:10": 0.030555,
+        "momentum:30": 0.035085
+       }
+      },
+      "disabledReason": "P(TP) band [30.0%, 45.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 29.9%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 261,
+       "stopPpm": 236,
+       "pTP": 0.299021,
+       "pSL": 0.327757,
+       "pTimeout": 0.373222,
+       "houseEdge": 0.027514,
+       "worstRegimeEdge": 0.007839
+      }
+     },
+     {
+      "tier": 3,
+      "label": "HYPER",
+      "multiplierBps": 30000,
+      "targetPpm": 679,
+      "stopPpm": 248,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.081522,
+       "pSL": 0.339869,
+       "pTimeout": 0.578609,
+       "houseEdge": 0.022778,
+       "worstRegimeEdge": 0.000565,
+       "edgeLong": 0.027352,
+       "edgeShort": 0.018203,
+       "expectedPayout": 0.977222,
+       "meanResolveSec": 23.165223,
+       "momentumWorstEdge": -0.00867
+      },
+      "grid": {
+       "T": 678.238895,
+       "S": 248.11138,
+       "houseEdge": 0.022277,
+       "pTP": 0.08168,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.029648,
+         "edgeShort": 0.027123,
+         "pTP": 0.045334,
+         "pTimeout": 0.678181
+        },
+        "volQ2": {
+         "edgeLong": 0.013639,
+         "edgeShort": 0.037498,
+         "pTP": 0.057755,
+         "pTimeout": 0.645182
+        },
+        "volQ3": {
+         "edgeLong": 0.035082,
+         "edgeShort": 0.000565,
+         "pTP": 0.085364,
+         "pTimeout": 0.563535
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.02904,
+         "edgeShort": 0.005623,
+         "pTP": 0.138278,
+         "pTimeout": 0.427492
+        },
+        "weekday": {
+         "edgeLong": 0.029424,
+         "edgeShort": 0.016389,
+         "pTP": 0.096459,
+         "pTimeout": 0.522988
+        },
+        "weekend": {
+         "edgeLong": 0.020422,
+         "edgeShort": 0.020987,
+         "pTP": 0.044724,
+         "pTimeout": 0.717671
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 490297,
+        "houseEdge": -0.00867,
+        "pTP": 0.093084
+       },
+       "momentum:10": {
+        "n": 541623,
+        "houseEdge": 0.00327,
+        "pTP": 0.087578
+       },
+       "momentum:30": {
+        "n": 586586,
+        "houseEdge": 0.023772,
+        "pTP": 0.080471
+       },
+       "contrarian:5": {
+        "n": 490297,
+        "houseEdge": 0.052085,
+        "pTP": 0.089764
+       },
+       "contrarian:10": {
+        "n": 541623,
+        "houseEdge": 0.04072,
+        "pTP": 0.087795
+       }
+      },
+      "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 8.2%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 678,
+       "stopPpm": 248,
+       "pTP": 0.08168,
+       "pSL": 0.339715,
+       "pTimeout": 0.578605,
+       "houseEdge": 0.022277,
+       "worstRegimeEdge": 0.000565
+      }
+     },
+     {
+      "tier": 4,
+      "label": "WARP",
+      "multiplierBps": 50000,
+      "targetPpm": 1442,
+      "stopPpm": 235,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.011375,
+       "pSL": 0.356227,
+       "pTimeout": 0.632398,
+       "houseEdge": 0.033182,
+       "worstRegimeEdge": 0.006129,
+       "edgeLong": 0.036151,
+       "edgeShort": 0.030213,
+       "expectedPayout": 0.966818,
+       "meanResolveSec": 23.780188,
+       "momentumWorstEdge": -0.000157
+      },
+      "grid": {
+       "T": 1441.898525,
+       "S": 235.944514,
+       "houseEdge": 0.032219,
+       "pTP": 0.011389,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.047367,
+         "edgeShort": 0.044803,
+         "pTP": 0.003049,
+         "pTimeout": 0.707788
+        },
+        "volQ2": {
+         "edgeLong": 0.026315,
+         "edgeShort": 0.055187,
+         "pTP": 0.005569,
+         "pTimeout": 0.683677
+        },
+        "volQ3": {
+         "edgeLong": 0.046629,
+         "edgeShort": 0.011014,
+         "pTP": 0.011515,
+         "pTimeout": 0.620939
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.020299,
+         "edgeShort": 0.006129,
+         "pTP": 0.025428,
+         "pTimeout": 0.520533
+        },
+        "weekday": {
+         "edgeLong": 0.036206,
+         "edgeShort": 0.028397,
+         "pTP": 0.013608,
+         "pTimeout": 0.588627
+        },
+        "weekend": {
+         "edgeLong": 0.032521,
+         "edgeShort": 0.031504,
+         "pTP": 0.005843,
+         "pTimeout": 0.744791
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 490297,
+        "houseEdge": -0.000157,
+        "pTP": 0.014065
+       },
+       "momentum:10": {
+        "n": 541623,
+        "houseEdge": 0.012597,
+        "pTP": 0.013112
+       },
+       "momentum:30": {
+        "n": 586586,
+        "houseEdge": 0.034381,
+        "pTP": 0.012249
+       },
+       "contrarian:5": {
+        "n": 490297,
+        "houseEdge": 0.061606,
+        "pTP": 0.012631
+       },
+       "contrarian:10": {
+        "n": 541623,
+        "houseEdge": 0.05069,
+        "pTP": 0.01189
+       }
+      },
+      "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 1.1%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 1442,
+       "stopPpm": 236,
+       "pTP": 0.011389,
+       "pSL": 0.355371,
+       "pTimeout": 0.63324,
+       "houseEdge": 0.032219,
+       "worstRegimeEdge": 0.006129
+      }
+     }
+    ],
+    "SOL": [
+     {
+      "tier": 1,
+      "label": "CRUISE",
+      "multiplierBps": 15000,
+      "targetPpm": 241,
+      "stopPpm": 461,
+      "feeBps": 100,
+      "enabled": true,
+      "stats": {
+       "pTP": 0.474245,
+       "pSL": 0.220268,
+       "pTimeout": 0.305487,
+       "houseEdge": 0.052071,
+       "worstRegimeEdge": 0.040076,
+       "edgeLong": 0.056349,
+       "edgeShort": 0.047794,
+       "expectedPayout": 0.947929,
+       "meanResolveSec": 17.504508,
+       "momentumWorstEdge": 0.036902
+      },
+      "grid": {
+       "T": 240.232256,
+       "S": 461.859333,
+       "houseEdge": 0.051471,
+       "pTP": 0.474319,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.049232,
+         "edgeShort": 0.040076,
+         "pTP": 0.428657,
+         "pTimeout": 0.400787
+        },
+        "volQ2": {
+         "edgeLong": 0.048346,
+         "edgeShort": 0.059473,
+         "pTP": 0.453869,
+         "pTimeout": 0.342798
+        },
+        "volQ3": {
+         "edgeLong": 0.062885,
+         "edgeShort": 0.041932,
+         "pTP": 0.496237,
+         "pTimeout": 0.268175
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.062575,
+         "edgeShort": 0.047254,
+         "pTP": 0.518522,
+         "pTimeout": 0.214199
+        },
+        "weekday": {
+         "edgeLong": 0.055143,
+         "edgeShort": 0.047487,
+         "pTP": 0.50908,
+         "pTimeout": 0.245507
+        },
+        "weekend": {
+         "edgeLong": 0.0573,
+         "edgeShort": 0.046425,
+         "pTP": 0.387402,
+         "pTimeout": 0.458989
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 443659,
+        "houseEdge": 0.036902,
+        "pTP": 0.49884
+       },
+       "momentum:10": {
+        "n": 497564,
+        "houseEdge": 0.040002,
+        "pTP": 0.492658
+       },
+       "momentum:30": {
+        "n": 553206,
+        "houseEdge": 0.043778,
+        "pTP": 0.483925
+       },
+       "contrarian:5": {
+        "n": 443659,
+        "houseEdge": 0.067858,
+        "pTP": 0.476981
+       },
+       "contrarian:10": {
+        "n": 497564,
+        "houseEdge": 0.064335,
+        "pTP": 0.47666
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.036902,
+        "momentum:10": 0.040002,
+        "momentum:30": 0.043778
+       },
+       "3": {
+        "momentum:5": 0.041646,
+        "momentum:10": 0.043302,
+        "momentum:30": 0.045653
+       },
+       "4": {
+        "momentum:5": 0.04507,
+        "momentum:10": 0.045645,
+        "momentum:30": 0.046846
+       },
+       "6": {
+        "momentum:5": 0.049776,
+        "momentum:10": 0.04882,
+        "momentum:30": 0.048678
+       },
+       "10": {
+        "momentum:5": 0.051507,
+        "momentum:10": 0.049836,
+        "momentum:30": 0.050272
+       }
+      }
+     },
+     {
+      "tier": 2,
+      "label": "BOOST",
+      "multiplierBps": 20000,
+      "targetPpm": 418,
+      "stopPpm": 359,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.292576,
+       "pSL": 0.315386,
+       "pTimeout": 0.392038,
+       "houseEdge": 0.027359,
+       "worstRegimeEdge": 0.012871,
+       "edgeLong": 0.031326,
+       "edgeShort": 0.023392,
+       "expectedPayout": 0.972641,
+       "meanResolveSec": 20.051978,
+       "momentumWorstEdge": 0.006951
+      },
+      "grid": {
+       "T": 417.672732,
+       "S": 359.191228,
+       "houseEdge": 0.026853,
+       "pTP": 0.292829,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.030865,
+         "edgeShort": 0.024884,
+         "pTP": 0.236888,
+         "pTimeout": 0.506214
+        },
+        "volQ2": {
+         "edgeLong": 0.022356,
+         "edgeShort": 0.038216,
+         "pTP": 0.270909,
+         "pTimeout": 0.430036
+        },
+        "volQ3": {
+         "edgeLong": 0.041227,
+         "edgeShort": 0.015722,
+         "pTP": 0.312027,
+         "pTimeout": 0.352312
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.028683,
+         "edgeShort": 0.012871,
+         "pTP": 0.351502,
+         "pTimeout": 0.280042
+        },
+        "weekday": {
+         "edgeLong": 0.020858,
+         "edgeShort": 0.015334,
+         "pTP": 0.329892,
+         "pTimeout": 0.332704
+        },
+        "weekend": {
+         "edgeLong": 0.055599,
+         "edgeShort": 0.0419,
+         "pTP": 0.200153,
+         "pTimeout": 0.540814
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 443659,
+        "houseEdge": 0.006951,
+        "pTP": 0.31538
+       },
+       "momentum:10": {
+        "n": 497564,
+        "houseEdge": 0.011308,
+        "pTP": 0.309044
+       },
+       "momentum:30": {
+        "n": 553206,
+        "houseEdge": 0.01638,
+        "pTP": 0.300002
+       },
+       "contrarian:5": {
+        "n": 443659,
+        "houseEdge": 0.046232,
+        "pTP": 0.299338
+       },
+       "contrarian:10": {
+        "n": 497564,
+        "houseEdge": 0.04241,
+        "pTP": 0.297447
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.006951,
+        "momentum:10": 0.011308,
+        "momentum:30": 0.01638
+       },
+       "3": {
+        "momentum:5": 0.012842,
+        "momentum:10": 0.015453,
+        "momentum:30": 0.018734
+       },
+       "4": {
+        "momentum:5": 0.016946,
+        "momentum:10": 0.018604,
+        "momentum:30": 0.020266
+       },
+       "6": {
+        "momentum:5": 0.023031,
+        "momentum:10": 0.022805,
+        "momentum:30": 0.022464
+       },
+       "10": {
+        "momentum:5": 0.025428,
+        "momentum:10": 0.023384,
+        "momentum:30": 0.024491
+       }
+      },
+      "disabledReason": "P(TP) band [30.0%, 45.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 29.3%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 418,
+       "stopPpm": 359,
+       "pTP": 0.292829,
+       "pSL": 0.315015,
+       "pTimeout": 0.392157,
+       "houseEdge": 0.026853,
+       "worstRegimeEdge": 0.012871
+      }
+     },
+     {
+      "tier": 3,
+      "label": "HYPER",
+      "multiplierBps": 30000,
+      "targetPpm": 982,
+      "stopPpm": 377,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.069709,
+       "pSL": 0.318775,
+       "pTimeout": 0.611516,
+       "houseEdge": 0.02329,
+       "worstRegimeEdge": 0.008381,
+       "edgeLong": 0.02345,
+       "edgeShort": 0.02313,
+       "expectedPayout": 0.97671,
+       "meanResolveSec": 24.057845,
+       "momentumWorstEdge": 0.002473
+      },
+      "grid": {
+       "T": 981.887497,
+       "S": 377.713513,
+       "houseEdge": 0.023097,
+       "pTP": 0.069717,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.036916,
+         "edgeShort": 0.033335,
+         "pTP": 0.033856,
+         "pTimeout": 0.717044
+        },
+        "volQ2": {
+         "edgeLong": 0.011543,
+         "edgeShort": 0.036568,
+         "pTP": 0.053793,
+         "pTimeout": 0.653677
+        },
+        "volQ3": {
+         "edgeLong": 0.029567,
+         "edgeShort": 0.008381,
+         "pTP": 0.07411,
+         "pTimeout": 0.586964
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.015016,
+         "edgeShort": 0.01345,
+         "pTP": 0.11712,
+         "pTimeout": 0.488321
+        },
+        "weekday": {
+         "edgeLong": 0.021381,
+         "edgeShort": 0.026215,
+         "pTP": 0.08199,
+         "pTimeout": 0.559061
+        },
+        "weekend": {
+         "edgeLong": 0.02796,
+         "edgeShort": 0.014729,
+         "pTP": 0.039032,
+         "pTimeout": 0.742646
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 443659,
+        "houseEdge": 0.002473,
+        "pTP": 0.080156
+       },
+       "momentum:10": {
+        "n": 497564,
+        "houseEdge": 0.006795,
+        "pTP": 0.076844
+       },
+       "momentum:30": {
+        "n": 553206,
+        "houseEdge": 0.013676,
+        "pTP": 0.071688
+       },
+       "contrarian:5": {
+        "n": 443659,
+        "houseEdge": 0.041627,
+        "pTP": 0.075497
+       },
+       "contrarian:10": {
+        "n": 497564,
+        "houseEdge": 0.038151,
+        "pTP": 0.07343
+       }
+      },
+      "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 7.0%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 982,
+       "stopPpm": 378,
+       "pTP": 0.069717,
+       "pSL": 0.318775,
+       "pTimeout": 0.611508,
+       "houseEdge": 0.023097,
+       "worstRegimeEdge": 0.008381
+      }
+     },
+     {
+      "tier": 4,
+      "label": "WARP",
+      "multiplierBps": 50000,
+      "targetPpm": 2088,
+      "stopPpm": 377,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.007439,
+       "pSL": 0.320533,
+       "pTimeout": 0.672027,
+       "houseEdge": 0.026272,
+       "worstRegimeEdge": 0.005417,
+       "edgeLong": 0.026328,
+       "edgeShort": 0.026216,
+       "expectedPayout": 0.973728,
+       "meanResolveSec": 24.827386,
+       "momentumWorstEdge": 0.00445
+      },
+      "grid": {
+       "T": 2087.438723,
+       "S": 377.713513,
+       "houseEdge": 0.026012,
+       "pTP": 0.007442,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.047138,
+         "edgeShort": 0.044116,
+         "pTP": 0.001386,
+         "pTimeout": 0.749392
+        },
+        "volQ2": {
+         "edgeLong": 0.019113,
+         "edgeShort": 0.042139,
+         "pTP": 0.003786,
+         "pTimeout": 0.703208
+        },
+        "volQ3": {
+         "edgeLong": 0.032597,
+         "edgeShort": 0.008076,
+         "pTP": 0.008145,
+         "pTimeout": 0.651187
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.005417,
+         "edgeShort": 0.009494,
+         "pTP": 0.016452,
+         "pTimeout": 0.584296
+        },
+        "weekday": {
+         "edgeLong": 0.021313,
+         "edgeShort": 0.028121,
+         "pTP": 0.009123,
+         "pTimeout": 0.629671
+        },
+        "weekend": {
+         "edgeLong": 0.037956,
+         "edgeShort": 0.020545,
+         "pTP": 0.003238,
+         "pTimeout": 0.777927
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 443659,
+        "houseEdge": 0.00445,
+        "pTP": 0.009422
+       },
+       "momentum:10": {
+        "n": 497564,
+        "houseEdge": 0.009205,
+        "pTP": 0.00895
+       },
+       "momentum:30": {
+        "n": 553206,
+        "houseEdge": 0.017713,
+        "pTP": 0.008375
+       },
+       "contrarian:5": {
+        "n": 443659,
+        "houseEdge": 0.042507,
+        "pTP": 0.008452
+       },
+       "contrarian:10": {
+        "n": 497564,
+        "houseEdge": 0.040051,
+        "pTP": 0.007788
+       }
+      },
+      "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 0.7%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 2087,
+       "stopPpm": 378,
+       "pTP": 0.007442,
+       "pSL": 0.320533,
+       "pTimeout": 0.672025,
+       "houseEdge": 0.026012,
+       "worstRegimeEdge": 0.005417
+      }
+     }
+    ],
+    "DOGE": [
+     {
+      "tier": 1,
+      "label": "CRUISE",
+      "multiplierBps": 15000,
+      "targetPpm": 372,
+      "stopPpm": 714,
+      "feeBps": 100,
+      "enabled": true,
+      "stats": {
+       "pTP": 0.436927,
+       "pSL": 0.211327,
+       "pTimeout": 0.351746,
+       "houseEdge": 0.058795,
+       "worstRegimeEdge": 0.046263,
+       "edgeLong": 0.05885,
+       "edgeShort": 0.05874,
+       "expectedPayout": 0.941205,
+       "meanResolveSec": 18.539076,
+       "momentumWorstEdge": 0.052011
+      },
+      "grid": {
+       "T": 371.757318,
+       "S": 714.723286,
+       "houseEdge": 0.05849,
+       "pTP": 0.436998,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.050074,
+         "edgeShort": 0.048777,
+         "pTP": 0.382576,
+         "pTimeout": 0.454894
+        },
+        "volQ2": {
+         "edgeLong": 0.046263,
+         "edgeShort": 0.070699,
+         "pTP": 0.424501,
+         "pTimeout": 0.38038
+        },
+        "volQ3": {
+         "edgeLong": 0.065826,
+         "edgeShort": 0.054053,
+         "pTP": 0.447589,
+         "pTimeout": 0.332454
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.072129,
+         "edgeShort": 0.0601,
+         "pTP": 0.49333,
+         "pTimeout": 0.240387
+        },
+        "weekday": {
+         "edgeLong": 0.059582,
+         "edgeShort": 0.060356,
+         "pTP": 0.487275,
+         "pTimeout": 0.265406
+        },
+        "weekend": {
+         "edgeLong": 0.056049,
+         "edgeShort": 0.053535,
+         "pTP": 0.311284,
+         "pTimeout": 0.568626
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 467256,
+        "houseEdge": 0.052011,
+        "pTP": 0.46097
+       },
+       "momentum:10": {
+        "n": 518227,
+        "houseEdge": 0.05538,
+        "pTP": 0.450926
+       },
+       "momentum:30": {
+        "n": 561886,
+        "houseEdge": 0.059321,
+        "pTP": 0.441469
+       },
+       "contrarian:5": {
+        "n": 467256,
+        "houseEdge": 0.068177,
+        "pTP": 0.449631
+       },
+       "contrarian:10": {
+        "n": 518227,
+        "houseEdge": 0.06396,
+        "pTP": 0.445434
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.052011,
+        "momentum:10": 0.05538,
+        "momentum:30": 0.059321
+       },
+       "3": {
+        "momentum:5": 0.053979,
+        "momentum:10": 0.057608,
+        "momentum:30": 0.060058
+       },
+       "4": {
+        "momentum:5": 0.056239,
+        "momentum:10": 0.059504,
+        "momentum:30": 0.060607
+       },
+       "6": {
+        "momentum:5": 0.060563,
+        "momentum:10": 0.061856,
+        "momentum:30": 0.061329
+       },
+       "10": {
+        "momentum:5": 0.06388,
+        "momentum:10": 0.061966,
+        "momentum:30": 0.06088
+       }
+      }
+     },
+     {
+      "tier": 2,
+      "label": "BOOST",
+      "multiplierBps": 20000,
+      "targetPpm": 615,
+      "stopPpm": 584,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.273711,
+       "pSL": 0.298377,
+       "pTimeout": 0.427911,
+       "houseEdge": 0.023392,
+       "worstRegimeEdge": 0.007663,
+       "edgeLong": 0.02348,
+       "edgeShort": 0.023305,
+       "expectedPayout": 0.976608,
+       "meanResolveSec": 20.635874,
+       "momentumWorstEdge": 0.013605
+      },
+      "grid": {
+       "T": 614.649497,
+       "S": 584.508364,
+       "houseEdge": 0.022928,
+       "pTP": 0.273977,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.027815,
+         "edgeShort": 0.022857,
+         "pTP": 0.215387,
+         "pTimeout": 0.541554
+        },
+        "volQ2": {
+         "edgeLong": 0.007663,
+         "edgeShort": 0.04317,
+         "pTP": 0.253968,
+         "pTimeout": 0.465582
+        },
+        "volQ3": {
+         "edgeLong": 0.030289,
+         "edgeShort": 0.014114,
+         "pTP": 0.285467,
+         "pTimeout": 0.406268
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.026244,
+         "edgeShort": 0.01127,
+         "pTP": 0.341088,
+         "pTimeout": 0.298409
+        },
+        "weekday": {
+         "edgeLong": 0.024013,
+         "edgeShort": 0.025264,
+         "pTP": 0.317282,
+         "pTimeout": 0.339332
+        },
+        "weekend": {
+         "edgeLong": 0.020475,
+         "edgeShort": 0.016826,
+         "pTP": 0.165694,
+         "pTimeout": 0.649549
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 467256,
+        "houseEdge": 0.013605,
+        "pTP": 0.295951
+       },
+       "momentum:10": {
+        "n": 518227,
+        "houseEdge": 0.018248,
+        "pTP": 0.28706
+       },
+       "momentum:30": {
+        "n": 561886,
+        "houseEdge": 0.023378,
+        "pTP": 0.278297
+       },
+       "contrarian:5": {
+        "n": 467256,
+        "houseEdge": 0.034191,
+        "pTP": 0.286599
+       },
+       "contrarian:10": {
+        "n": 518227,
+        "houseEdge": 0.02918,
+        "pTP": 0.28189
+       }
+      },
+      "entryDelaySweep": {
+       "2": {
+        "momentum:5": 0.013605,
+        "momentum:10": 0.018248,
+        "momentum:30": 0.023378
+       },
+       "3": {
+        "momentum:5": 0.016151,
+        "momentum:10": 0.021124,
+        "momentum:30": 0.02421
+       },
+       "4": {
+        "momentum:5": 0.018928,
+        "momentum:10": 0.023824,
+        "momentum:30": 0.024631
+       },
+       "6": {
+        "momentum:5": 0.024473,
+        "momentum:10": 0.026287,
+        "momentum:30": 0.025839
+       },
+       "10": {
+        "momentum:5": 0.028545,
+        "momentum:10": 0.0262,
+        "momentum:30": 0.025308
+       }
+      },
+      "disabledReason": "P(TP) band [30.0%, 45.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 27.4%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 615,
+       "stopPpm": 585,
+       "pTP": 0.273977,
+       "pSL": 0.298069,
+       "pTimeout": 0.427954,
+       "houseEdge": 0.022928,
+       "worstRegimeEdge": 0.007663
+      }
+     },
+     {
+      "tier": 3,
+      "label": "HYPER",
+      "multiplierBps": 30000,
+      "targetPpm": 1445,
+      "stopPpm": 584,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.07319,
+       "pSL": 0.31671,
+       "pTimeout": 0.610101,
+       "houseEdge": 0.024446,
+       "worstRegimeEdge": 0.001879,
+       "edgeLong": 0.021819,
+       "edgeShort": 0.027073,
+       "expectedPayout": 0.975554,
+       "meanResolveSec": 23.950162,
+       "momentumWorstEdge": 0.015549
+      },
+      "grid": {
+       "T": 1444.951057,
+       "S": 584.508364,
+       "houseEdge": 0.024229,
+       "pTP": 0.073201,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.036385,
+         "edgeShort": 0.032334,
+         "pTP": 0.040847,
+         "pTimeout": 0.708254
+        },
+        "volQ2": {
+         "edgeLong": 0.001879,
+         "edgeShort": 0.042704,
+         "pTP": 0.061237,
+         "pTimeout": 0.646349
+        },
+        "volQ3": {
+         "edgeLong": 0.021327,
+         "edgeShort": 0.017203,
+         "pTP": 0.07696,
+         "pTimeout": 0.596851
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.026805,
+         "edgeShort": 0.01519,
+         "pTP": 0.11376,
+         "pTimeout": 0.489878
+        },
+        "weekday": {
+         "edgeLong": 0.017849,
+         "edgeShort": 0.027037,
+         "pTP": 0.091979,
+         "pTimeout": 0.540318
+        },
+        "weekend": {
+         "edgeLong": 0.030976,
+         "edgeShort": 0.026412,
+         "pTP": 0.026246,
+         "pTimeout": 0.785403
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 467256,
+        "houseEdge": 0.015549,
+        "pTP": 0.083136
+       },
+       "momentum:10": {
+        "n": 518227,
+        "houseEdge": 0.020421,
+        "pTP": 0.0789
+       },
+       "momentum:30": {
+        "n": 561886,
+        "houseEdge": 0.026952,
+        "pTP": 0.073568
+       },
+       "contrarian:5": {
+        "n": 467256,
+        "houseEdge": 0.031196,
+        "pTP": 0.081326
+       },
+       "contrarian:10": {
+        "n": 518227,
+        "houseEdge": 0.027494,
+        "pTP": 0.078053
+       }
+      },
+      "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 7.3%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 1445,
+       "stopPpm": 585,
+       "pTP": 0.073201,
+       "pSL": 0.316466,
+       "pTimeout": 0.610334,
+       "houseEdge": 0.024229,
+       "worstRegimeEdge": 0.001879
+      }
+     },
+     {
+      "tier": 4,
+      "label": "WARP",
+      "multiplierBps": 50000,
+      "targetPpm": 3072,
+      "stopPpm": 584,
+      "feeBps": 100,
+      "enabled": false,
+      "stats": {
+       "pTP": 0.009186,
+       "pSL": 0.319104,
+       "pTimeout": 0.67171,
+       "houseEdge": 0.02729,
+       "worstRegimeEdge": 0.010207,
+       "edgeLong": 0.02432,
+       "edgeShort": 0.03026,
+       "expectedPayout": 0.97271,
+       "meanResolveSec": 24.773559,
+       "momentumWorstEdge": 0.016548
+      },
+      "grid": {
+       "T": 3071.886341,
+       "S": 584.508364,
+       "houseEdge": 0.027061,
+       "pTP": 0.009189,
+       "regimes": {
+        "volQ1_quietest": {
+         "edgeLong": 0.04373,
+         "edgeShort": 0.043665,
+         "pTP": 0.002612,
+         "pTimeout": 0.746022
+        },
+        "volQ2": {
+         "edgeLong": 0.010207,
+         "edgeShort": 0.047218,
+         "pTP": 0.007226,
+         "pTimeout": 0.698591
+        },
+        "volQ3": {
+         "edgeLong": 0.019462,
+         "edgeShort": 0.018455,
+         "pTP": 0.009112,
+         "pTimeout": 0.66235
+        },
+        "volQ4_loudest": {
+         "edgeLong": 0.022973,
+         "edgeShort": 0.010779,
+         "pTP": 0.017804,
+         "pTimeout": 0.58084
+        },
+        "weekday": {
+         "edgeLong": 0.017676,
+         "edgeShort": 0.028876,
+         "pTP": 0.012043,
+         "pTimeout": 0.616962
+        },
+        "weekend": {
+         "edgeLong": 0.040138,
+         "edgeShort": 0.032915,
+         "pTP": 0.002052,
+         "pTimeout": 0.809449
+        }
+       }
+      },
+      "strategyStress": {
+       "momentum:5": {
+        "n": 467256,
+        "houseEdge": 0.016548,
+        "pTP": 0.01115
+       },
+       "momentum:10": {
+        "n": 518227,
+        "houseEdge": 0.021901,
+        "pTP": 0.010316
+       },
+       "momentum:30": {
+        "n": 561886,
+        "houseEdge": 0.029634,
+        "pTP": 0.010034
+       },
+       "contrarian:5": {
+        "n": 467256,
+        "houseEdge": 0.033186,
+        "pTP": 0.010461
+       },
+       "contrarian:10": {
+        "n": 518227,
+        "houseEdge": 0.030153,
+        "pTP": 0.00992
+       }
+      },
+      "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 0.9%",
+      "maxPTPUnderConstraints": {
+       "targetPpm": 3072,
+       "stopPpm": 585,
+       "pTP": 0.009189,
+       "pSL": 0.31886,
+       "pTimeout": 0.671951,
+       "houseEdge": 0.027061,
+       "worstRegimeEdge": 0.010207
+      }
+     }
+    ]
+   }
+  }
+ },
+ "proxyCheck": {
+  "supraSeries": "supra-series-main-1790414012.json",
+  "binanceWindow": {
+   "startMs": 1790414007000,
+   "endMs": 1790417617000
+  },
+  "perAsset": {
+   "BNB": {
+    "pairId": 49,
+    "bestLagSec": -2,
+    "lags": {
+     "0": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.3865697069472462,
+       "sd": 1.2051250996040743,
+       "p50Abs": 0.5190895169882026,
+       "p95Abs": 2.5938655080737227,
+       "maxAbs": 10.081167989213213
+      },
+      "corr1s": 0.03007386359682456,
+      "corr20s": 0.4430495118346659,
+      "sigma1sSupraPpm": 19.875412086892464,
+      "sigma1sBinancePpm": 27.452210010706363,
+      "sigma20sRatioSupraOverBinance": 0.9423074460446408
+     },
+     "1": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.38524425569311305,
+       "sd": 1.2472855270045236,
+       "p50Abs": 0.541870003114564,
+       "p95Abs": 2.7252106286446143,
+       "maxAbs": 10.081167989213213
+      },
+      "corr1s": 0.021754129515586383,
+      "corr20s": 0.3995614200681275,
+      "sigma1sSupraPpm": 19.875412086892464,
+      "sigma1sBinancePpm": 27.452210010706363,
+      "sigma20sRatioSupraOverBinance": 0.9440120185035805
+     },
+     "2": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.3838829715804091,
+       "sd": 1.2890044360423951,
+       "p50Abs": 0.5775695354781618,
+       "p95Abs": 2.78898416116391,
+       "maxAbs": 10.567397956535718
+      },
+      "corr1s": 0.013373132211493593,
+      "corr20s": 0.3559864481895732,
+      "sigma1sSupraPpm": 19.875412086892464,
+      "sigma1sBinancePpm": 27.453040049573126,
+      "sigma20sRatioSupraOverBinance": 0.9457268705599136
+     },
+     "-5": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.3943527505076723,
+       "sd": 1.0138321583643066,
+       "p50Abs": 0.4864759680867081,
+       "p95Abs": 2.2367448554860836,
+       "maxAbs": 7.487941496810979
+      },
+      "corr1s": 0.03782718905389763,
+      "corr20s": 0.6309157287331907,
+      "sigma1sSupraPpm": 19.875412086892464,
+      "sigma1sBinancePpm": 27.50284554902972,
+      "sigma20sRatioSupraOverBinance": 0.9364425672856509
+     },
+     "-4": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.39259410441942993,
+       "sd": 1.0493630087964998,
+       "p50Abs": 0.492151479044578,
+       "p95Abs": 2.3348423332869572,
+       "maxAbs": 7.487941496810979
+      },
+      "corr1s": 0.029058377410433836,
+      "corr20s": 0.597491748001034,
+      "sigma1sSupraPpm": 19.875412086892464,
+      "sigma1sBinancePpm": 27.502021129514308,
+      "sigma20sRatioSupraOverBinance": 0.9371890352225156
+     },
+     "-3": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.3908715921923495,
+       "sd": 1.0851769497891386,
+       "p50Abs": 0.492151479044578,
+       "p95Abs": 2.3489105467366933,
+       "maxAbs": 7.84451013951637
+      },
+      "corr1s": -0.0031279979823825416,
+      "corr20s": 0.5637930288897206,
+      "sigma1sSupraPpm": 19.875412086892464,
+      "sigma1sBinancePpm": 27.49446030190789,
+      "sigma20sRatioSupraOverBinance": 0.9380007410719978
+     },
+     "-2": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.3892569817405627,
+       "sd": 1.1196167213894064,
+       "p50Abs": 0.492151479044578,
+       "p95Abs": 2.4207260880282355,
+       "maxAbs": 7.909340801826037
+      },
+      "corr1s": 0.21515577558687754,
+      "corr20s": 0.5314976391946095,
+      "sigma1sSupraPpm": 19.875412086892464,
+      "sigma1sBinancePpm": 27.453040875253468,
+      "sigma20sRatioSupraOverBinance": 0.9390199640003282
+     },
+     "-1": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.3878953224553919,
+       "sd": 1.1628469598623254,
+       "p50Abs": 0.5184436322158703,
+       "p95Abs": 2.466187274474674,
+       "maxAbs": 9.108708054561543
+      },
+      "corr1s": 0.014492268032853941,
+      "corr20s": 0.48647048764327067,
+      "sigma1sSupraPpm": 19.875412086892464,
+      "sigma1sBinancePpm": 27.452210010706363,
+      "sigma20sRatioSupraOverBinance": 0.9406130535807712
+     }
+    },
+    "binanceInformedOnSupra": {
+     "20": {
+      "CRUISE": {
+       "delay2_k3": {
+        "n": 1808,
+        "houseEdge": -0.046059
+       },
+       "delay2_k5": {
+        "n": 2043,
+        "houseEdge": -0.067806
+       },
+       "delay2_k10": {
+        "n": 2428,
+        "houseEdge": -0.093648
+       },
+       "delay3_k3": {
+        "n": 1807,
+        "houseEdge": -0.048194
+       },
+       "delay3_k5": {
+        "n": 2042,
+        "houseEdge": -0.068405
+       },
+       "delay3_k10": {
+        "n": 2427,
+        "houseEdge": -0.09063
+       },
+       "delay5_k3": {
+        "n": 1806,
+        "houseEdge": -0.04928
+       },
+       "delay5_k5": {
+        "n": 2041,
+        "houseEdge": -0.065406
+       },
+       "delay5_k10": {
+        "n": 2426,
+        "houseEdge": -0.082181
+       },
+       "delay8_k3": {
+        "n": 1806,
+        "houseEdge": -0.039052
+       },
+       "delay8_k5": {
+        "n": 2041,
+        "houseEdge": -0.052521
+       },
+       "delay8_k10": {
+        "n": 2426,
+        "houseEdge": -0.063333
+       }
+      },
+      "BOOST": {
+       "delay2_k3": {
+        "n": 1808,
+        "houseEdge": -0.101269
+       },
+       "delay2_k5": {
+        "n": 2043,
+        "houseEdge": -0.143474
+       },
+       "delay2_k10": {
+        "n": 2428,
+        "houseEdge": -0.194264
+       },
+       "delay3_k3": {
+        "n": 1807,
+        "houseEdge": -0.105035
+       },
+       "delay3_k5": {
+        "n": 2042,
+        "houseEdge": -0.143645
+       },
+       "delay3_k10": {
+        "n": 2427,
+        "houseEdge": -0.188353
+       },
+       "delay5_k3": {
+        "n": 1806,
+        "houseEdge": -0.108077
+       },
+       "delay5_k5": {
+        "n": 2041,
+        "houseEdge": -0.138695
+       },
+       "delay5_k10": {
+        "n": 2426,
+        "houseEdge": -0.172694
+       },
+       "delay8_k3": {
+        "n": 1806,
+        "houseEdge": -0.08971
+       },
+       "delay8_k5": {
+        "n": 2041,
+        "houseEdge": -0.11482
+       },
+       "delay8_k10": {
+        "n": 2426,
+        "houseEdge": -0.136704
+       }
+      }
+     },
+     "30": {
+      "CRUISE": {
+       "delay2_k3": {
+        "n": 1806,
+        "houseEdge": -0.046149
+       },
+       "delay2_k5": {
+        "n": 2041,
+        "houseEdge": -0.066056
+       },
+       "delay2_k10": {
+        "n": 2426,
+        "houseEdge": -0.088886
+       },
+       "delay3_k3": {
+        "n": 1806,
+        "houseEdge": -0.044465
+       },
+       "delay3_k5": {
+        "n": 2041,
+        "houseEdge": -0.064268
+       },
+       "delay3_k10": {
+        "n": 2426,
+        "houseEdge": -0.084012
+       },
+       "delay5_k3": {
+        "n": 1806,
+        "houseEdge": -0.044111
+       },
+       "delay5_k5": {
+        "n": 2041,
+        "houseEdge": -0.060415
+       },
+       "delay5_k10": {
+        "n": 2426,
+        "houseEdge": -0.074194
+       },
+       "delay8_k3": {
+        "n": 1806,
+        "houseEdge": -0.035694
+       },
+       "delay8_k5": {
+        "n": 2041,
+        "houseEdge": -0.047208
+       },
+       "delay8_k10": {
+        "n": 2424,
+        "houseEdge": -0.056157
+       }
+      },
+      "BOOST": {
+       "delay2_k3": {
+        "n": 1806,
+        "houseEdge": -0.099791
+       },
+       "delay2_k5": {
+        "n": 2041,
+        "houseEdge": -0.141956
+       },
+       "delay2_k10": {
+        "n": 2426,
+        "houseEdge": -0.19091
+       },
+       "delay3_k3": {
+        "n": 1806,
+        "houseEdge": -0.097771
+       },
+       "delay3_k5": {
+        "n": 2041,
+        "houseEdge": -0.139423
+       },
+       "delay3_k10": {
+        "n": 2426,
+        "houseEdge": -0.181435
+       },
+       "delay5_k3": {
+        "n": 1806,
+        "houseEdge": -0.100307
+       },
+       "delay5_k5": {
+        "n": 2041,
+        "houseEdge": -0.133056
+       },
+       "delay5_k10": {
+        "n": 2426,
+        "houseEdge": -0.161681
+       },
+       "delay8_k3": {
+        "n": 1806,
+        "houseEdge": -0.085333
+       },
+       "delay8_k5": {
+        "n": 2041,
+        "houseEdge": -0.107194
+       },
+       "delay8_k10": {
+        "n": 2424,
+        "houseEdge": -0.125688
+       }
+      }
+     }
+    },
+    "supraStats": {
+     "sigma1sPlainPpm": 19.875412086892588,
+     "sigma1sBipowerPpm": 14.305579677642411,
+     "zeroReturnPct": 58.182828563489856,
+     "acf1s": {
+      "1": -0.038841811782372636,
+      "2": 0.08474317235981385,
+      "3": 0.056837154086696234,
+      "4": 0.08117940052471824,
+      "5": 0.06619267289513808,
+      "6": 0.11070959431763522,
+      "7": 0.08480726801581107,
+      "8": 0.050389621546123683,
+      "9": 0.03276086335724007,
+      "10": 0.04888757587164779
+     },
+     "varianceRatio": {
+      "5": 1.1167664620000328,
+      "20": 1.926011266841992,
+      "30": 2.1127742454140894,
+      "60": 1.88259222690506
+     },
+     "absReturnPpm": {
+      "p50": 0,
+      "p99": 71.29986128928678,
+      "p999": 155.5522428688949,
+      "p9999": 213.85106893145877,
+      "max": 213.85106893145877
+     }
+    },
+    "binanceSameHourStats": {
+     "sigma1sPlainPpm": 27.452210010707475,
+     "sigma1sBipowerPpm": 15.443537168777558,
+     "zeroReturnPct": 67.85218116143373,
+     "acf1s": {
+      "1": 0.07713760592664859,
+      "2": 0.02924604777569072,
+      "3": 0.018843595170010143,
+      "4": -0.006160922954862042,
+      "5": 0.015750837905954013,
+      "6": 0.01727582967274728,
+      "7": -0.0013514745834913352,
+      "8": -0.017202647812507656,
+      "9": -0.014228399874857378,
+      "10": -0.014887628960859316
+     },
+     "varianceRatio": {
+      "5": 1.1724135440176298,
+      "20": 1.1369758394013596,
+      "30": 1.1723097107337237,
+      "60": 0.9787803932266184
+     },
+     "absReturnPpm": {
+      "p50": 0,
+      "p99": 129.6579622955818,
+      "p999": 285.5288773524478,
+      "p9999": 401.8302720780742,
+      "max": 401.8302720780742
+     }
+    },
+    "gameOnRecordedHour": {
+     "20": {
+      "CRUISE": {
+       "supra": {
+        "pTP": 0.037151,
+        "pTimeout": 0.953352,
+        "houseEdge": 0.020718,
+        "momentum5Edge": -0.03472
+       },
+       "binanceSameHour": {
+        "pTP": 0.072067,
+        "pTimeout": 0.912989,
+        "houseEdge": 0.021109,
+        "momentum5Edge": 0.001968
+       }
+      },
+      "BOOST": {
+       "supra": {
+        "pTP": 0.037151,
+        "pTimeout": 0.913687,
+        "houseEdge": 0.024264,
+        "momentum5Edge": -0.078025
+       },
+       "binanceSameHour": {
+        "pTP": 0.071788,
+        "pTimeout": 0.848464,
+        "houseEdge": 0.021751,
+        "momentum5Edge": -0.009738
+       }
+      },
+      "HYPER": {
+       "supra": {
+        "pTP": 0.003073,
+        "pTimeout": 0.947765,
+        "houseEdge": 0.049901,
+        "momentum5Edge": -0.050556
+       },
+       "binanceSameHour": {
+        "pTP": 0.002793,
+        "pTimeout": 0.917039,
+        "houseEdge": 0.051233,
+        "momentum5Edge": 0.018451
+       }
+      },
+      "WARP": {
+       "supra": {
+        "pTP": 0,
+        "pTimeout": 0.955028,
+        "houseEdge": 0.056993,
+        "momentum5Edge": -0.039008
+       },
+       "binanceSameHour": {
+        "pTP": 0,
+        "pTimeout": 0.919832,
+        "houseEdge": 0.060826,
+        "momentum5Edge": 0.028877
+       }
+      }
+     },
+     "30": {
+      "CRUISE": {
+       "supra": {
+        "pTP": 0.064286,
+        "pTimeout": 0.922549,
+        "houseEdge": 0.024651,
+        "momentum5Edge": -0.034976
+       },
+       "binanceSameHour": {
+        "pTP": 0.092717,
+        "pTimeout": 0.890056,
+        "houseEdge": 0.022696,
+        "momentum5Edge": 0.008567
+       }
+      },
+      "BOOST": {
+       "supra": {
+        "pTP": 0.070728,
+        "pTimeout": 0.835434,
+        "houseEdge": 0.033243,
+        "momentum5Edge": -0.085192
+       },
+       "binanceSameHour": {
+        "pTP": 0.09902,
+        "pTimeout": 0.77591,
+        "houseEdge": 0.032522,
+        "momentum5Edge": 0.005647
+       }
+      },
+      "HYPER": {
+       "supra": {
+        "pTP": 0.007143,
+        "pTimeout": 0.898739,
+        "houseEdge": 0.050545,
+        "momentum5Edge": -0.067161
+       },
+       "binanceSameHour": {
+        "pTP": 0.005882,
+        "pTimeout": 0.868207,
+        "houseEdge": 0.058463,
+        "momentum5Edge": 0.026728
+       }
+      },
+      "WARP": {
+       "supra": {
+        "pTP": 0,
+        "pTimeout": 0.905882,
+        "houseEdge": 0.068491,
+        "momentum5Edge": -0.043035
+       },
+       "binanceSameHour": {
+        "pTP": 0.0007,
+        "pTimeout": 0.873389,
+        "houseEdge": 0.076935,
+        "momentum5Edge": 0.051339
+       }
+      }
+     }
+    }
+   },
+   "BTC": {
+    "pairId": 0,
+    "bestLagSec": -2,
+    "lags": {
+     "0": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -0.05115811266044131,
+       "sd": 0.6342049632756962,
+       "p50Abs": 0.23210417311458897,
+       "p95Abs": 1.3660131876747084,
+       "maxAbs": 4.118524932257284
+      },
+      "corr1s": 0.05419003790903427,
+      "corr20s": 0.7405203318888405,
+      "sigma1sSupraPpm": 16.261047495267313,
+      "sigma1sBinancePpm": 20.25722565692549,
+      "sigma20sRatioSupraOverBinance": 0.8174906362629383
+     },
+     "1": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -0.05304404899759025,
+       "sd": 0.6775825247400027,
+       "p50Abs": 0.2407241839352814,
+       "p95Abs": 1.5321899808395933,
+       "maxAbs": 4.303580695814713
+      },
+      "corr1s": 0.02929368158866968,
+      "corr20s": 0.693356477830054,
+      "sigma1sSupraPpm": 16.261047495267313,
+      "sigma1sBinancePpm": 20.257225657004447,
+      "sigma20sRatioSupraOverBinance": 0.8189438790762861
+     },
+     "2": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -0.054929227834226824,
+       "sd": 0.7196883205231576,
+       "p50Abs": 0.24696518129752043,
+       "p95Abs": 1.668553607996337,
+       "maxAbs": 5.212452304765858
+      },
+      "corr1s": 0.015653503106479734,
+      "corr20s": 0.6442457216810389,
+      "sigma1sSupraPpm": 16.261047495267313,
+      "sigma1sBinancePpm": 20.257226062234793,
+      "sigma20sRatioSupraOverBinance": 0.8204065376853847
+     },
+     "-5": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -0.04057340472922077,
+       "sd": 0.48031131158085977,
+       "p50Abs": 0.20230453425140738,
+       "p95Abs": 1.040674697647681,
+       "maxAbs": 3.0116079903963477
+      },
+      "corr1s": 0.10582303035665762,
+      "corr20s": 0.8692432218450881,
+      "sigma1sSupraPpm": 16.261047495267313,
+      "sigma1sBinancePpm": 20.54912421594937,
+      "sigma20sRatioSupraOverBinance": 0.8120584422257048
+     },
+     "-4": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -0.04303696519803572,
+       "sd": 0.4986909218923689,
+       "p50Abs": 0.20145449550534877,
+       "p95Abs": 1.0966063783190982,
+       "maxAbs": 3.0116079903963477
+      },
+      "corr1s": 0.11342739262040048,
+      "corr20s": 0.8597258552571475,
+      "sigma1sSupraPpm": 16.261047495267313,
+      "sigma1sBinancePpm": 20.54912451715123,
+      "sigma20sRatioSupraOverBinance": 0.8126176175914317
+     },
+     "-3": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -0.04549981563432231,
+       "sd": 0.5237032486368802,
+       "p50Abs": 0.20119784339578395,
+       "p95Abs": 1.1669292257421304,
+       "maxAbs": 3.0116079903963477
+      },
+      "corr1s": 0.0557644464834737,
+      "corr20s": 0.842603015229541,
+      "sigma1sSupraPpm": 16.261047495267313,
+      "sigma1sBinancePpm": 20.257225657268172,
+      "sigma20sRatioSupraOverBinance": 0.8131782516438077
+     },
+     "-2": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -0.047386850202658426,
+       "sd": 0.5501031049651627,
+       "p50Abs": 0.20169835968530947,
+       "p95Abs": 1.2186125453550467,
+       "maxAbs": 3.017558608832127
+      },
+      "corr1s": 0.2721217272239283,
+      "corr20s": 0.8212583723580641,
+      "sigma1sSupraPpm": 16.261047495267313,
+      "sigma1sBinancePpm": 20.257225657268172,
+      "sigma20sRatioSupraOverBinance": 0.814607908645778
+     },
+     "-1": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -0.04927265799668583,
+       "sd": 0.5906662861740872,
+       "p50Abs": 0.21663437782981632,
+       "p95Abs": 1.2939852378013317,
+       "maxAbs": 3.48270755329505
+      },
+      "corr1s": 0.10709401251249656,
+      "corr20s": 0.7842962406345372,
+      "sigma1sSupraPpm": 16.261047495267313,
+      "sigma1sBinancePpm": 20.25722606249852,
+      "sigma20sRatioSupraOverBinance": 0.8160450610926235
+     }
+    },
+    "binanceInformedOnSupra": {
+     "20": {
+      "CRUISE": {
+       "delay2_k3": {
+        "n": 2004,
+        "houseEdge": -0.040281
+       },
+       "delay2_k5": {
+        "n": 2061,
+        "houseEdge": -0.058243
+       },
+       "delay2_k10": {
+        "n": 2368,
+        "houseEdge": -0.075503
+       },
+       "delay3_k3": {
+        "n": 2004,
+        "houseEdge": -0.037254
+       },
+       "delay3_k5": {
+        "n": 2060,
+        "houseEdge": -0.05509
+       },
+       "delay3_k10": {
+        "n": 2368,
+        "houseEdge": -0.07034
+       },
+       "delay5_k3": {
+        "n": 2003,
+        "houseEdge": -0.031526
+       },
+       "delay5_k5": {
+        "n": 2058,
+        "houseEdge": -0.045805
+       },
+       "delay5_k10": {
+        "n": 2368,
+        "houseEdge": -0.05848
+       },
+       "delay8_k3": {
+        "n": 2000,
+        "houseEdge": -0.019668
+       },
+       "delay8_k5": {
+        "n": 2057,
+        "houseEdge": -0.033371
+       },
+       "delay8_k10": {
+        "n": 2367,
+        "houseEdge": -0.041461
+       }
+      },
+      "BOOST": {
+       "delay2_k3": {
+        "n": 2004,
+        "houseEdge": -0.0919
+       },
+       "delay2_k5": {
+        "n": 2061,
+        "houseEdge": -0.128317
+       },
+       "delay2_k10": {
+        "n": 2368,
+        "houseEdge": -0.161144
+       },
+       "delay3_k3": {
+        "n": 2004,
+        "houseEdge": -0.086263
+       },
+       "delay3_k5": {
+        "n": 2060,
+        "houseEdge": -0.122237
+       },
+       "delay3_k10": {
+        "n": 2368,
+        "houseEdge": -0.151192
+       },
+       "delay5_k3": {
+        "n": 2003,
+        "houseEdge": -0.075702
+       },
+       "delay5_k5": {
+        "n": 2058,
+        "houseEdge": -0.103099
+       },
+       "delay5_k10": {
+        "n": 2368,
+        "houseEdge": -0.127042
+       },
+       "delay8_k3": {
+        "n": 2000,
+        "houseEdge": -0.050527
+       },
+       "delay8_k5": {
+        "n": 2057,
+        "houseEdge": -0.077372
+       },
+       "delay8_k10": {
+        "n": 2367,
+        "houseEdge": -0.094525
+       }
+      }
+     },
+     "30": {
+      "CRUISE": {
+       "delay2_k3": {
+        "n": 2000,
+        "houseEdge": -0.037167
+       },
+       "delay2_k5": {
+        "n": 2054,
+        "houseEdge": -0.053069
+       },
+       "delay2_k10": {
+        "n": 2365,
+        "houseEdge": -0.066022
+       },
+       "delay3_k3": {
+        "n": 2000,
+        "houseEdge": -0.033995
+       },
+       "delay3_k5": {
+        "n": 2053,
+        "houseEdge": -0.048403
+       },
+       "delay3_k10": {
+        "n": 2365,
+        "houseEdge": -0.059338
+       },
+       "delay5_k3": {
+        "n": 2000,
+        "houseEdge": -0.02659
+       },
+       "delay5_k5": {
+        "n": 2052,
+        "houseEdge": -0.037981
+       },
+       "delay5_k10": {
+        "n": 2363,
+        "houseEdge": -0.046969
+       },
+       "delay8_k3": {
+        "n": 1997,
+        "houseEdge": -0.013352
+       },
+       "delay8_k5": {
+        "n": 2051,
+        "houseEdge": -0.023846
+       },
+       "delay8_k10": {
+        "n": 2361,
+        "houseEdge": -0.028126
+       }
+      },
+      "BOOST": {
+       "delay2_k3": {
+        "n": 2000,
+        "houseEdge": -0.106037
+       },
+       "delay2_k5": {
+        "n": 2054,
+        "houseEdge": -0.147694
+       },
+       "delay2_k10": {
+        "n": 2365,
+        "houseEdge": -0.174451
+       },
+       "delay3_k3": {
+        "n": 2000,
+        "houseEdge": -0.102118
+       },
+       "delay3_k5": {
+        "n": 2053,
+        "houseEdge": -0.138578
+       },
+       "delay3_k10": {
+        "n": 2365,
+        "houseEdge": -0.160786
+       },
+       "delay5_k3": {
+        "n": 2000,
+        "houseEdge": -0.086646
+       },
+       "delay5_k5": {
+        "n": 2052,
+        "houseEdge": -0.114799
+       },
+       "delay5_k10": {
+        "n": 2363,
+        "houseEdge": -0.133274
+       },
+       "delay8_k3": {
+        "n": 1997,
+        "houseEdge": -0.054611
+       },
+       "delay8_k5": {
+        "n": 2051,
+        "houseEdge": -0.079443
+       },
+       "delay8_k10": {
+        "n": 2361,
+        "houseEdge": -0.092883
+       }
+      }
+     }
+    },
+    "supraStats": {
+     "sigma1sPlainPpm": 16.261047495267395,
+     "sigma1sBipowerPpm": 12.194253238918238,
+     "zeroReturnPct": 44.92914698527369,
+     "acf1s": {
+      "1": -0.042105060775267,
+      "2": 0.017467552619388278,
+      "3": 0.05490601250207507,
+      "4": 0.051646898842352004,
+      "5": 0.02120235322293899,
+      "6": 0.056305292001973074,
+      "7": 0.08825300712247561,
+      "8": 0.04608549323165204,
+      "9": 0.0666748612687422,
+      "10": 0.04651033367831042
+     },
+     "varianceRatio": {
+      "5": 1.0192937315473114,
+      "20": 1.6693195866579305,
+      "30": 1.8622665063440402,
+      "60": 1.5977477411990784
+     },
+     "absReturnPpm": {
+      "p50": 0.029762771802666066,
+      "p99": 68.73173290555812,
+      "p999": 127.65110364632015,
+      "p9999": 185.94754333212114,
+      "max": 185.94754333212114
+     }
+    },
+    "binanceSameHourStats": {
+     "sigma1sPlainPpm": 20.25722565692597,
+     "sigma1sBipowerPpm": 9.640625814367295,
+     "zeroReturnPct": 47.7910530702973,
+     "acf1s": {
+      "1": 0.13740999730878972,
+      "2": 0.05467576521634817,
+      "3": 0.06787611864999737,
+      "4": 0.041095381646356,
+      "5": 0.04627314680185225,
+      "6": 0.019071701668067,
+      "7": -0.0190428925294755,
+      "8": 0.00932406947917951,
+      "9": -0.020061878250675725,
+      "10": 0.0023372305558832882
+     },
+     "varianceRatio": {
+      "5": 1.3576636779538285,
+      "20": 1.609574266685427,
+      "30": 1.6013891732904044,
+      "60": 1.2262169829382814
+     },
+     "absReturnPpm": {
+      "p50": 0.11887614004280067,
+      "p99": 100.14273312819455,
+      "p999": 225.06473735450783,
+      "p9999": 316.5540631839825,
+      "max": 316.5540631839825
+     }
+    },
+    "gameOnRecordedHour": {
+     "20": {
+      "CRUISE": {
+       "supra": {
+        "pTP": 0.041899,
+        "pTimeout": 0.954469,
+        "houseEdge": 0.017704,
+        "momentum5Edge": -0.037403
+       },
+       "binanceSameHour": {
+        "pTP": 0.065223,
+        "pTimeout": 0.924162,
+        "houseEdge": 0.025033,
+        "momentum5Edge": -0.005764
+       }
+      },
+      "BOOST": {
+       "supra": {
+        "pTP": 0.041899,
+        "pTimeout": 0.904469,
+        "houseEdge": 0.023052,
+        "momentum5Edge": -0.088782
+       },
+       "binanceSameHour": {
+        "pTP": 0.065223,
+        "pTimeout": 0.861732,
+        "houseEdge": 0.018183,
+        "momentum5Edge": -0.048928
+       }
+      },
+      "HYPER": {
+       "supra": {
+        "pTP": 0.002374,
+        "pTimeout": 0.938547,
+        "houseEdge": 0.062868,
+        "momentum5Edge": -0.036071
+       },
+       "binanceSameHour": {
+        "pTP": 0.003073,
+        "pTimeout": 0.918017,
+        "houseEdge": 0.046068,
+        "momentum5Edge": -0.011485
+       }
+      },
+      "WARP": {
+       "supra": {
+        "pTP": 0,
+        "pTimeout": 0.940922,
+        "houseEdge": 0.074482,
+        "momentum5Edge": -0.020191
+       },
+       "binanceSameHour": {
+        "pTP": 0,
+        "pTimeout": 0.921089,
+        "houseEdge": 0.058007,
+        "momentum5Edge": 0.003371
+       }
+      }
+     },
+     "30": {
+      "CRUISE": {
+       "supra": {
+        "pTP": 0.053081,
+        "pTimeout": 0.941457,
+        "houseEdge": 0.017884,
+        "momentum5Edge": -0.030242
+       },
+       "binanceSameHour": {
+        "pTP": 0.080532,
+        "pTimeout": 0.913866,
+        "houseEdge": 0.021278,
+        "momentum5Edge": -0.003332
+       }
+      },
+      "BOOST": {
+       "supra": {
+        "pTP": 0.094398,
+        "pTimeout": 0.795238,
+        "houseEdge": 0.021338,
+        "momentum5Edge": -0.099504
+       },
+       "binanceSameHour": {
+        "pTP": 0.112045,
+        "pTimeout": 0.763585,
+        "houseEdge": 0.020237,
+        "momentum5Edge": -0.054815
+       }
+      },
+      "HYPER": {
+       "supra": {
+        "pTP": 0.003501,
+        "pTimeout": 0.893838,
+        "houseEdge": 0.067137,
+        "momentum5Edge": -0.029723
+       },
+       "binanceSameHour": {
+        "pTP": 0.004342,
+        "pTimeout": 0.877311,
+        "houseEdge": 0.052265,
+        "momentum5Edge": -0.008681
+       }
+      },
+      "WARP": {
+       "supra": {
+        "pTP": 0,
+        "pTimeout": 0.897339,
+        "houseEdge": 0.08176,
+        "momentum5Edge": -0.009962
+       },
+       "binanceSameHour": {
+        "pTP": 0,
+        "pTimeout": 0.881653,
+        "houseEdge": 0.067912,
+        "momentum5Edge": 0.013468
+       }
+      }
+     }
+    }
+   },
+   "ETH": {
+    "pairId": 1,
+    "bestLagSec": -2,
+    "lags": {
+     "0": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.0161162424911947,
+       "sd": 1.0342861318308543,
+       "p50Abs": 0.2979227337385204,
+       "p95Abs": 2.201492537314831,
+       "maxAbs": 10.342031055853296
+      },
+      "corr1s": 0.01696510408933014,
+      "corr20s": 0.7614493117596434,
+      "sigma1sSupraPpm": 25.798354517307775,
+      "sigma1sBinancePpm": 41.33008545669675,
+      "sigma20sRatioSupraOverBinance": 0.8447128550862928
+     },
+     "1": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.011959675899552743,
+       "sd": 1.133692357724192,
+       "p50Abs": 0.31666672875796387,
+       "p95Abs": 2.404186639431982,
+       "maxAbs": 10.37923260641449
+      },
+      "corr1s": 0.05333010475411024,
+      "corr20s": 0.7080924341907979,
+      "sigma1sSupraPpm": 25.798354517307775,
+      "sigma1sBinancePpm": 41.33008545669675,
+      "sigma20sRatioSupraOverBinance": 0.8461018234274633
+     },
+     "2": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.00795868498153697,
+       "sd": 1.2297365191900786,
+       "p50Abs": 0.3538992244012107,
+       "p95Abs": 2.6464394207659225,
+       "maxAbs": 10.397833381695643
+      },
+      "corr1s": 0.04940147971202211,
+      "corr20s": 0.6515982006877133,
+      "sigma1sSupraPpm": 25.798354517307775,
+      "sigma1sBinancePpm": 41.34064677195476,
+      "sigma20sRatioSupraOverBinance": 0.8474975809933236
+     },
+     "-5": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.037589082739320046,
+       "sd": 0.7382378140374871,
+       "p50Abs": 0.22361359570899353,
+       "p95Abs": 1.527758629040754,
+       "maxAbs": 6.451889202534478
+      },
+      "corr1s": 0.14334546237294443,
+      "corr20s": 0.883877912370048,
+      "sigma1sSupraPpm": 25.798354517307775,
+      "sigma1sBinancePpm": 41.34654157452612,
+      "sigma20sRatioSupraOverBinance": 0.8377208703167599
+     },
+     "-4": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.03314401757812371,
+       "sd": 0.7610780778009495,
+       "p50Abs": 0.22364026717625052,
+       "p95Abs": 1.566048077676907,
+       "maxAbs": 6.152125279641485
+      },
+      "corr1s": 0.1122493693713375,
+      "corr20s": 0.8771610718623684,
+      "sigma1sSupraPpm": 25.798354517307775,
+      "sigma1sBinancePpm": 41.34650607550796,
+      "sigma20sRatioSupraOverBinance": 0.8391584429042925
+     },
+     "-3": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.02871050143852199,
+       "sd": 0.7983974379214824,
+       "p50Abs": 0.22370113528347169,
+       "p95Abs": 1.6592342913401836,
+       "maxAbs": 6.208030544256893
+      },
+      "corr1s": 0.031514278073717525,
+      "corr20s": 0.8643612280954751,
+      "sigma1sSupraPpm": 25.798354517307775,
+      "sigma1sBinancePpm": 41.33473829795611,
+      "sigma20sRatioSupraOverBinance": 0.8406189022243407
+     },
+     "-2": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.024442916727417004,
+       "sd": 0.838130872656071,
+       "p50Abs": 0.22378123146760132,
+       "p95Abs": 1.7891621502752475,
+       "maxAbs": 6.245339299031372
+      },
+      "corr1s": 0.42419494476629055,
+      "corr20s": 0.8501387672942494,
+      "sigma1sSupraPpm": 25.798354517307775,
+      "sigma1sBinancePpm": 41.330178764205314,
+      "sigma20sRatioSupraOverBinance": 0.8419431348434219
+     },
+     "-1": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.020283339949499404,
+       "sd": 0.9262008284520147,
+       "p50Abs": 0.26100801294504095,
+       "p95Abs": 1.9761593157263668,
+       "maxAbs": 9.365490353637762
+      },
+      "corr1s": 0.26514903400304274,
+      "corr20s": 0.8127664417030454,
+      "sigma1sSupraPpm": 25.798354517307775,
+      "sigma1sBinancePpm": 41.33012163598807,
+      "sigma20sRatioSupraOverBinance": 0.8433314181454233
+     }
+    },
+    "binanceInformedOnSupra": {
+     "20": {
+      "CRUISE": {
+       "delay2_k3": {
+        "n": 2126,
+        "houseEdge": -0.048054
+       },
+       "delay2_k5": {
+        "n": 2384,
+        "houseEdge": -0.056374
+       },
+       "delay2_k10": {
+        "n": 2783,
+        "houseEdge": -0.070393
+       },
+       "delay3_k3": {
+        "n": 2126,
+        "houseEdge": -0.043512
+       },
+       "delay3_k5": {
+        "n": 2384,
+        "houseEdge": -0.049115
+       },
+       "delay3_k10": {
+        "n": 2783,
+        "houseEdge": -0.063327
+       },
+       "delay5_k3": {
+        "n": 2126,
+        "houseEdge": -0.03296
+       },
+       "delay5_k5": {
+        "n": 2384,
+        "houseEdge": -0.036001
+       },
+       "delay5_k10": {
+        "n": 2783,
+        "houseEdge": -0.050325
+       },
+       "delay8_k3": {
+        "n": 2126,
+        "houseEdge": -0.017683
+       },
+       "delay8_k5": {
+        "n": 2384,
+        "houseEdge": -0.019953
+       },
+       "delay8_k10": {
+        "n": 2783,
+        "houseEdge": -0.034367
+       }
+      },
+      "BOOST": {
+       "delay2_k3": {
+        "n": 2126,
+        "houseEdge": -0.108317
+       },
+       "delay2_k5": {
+        "n": 2384,
+        "houseEdge": -0.123781
+       },
+       "delay2_k10": {
+        "n": 2783,
+        "houseEdge": -0.146232
+       },
+       "delay3_k3": {
+        "n": 2126,
+        "houseEdge": -0.101985
+       },
+       "delay3_k5": {
+        "n": 2384,
+        "houseEdge": -0.111394
+       },
+       "delay3_k10": {
+        "n": 2783,
+        "houseEdge": -0.134111
+       },
+       "delay5_k3": {
+        "n": 2126,
+        "houseEdge": -0.083491
+       },
+       "delay5_k5": {
+        "n": 2384,
+        "houseEdge": -0.088735
+       },
+       "delay5_k10": {
+        "n": 2783,
+        "houseEdge": -0.110026
+       },
+       "delay8_k3": {
+        "n": 2126,
+        "houseEdge": -0.05499
+       },
+       "delay8_k5": {
+        "n": 2384,
+        "houseEdge": -0.05915
+       },
+       "delay8_k10": {
+        "n": 2783,
+        "houseEdge": -0.079748
+       }
+      }
+     },
+     "30": {
+      "CRUISE": {
+       "delay2_k3": {
+        "n": 2126,
+        "houseEdge": -0.039989
+       },
+       "delay2_k5": {
+        "n": 2384,
+        "houseEdge": -0.047077
+       },
+       "delay2_k10": {
+        "n": 2781,
+        "houseEdge": -0.059989
+       },
+       "delay3_k3": {
+        "n": 2126,
+        "houseEdge": -0.034092
+       },
+       "delay3_k5": {
+        "n": 2384,
+        "houseEdge": -0.038721
+       },
+       "delay3_k10": {
+        "n": 2780,
+        "houseEdge": -0.051103
+       },
+       "delay5_k3": {
+        "n": 2126,
+        "houseEdge": -0.018715
+       },
+       "delay5_k5": {
+        "n": 2384,
+        "houseEdge": -0.02336
+       },
+       "delay5_k10": {
+        "n": 2778,
+        "houseEdge": -0.034927
+       },
+       "delay8_k3": {
+        "n": 2125,
+        "houseEdge": -0.000754
+       },
+       "delay8_k5": {
+        "n": 2381,
+        "houseEdge": -0.004267
+       },
+       "delay8_k10": {
+        "n": 2776,
+        "houseEdge": -0.016451
+       }
+      },
+      "BOOST": {
+       "delay2_k3": {
+        "n": 2126,
+        "houseEdge": -0.109655
+       },
+       "delay2_k5": {
+        "n": 2384,
+        "houseEdge": -0.126124
+       },
+       "delay2_k10": {
+        "n": 2781,
+        "houseEdge": -0.145057
+       },
+       "delay3_k3": {
+        "n": 2126,
+        "houseEdge": -0.100721
+       },
+       "delay3_k5": {
+        "n": 2384,
+        "houseEdge": -0.1106
+       },
+       "delay3_k10": {
+        "n": 2780,
+        "houseEdge": -0.128727
+       },
+       "delay5_k3": {
+        "n": 2126,
+        "houseEdge": -0.075138
+       },
+       "delay5_k5": {
+        "n": 2384,
+        "houseEdge": -0.081973
+       },
+       "delay5_k10": {
+        "n": 2778,
+        "houseEdge": -0.097803
+       },
+       "delay8_k3": {
+        "n": 2125,
+        "houseEdge": -0.038435
+       },
+       "delay8_k5": {
+        "n": 2381,
+        "houseEdge": -0.043494
+       },
+       "delay8_k10": {
+        "n": 2776,
+        "houseEdge": -0.063086
+       }
+      }
+     }
+    },
+    "supraStats": {
+     "sigma1sPlainPpm": 25.798354517307313,
+     "sigma1sBipowerPpm": 21.083130628182396,
+     "zeroReturnPct": 50.514031675465404,
+     "acf1s": {
+      "1": 0.016175758034863295,
+      "2": 0.09721512692375744,
+      "3": 0.10600132669276187,
+      "4": 0.12888434509797334,
+      "5": 0.09685487455179738,
+      "6": 0.09897333322126224,
+      "7": 0.037432856631022415,
+      "8": 0.12961426965731926,
+      "9": 0.003877033383882353,
+      "10": 0.04243968863119619
+     },
+     "varianceRatio": {
+      "5": 1.2803359570406243,
+      "20": 2.333478550293781,
+      "30": 2.533637274928652,
+      "60": 1.9715950070846744
+     },
+     "absReturnPpm": {
+      "p50": 0,
+      "p99": 107.13021444674897,
+      "p999": 247.8605719056226,
+      "p9999": 444.0443597522048,
+      "max": 444.0443597522048
+     }
+    },
+    "binanceSameHourStats": {
+     "sigma1sPlainPpm": 41.33008545669761,
+     "sigma1sBipowerPpm": 23.27264615476286,
+     "zeroReturnPct": 63.76771325368158,
+     "acf1s": {
+      "1": 0.10379692374380929,
+      "2": 0.06282463391822175,
+      "3": 0.09029465000472255,
+      "4": -0.011026138974477425,
+      "5": -0.008752563432982885,
+      "6": 0.006685403173534627,
+      "7": 0.018464516593696002,
+      "8": -0.04977458541241503,
+      "9": 0.000654432031775155,
+      "10": 0.006480864152696605
+     },
+     "varianceRatio": {
+      "5": 1.3107282456688047,
+      "20": 1.2741982745880445,
+      "30": 1.2402533973912115,
+      "60": 0.9073075648124638
+     },
+     "absReturnPpm": {
+      "p50": 0,
+      "p99": 175.2430098544977,
+      "p999": 439.61120486990524,
+      "p9999": 1042.7295680863758,
+      "max": 1042.7295680863758
+     }
+    },
+    "gameOnRecordedHour": {
+     "20": {
+      "CRUISE": {
+       "supra": {
+        "pTP": 0.069832,
+        "pTimeout": 0.914525,
+        "houseEdge": 0.02671,
+        "momentum5Edge": -0.039856
+       },
+       "binanceSameHour": {
+        "pTP": 0.112709,
+        "pTimeout": 0.853631,
+        "houseEdge": 0.032705,
+        "momentum5Edge": 0.02744
+       }
+      },
+      "BOOST": {
+       "supra": {
+        "pTP": 0.053212,
+        "pTimeout": 0.881844,
+        "houseEdge": 0.022468,
+        "momentum5Edge": -0.091597
+       },
+       "binanceSameHour": {
+        "pTP": 0.093715,
+        "pTimeout": 0.799162,
+        "houseEdge": 0.024249,
+        "momentum5Edge": 0.005316
+       }
+      },
+      "HYPER": {
+       "supra": {
+        "pTP": 0.009637,
+        "pTimeout": 0.925419,
+        "houseEdge": 0.035927,
+        "momentum5Edge": -0.074779
+       },
+       "binanceSameHour": {
+        "pTP": 0.01257,
+        "pTimeout": 0.878771,
+        "houseEdge": 0.037052,
+        "momentum5Edge": 0.02855
+       }
+      },
+      "WARP": {
+       "supra": {
+        "pTP": 0,
+        "pTimeout": 0.942039,
+        "houseEdge": 0.041008,
+        "momentum5Edge": -0.064512
+       },
+       "binanceSameHour": {
+        "pTP": 0,
+        "pTimeout": 0.898324,
+        "houseEdge": 0.043742,
+        "momentum5Edge": 0.038286
+       }
+      }
+     },
+     "30": {
+      "CRUISE": {
+       "supra": {
+        "pTP": 0.093838,
+        "pTimeout": 0.885014,
+        "houseEdge": 0.030001,
+        "momentum5Edge": -0.022276
+       },
+       "binanceSameHour": {
+        "pTP": 0.142857,
+        "pTimeout": 0.820588,
+        "houseEdge": 0.033796,
+        "momentum5Edge": 0.026995
+       }
+      },
+      "BOOST": {
+       "supra": {
+        "pTP": 0.093277,
+        "pTimeout": 0.795238,
+        "houseEdge": 0.023378,
+        "momentum5Edge": -0.076546
+       },
+       "binanceSameHour": {
+        "pTP": 0.139216,
+        "pTimeout": 0.706863,
+        "houseEdge": 0.02312,
+        "momentum5Edge": -0.001156
+       }
+      },
+      "HYPER": {
+       "supra": {
+        "pTP": 0.013866,
+        "pTimeout": 0.883754,
+        "houseEdge": 0.035037,
+        "momentum5Edge": -0.060872
+       },
+       "binanceSameHour": {
+        "pTP": 0.017507,
+        "pTimeout": 0.835154,
+        "houseEdge": 0.038614,
+        "momentum5Edge": 0.018651
+       }
+      },
+      "WARP": {
+       "supra": {
+        "pTP": 0.00014,
+        "pTimeout": 0.887955,
+        "houseEdge": 0.046853,
+        "momentum5Edge": -0.048088
+       },
+       "binanceSameHour": {
+        "pTP": 0.001401,
+        "pTimeout": 0.842857,
+        "houseEdge": 0.056446,
+        "momentum5Edge": 0.047065
+       }
+      }
+     }
+    }
+   },
+   "SOL": {
+    "pairId": 10,
+    "bestLagSec": -1,
+    "lags": {
+     "0": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.792454436689079,
+       "sd": 1.6989497314093198,
+       "p50Abs": 1.0392417692051126,
+       "p95Abs": 3.5434383858601315,
+       "maxAbs": 12.497917013831739
+      },
+      "corr1s": -0.018823098764808078,
+      "corr20s": 0.701102723377397,
+      "sigma1sSupraPpm": 63.60936018894369,
+      "sigma1sBinancePpm": 83.05953009695506,
+      "sigma20sRatioSupraOverBinance": 0.8100289392822968
+     },
+     "1": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.7934011499554153,
+       "sd": 1.8286513991964088,
+       "p50Abs": 1.041579868343856,
+       "p95Abs": 3.7515631513129755,
+       "maxAbs": 14.580903182803695
+      },
+      "corr1s": -0.013906267634265192,
+      "corr20s": 0.6537894558836923,
+      "sigma1sSupraPpm": 63.60936018894369,
+      "sigma1sBinancePpm": 83.0710711270193,
+      "sigma20sRatioSupraOverBinance": 0.8113101011914867
+     },
+     "2": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.7941161327323023,
+       "sd": 1.9459356046803329,
+       "p50Abs": 1.1665694525442305,
+       "p95Abs": 4.165278240586545,
+       "maxAbs": 14.997500416598086
+      },
+      "corr1s": 0.025635243330261622,
+      "corr20s": 0.6060181161786821,
+      "sigma1sSupraPpm": 63.60936018894369,
+      "sigma1sBinancePpm": 83.08265552335466,
+      "sigma20sRatioSupraOverBinance": 0.8128060716971159
+     },
+     "-5": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.7896258859561439,
+       "sd": 1.3203914313340916,
+       "p50Abs": 0.8339588024353084,
+       "p95Abs": 2.9164236313627967,
+       "maxAbs": 8.122292569143763
+      },
+      "corr1s": 0.014643392501280047,
+      "corr20s": 0.8254419035658325,
+      "sigma1sSupraPpm": 63.60936018894369,
+      "sigma1sBinancePpm": 83.11731882894428,
+      "sigma20sRatioSupraOverBinance": 0.8050210097568022
+     },
+     "-4": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.7898617538876854,
+       "sd": 1.3569812360279685,
+       "p50Abs": 0.8340283569641116,
+       "p95Abs": 2.9176392130714213,
+       "maxAbs": 8.165305782370513
+      },
+      "corr1s": 0.06148063361355296,
+      "corr20s": 0.8165744349696819,
+      "sigma1sSupraPpm": 63.60936018894369,
+      "sigma1sBinancePpm": 83.12888393942076,
+      "sigma20sRatioSupraOverBinance": 0.8057602431629681
+     },
+     "-3": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.7901008727883034,
+       "sd": 1.4157683833561936,
+       "p50Abs": 0.8340979230969658,
+       "p95Abs": 3.1236984589755323,
+       "maxAbs": 9.081819696719062
+      },
+      "corr1s": -0.003222242983341426,
+      "corr20s": 0.7980532312107544,
+      "sigma1sSupraPpm": 63.60936018894369,
+      "sigma1sBinancePpm": 83.0826401501833,
+      "sigma20sRatioSupraOverBinance": 0.8063596516272806
+     },
+     "-2": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.7908016688083154,
+       "sd": 1.4708140881191614,
+       "p50Abs": 0.8339588024353084,
+       "p95Abs": 3.3286177914626514,
+       "maxAbs": 10.289951674722353
+      },
+      "corr1s": 0.08314672856144181,
+      "corr20s": 0.7814870855323236,
+      "sigma1sSupraPpm": 63.60936018894369,
+      "sigma1sBinancePpm": 83.07106344854364,
+      "sigma20sRatioSupraOverBinance": 0.8072683623096326
+     },
+     "-1": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": 0.7917377259528494,
+       "sd": 1.552156006779573,
+       "p50Abs": 0.8338892595061154,
+       "p95Abs": 3.3341668750530573,
+       "maxAbs": 12.664555907349051
+      },
+      "corr1s": 0.21805617287216086,
+      "corr20s": 0.7541089459843737,
+      "sigma1sSupraPpm": 63.60936018894369,
+      "sigma1sBinancePpm": 83.05953009695506,
+      "sigma20sRatioSupraOverBinance": 0.8087466030344997
+     }
+    },
+    "binanceInformedOnSupra": {
+     "20": {
+      "CRUISE": {
+       "delay2_k3": {
+        "n": 2196,
+        "houseEdge": -0.061538
+       },
+       "delay2_k5": {
+        "n": 2293,
+        "houseEdge": -0.096205
+       },
+       "delay2_k10": {
+        "n": 2645,
+        "houseEdge": -0.129976
+       },
+       "delay3_k3": {
+        "n": 2195,
+        "houseEdge": -0.058709
+       },
+       "delay3_k5": {
+        "n": 2293,
+        "houseEdge": -0.088199
+       },
+       "delay3_k10": {
+        "n": 2645,
+        "houseEdge": -0.119587
+       },
+       "delay5_k3": {
+        "n": 2194,
+        "houseEdge": -0.048207
+       },
+       "delay5_k5": {
+        "n": 2292,
+        "houseEdge": -0.077114
+       },
+       "delay5_k10": {
+        "n": 2645,
+        "houseEdge": -0.099238
+       },
+       "delay8_k3": {
+        "n": 2192,
+        "houseEdge": -0.035241
+       },
+       "delay8_k5": {
+        "n": 2291,
+        "houseEdge": -0.052794
+       },
+       "delay8_k10": {
+        "n": 2643,
+        "houseEdge": -0.064741
+       }
+      },
+      "BOOST": {
+       "delay2_k3": {
+        "n": 2196,
+        "houseEdge": -0.103536
+       },
+       "delay2_k5": {
+        "n": 2293,
+        "houseEdge": -0.147003
+       },
+       "delay2_k10": {
+        "n": 2645,
+        "houseEdge": -0.187631
+       },
+       "delay3_k3": {
+        "n": 2195,
+        "houseEdge": -0.098508
+       },
+       "delay3_k5": {
+        "n": 2293,
+        "houseEdge": -0.137192
+       },
+       "delay3_k10": {
+        "n": 2645,
+        "houseEdge": -0.172546
+       },
+       "delay5_k3": {
+        "n": 2194,
+        "houseEdge": -0.083993
+       },
+       "delay5_k5": {
+        "n": 2292,
+        "houseEdge": -0.120374
+       },
+       "delay5_k10": {
+        "n": 2645,
+        "houseEdge": -0.147283
+       },
+       "delay8_k3": {
+        "n": 2192,
+        "houseEdge": -0.064426
+       },
+       "delay8_k5": {
+        "n": 2291,
+        "houseEdge": -0.086692
+       },
+       "delay8_k10": {
+        "n": 2643,
+        "houseEdge": -0.102819
+       }
+      }
+     },
+     "30": {
+      "CRUISE": {
+       "delay2_k3": {
+        "n": 2190,
+        "houseEdge": -0.04741
+       },
+       "delay2_k5": {
+        "n": 2289,
+        "houseEdge": -0.078992
+       },
+       "delay2_k10": {
+        "n": 2639,
+        "houseEdge": -0.104605
+       },
+       "delay3_k3": {
+        "n": 2190,
+        "houseEdge": -0.046439
+       },
+       "delay3_k5": {
+        "n": 2289,
+        "houseEdge": -0.068324
+       },
+       "delay3_k10": {
+        "n": 2638,
+        "houseEdge": -0.093396
+       },
+       "delay5_k3": {
+        "n": 2190,
+        "houseEdge": -0.027644
+       },
+       "delay5_k5": {
+        "n": 2287,
+        "houseEdge": -0.052109
+       },
+       "delay5_k10": {
+        "n": 2636,
+        "houseEdge": -0.065896
+       },
+       "delay8_k3": {
+        "n": 2187,
+        "houseEdge": -0.009383
+       },
+       "delay8_k5": {
+        "n": 2284,
+        "houseEdge": -0.021071
+       },
+       "delay8_k10": {
+        "n": 2633,
+        "houseEdge": -0.028128
+       }
+      },
+      "BOOST": {
+       "delay2_k3": {
+        "n": 2190,
+        "houseEdge": -0.089315
+       },
+       "delay2_k5": {
+        "n": 2289,
+        "houseEdge": -0.130658
+       },
+       "delay2_k10": {
+        "n": 2639,
+        "houseEdge": -0.163351
+       },
+       "delay3_k3": {
+        "n": 2190,
+        "houseEdge": -0.083588
+       },
+       "delay3_k5": {
+        "n": 2289,
+        "houseEdge": -0.11705
+       },
+       "delay3_k10": {
+        "n": 2638,
+        "houseEdge": -0.14723
+       },
+       "delay5_k3": {
+        "n": 2190,
+        "houseEdge": -0.063068
+       },
+       "delay5_k5": {
+        "n": 2287,
+        "houseEdge": -0.09621
+       },
+       "delay5_k10": {
+        "n": 2636,
+        "houseEdge": -0.11449
+       },
+       "delay8_k3": {
+        "n": 2187,
+        "houseEdge": -0.038663
+       },
+       "delay8_k5": {
+        "n": 2284,
+        "houseEdge": -0.055868
+       },
+       "delay8_k10": {
+        "n": 2633,
+        "houseEdge": -0.065438
+       }
+      }
+     }
+    },
+    "supraStats": {
+     "sigma1sPlainPpm": 63.60936018894231,
+     "sigma1sBipowerPpm": 61.828665338943956,
+     "zeroReturnPct": 38.482911919977774,
+     "acf1s": {
+      "1": -0.36270782705427906,
+      "2": 0.043998510083415224,
+      "3": 0.02818850199898627,
+      "4": 0.07281670496024031,
+      "5": -0.00035077104768782384,
+      "6": 0.05974873857340792,
+      "7": 0.020388356596225496,
+      "8": 0.042818267325459826,
+      "9": 0.014963027826340328,
+      "10": 0.010551300549229512
+     },
+     "varianceRatio": {
+      "5": 0.5244746944793895,
+      "20": 0.8359763143815249,
+      "30": 0.9299695522022338,
+      "60": 0.7296331189390293
+     },
+     "absReturnPpm": {
+      "p50": 24.98324040955957,
+      "p99": 208.3420142506842,
+      "p999": 391.4807133278408,
+      "p9999": 500.1667222408468,
+      "max": 500.1667222408468
+     }
+    },
+    "binanceSameHourStats": {
+     "sigma1sPlainPpm": 83.05953009695351,
+     "sigma1sBipowerPpm": 60.25502750335832,
+     "zeroReturnPct": 58.23839955543207,
+     "acf1s": {
+      "1": -0.11185780209346673,
+      "2": -0.05148938845263438,
+      "3": 0.005582053660006715,
+      "4": -0.009776878491339508,
+      "5": 0.06957775830079825,
+      "6": -0.011491508730345334,
+      "7": 0.019852097641197722,
+      "8": -0.04366556979749474,
+      "9": 0.015430616913582648,
+      "10": 0.03217003477291821
+     },
+     "varianceRatio": {
+      "5": 0.7606380952418236,
+      "20": 0.7472329564236154,
+      "30": 0.7319229460867654,
+      "60": 0.5132102956411828
+     },
+     "absReturnPpm": {
+      "p50": 0,
+      "p99": 333.38889814960027,
+      "p999": 666.6111157402898,
+      "p9999": 1083.1528078653064,
+      "max": 1083.1528078653064
+     }
+    },
+    "gameOnRecordedHour": {
+     "20": {
+      "CRUISE": {
+       "supra": {
+        "pTP": 0.162849,
+        "pTimeout": 0.807821,
+        "houseEdge": 0.036257,
+        "momentum5Edge": -0.050827
+       },
+       "binanceSameHour": {
+        "pTP": 0.300419,
+        "pTimeout": 0.623184,
+        "houseEdge": 0.029563,
+        "momentum5Edge": 0.01646
+       }
+      },
+      "BOOST": {
+       "supra": {
+        "pTP": 0.047765,
+        "pTimeout": 0.888966,
+        "houseEdge": 0.026438,
+        "momentum5Edge": -0.089108
+       },
+       "binanceSameHour": {
+        "pTP": 0.117039,
+        "pTimeout": 0.765922,
+        "houseEdge": 0.021531,
+        "momentum5Edge": -0.00919
+       }
+      },
+      "HYPER": {
+       "supra": {
+        "pTP": 0.007961,
+        "pTimeout": 0.928771,
+        "houseEdge": 0.04067,
+        "momentum5Edge": -0.076379
+       },
+       "binanceSameHour": {
+        "pTP": 0.013408,
+        "pTimeout": 0.868855,
+        "houseEdge": 0.041517,
+        "momentum5Edge": 0.018661
+       }
+      },
+      "WARP": {
+       "supra": {
+        "pTP": 0,
+        "pTimeout": 0.936732,
+        "houseEdge": 0.047284,
+        "momentum5Edge": -0.07019
+       },
+       "binanceSameHour": {
+        "pTP": 0.000279,
+        "pTimeout": 0.881983,
+        "houseEdge": 0.049895,
+        "momentum5Edge": 0.025533
+       }
+      }
+     },
+     "30": {
+      "CRUISE": {
+       "supra": {
+        "pTP": 0.252381,
+        "pTimeout": 0.680392,
+        "houseEdge": 0.052465,
+        "momentum5Edge": -0.020939
+       },
+       "binanceSameHour": {
+        "pTP": 0.397619,
+        "pTimeout": 0.480252,
+        "houseEdge": 0.033825,
+        "momentum5Edge": 0.035372
+       }
+      },
+      "BOOST": {
+       "supra": {
+        "pTP": 0.081793,
+        "pTimeout": 0.79902,
+        "houseEdge": 0.037574,
+        "momentum5Edge": -0.060302
+       },
+       "binanceSameHour": {
+        "pTP": 0.127031,
+        "pTimeout": 0.683894,
+        "houseEdge": 0.043604,
+        "momentum5Edge": 0.036477
+       }
+      },
+      "HYPER": {
+       "supra": {
+        "pTP": 0.011064,
+        "pTimeout": 0.880952,
+        "houseEdge": 0.039647,
+        "momentum5Edge": -0.056376
+       },
+       "binanceSameHour": {
+        "pTP": 0.019328,
+        "pTimeout": 0.791036,
+        "houseEdge": 0.048606,
+        "momentum5Edge": 0.042724
+       }
+      },
+      "WARP": {
+       "supra": {
+        "pTP": 0,
+        "pTimeout": 0.892017,
+        "houseEdge": 0.045679,
+        "momentum5Edge": -0.050496
+       },
+       "binanceSameHour": {
+        "pTP": 0.001681,
+        "pTimeout": 0.808683,
+        "houseEdge": 0.058268,
+        "momentum5Edge": 0.055042
+       }
+      }
+     }
+    }
+   },
+   "DOGE": {
+    "pairId": 3,
+    "bestLagSec": -1,
+    "lags": {
+     "0": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -1.2983044176370198,
+       "sd": 2.1160288873192488,
+       "p50Abs": 1.5454358128974555,
+       "p95Abs": 5.057281453193507,
+       "maxAbs": 12.391573729864103
+      },
+      "corr1s": 0.015317550030950228,
+      "corr20s": 0.5873125985705043,
+      "sigma1sSupraPpm": 59.52017907274241,
+      "sigma1sBinancePpm": 90.93645693828901,
+      "sigma20sRatioSupraOverBinance": 0.7445608807620107
+     },
+     "1": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -1.310825640840093,
+       "sd": 2.2511744144236077,
+       "p50Abs": 1.6471072678614362,
+       "p95Abs": 5.151452709664106,
+       "maxAbs": 12.907889301940756
+      },
+      "corr1s": -0.012882383727654692,
+      "corr20s": 0.5266013239889304,
+      "sigma1sSupraPpm": 59.52017907274241,
+      "sigma1sBinancePpm": 90.88732239112518,
+      "sigma20sRatioSupraOverBinance": 0.7473580241317678
+     },
+     "2": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -1.323918864553831,
+       "sd": 2.377892111615096,
+       "p50Abs": 1.8015235742230296,
+       "p95Abs": 5.379649554256849,
+       "maxAbs": 11.874032008258872
+      },
+      "corr1s": 0.024921948095558477,
+      "corr20s": 0.46600994024290665,
+      "sigma1sSupraPpm": 59.52017907274241,
+      "sigma1sBinancePpm": 90.88732239112518,
+      "sigma20sRatioSupraOverBinance": 0.7501896144385097
+     },
+     "-5": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -1.2299178569293172,
+       "sd": 1.6898380445660195,
+       "p50Abs": 1.5367277942834878,
+       "p95Abs": 3.949814126393836,
+       "maxAbs": 11.337868480725266
+      },
+      "corr1s": 0.038623052574940836,
+      "corr20s": 0.7630687799939343,
+      "sigma1sSupraPpm": 59.52017907274241,
+      "sigma1sBinancePpm": 91.38680639706122,
+      "sigma20sRatioSupraOverBinance": 0.7348982933132336
+     },
+     "-4": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -1.2444606751919467,
+       "sd": 1.7392037149598643,
+       "p50Abs": 1.5433686593269158,
+       "p95Abs": 4.114803003806289,
+       "maxAbs": 11.337868480725266
+      },
+      "corr1s": 0.05805760034006816,
+      "corr20s": 0.7428448440423557,
+      "sigma1sSupraPpm": 59.52017907274241,
+      "sigma1sBinancePpm": 91.38680639706122,
+      "sigma20sRatioSupraOverBinance": 0.736481734653869
+     },
+     "-3": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -1.2590003137502468,
+       "sd": 1.8047946679957156,
+       "p50Abs": 1.5436863229389974,
+       "p95Abs": 4.129671691099901,
+       "maxAbs": 10.308215647871766
+      },
+      "corr1s": 0.05309316264804054,
+      "corr20s": 0.7185367947523842,
+      "sigma1sSupraPpm": 59.52017907274241,
+      "sigma1sBinancePpm": 90.98491963713522,
+      "sigma20sRatioSupraOverBinance": 0.7378447320378839
+     },
+     "-2": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -1.2721080124098774,
+       "sd": 1.8785058244285184,
+       "p50Abs": 1.543845203787475,
+       "p95Abs": 4.387776171794755,
+       "maxAbs": 11.049153242463916
+      },
+      "corr1s": 0.08623091126482488,
+      "corr20s": 0.6890694549062489,
+      "sigma1sSupraPpm": 59.52017907274241,
+      "sigma1sBinancePpm": 90.98491963713522,
+      "sigma20sRatioSupraOverBinance": 0.7399645932088227
+     },
+     "-1": {
+      "n": 3600,
+      "trackingErrorBps": {
+       "mean": -1.284926413546053,
+       "sd": 1.973366552363405,
+       "p50Abs": 1.5441630636192638,
+       "p95Abs": 4.637262984337198,
+       "maxAbs": 11.87525815778745
+      },
+      "corr1s": 0.19717050834360722,
+      "corr20s": 0.6493352398593674,
+      "sigma1sSupraPpm": 59.52017907274241,
+      "sigma1sBinancePpm": 90.98476551341176,
+      "sigma20sRatioSupraOverBinance": 0.7423983210454445
+     }
+    },
+    "binanceInformedOnSupra": {
+     "20": {
+      "CRUISE": {
+       "delay2_k3": {
+        "n": 2172,
+        "houseEdge": -0.066216
+       },
+       "delay2_k5": {
+        "n": 2461,
+        "houseEdge": -0.086475
+       },
+       "delay2_k10": {
+        "n": 2707,
+        "houseEdge": -0.108159
+       },
+       "delay3_k3": {
+        "n": 2172,
+        "houseEdge": -0.06167
+       },
+       "delay3_k5": {
+        "n": 2461,
+        "houseEdge": -0.082509
+       },
+       "delay3_k10": {
+        "n": 2706,
+        "houseEdge": -0.101132
+       },
+       "delay5_k3": {
+        "n": 2172,
+        "houseEdge": -0.055935
+       },
+       "delay5_k5": {
+        "n": 2460,
+        "houseEdge": -0.069663
+       },
+       "delay5_k10": {
+        "n": 2704,
+        "houseEdge": -0.087061
+       },
+       "delay8_k3": {
+        "n": 2170,
+        "houseEdge": -0.039905
+       },
+       "delay8_k5": {
+        "n": 2457,
+        "houseEdge": -0.052294
+       },
+       "delay8_k10": {
+        "n": 2704,
+        "houseEdge": -0.064266
+       }
+      },
+      "BOOST": {
+       "delay2_k3": {
+        "n": 2172,
+        "houseEdge": -0.102433
+       },
+       "delay2_k5": {
+        "n": 2461,
+        "houseEdge": -0.128295
+       },
+       "delay2_k10": {
+        "n": 2707,
+        "houseEdge": -0.154806
+       },
+       "delay3_k3": {
+        "n": 2172,
+        "houseEdge": -0.096599
+       },
+       "delay3_k5": {
+        "n": 2461,
+        "houseEdge": -0.121263
+       },
+       "delay3_k10": {
+        "n": 2706,
+        "houseEdge": -0.145741
+       },
+       "delay5_k3": {
+        "n": 2172,
+        "houseEdge": -0.085169
+       },
+       "delay5_k5": {
+        "n": 2460,
+        "houseEdge": -0.10535
+       },
+       "delay5_k10": {
+        "n": 2704,
+        "houseEdge": -0.128857
+       },
+       "delay8_k3": {
+        "n": 2170,
+        "houseEdge": -0.070215
+       },
+       "delay8_k5": {
+        "n": 2457,
+        "houseEdge": -0.086494
+       },
+       "delay8_k10": {
+        "n": 2704,
+        "houseEdge": -0.099355
+       }
+      }
+     },
+     "30": {
+      "CRUISE": {
+       "delay2_k3": {
+        "n": 2169,
+        "houseEdge": -0.05779
+       },
+       "delay2_k5": {
+        "n": 2454,
+        "houseEdge": -0.078934
+       },
+       "delay2_k10": {
+        "n": 2701,
+        "houseEdge": -0.098456
+       },
+       "delay3_k3": {
+        "n": 2168,
+        "houseEdge": -0.050962
+       },
+       "delay3_k5": {
+        "n": 2453,
+        "houseEdge": -0.072854
+       },
+       "delay3_k10": {
+        "n": 2701,
+        "houseEdge": -0.090477
+       },
+       "delay5_k3": {
+        "n": 2166,
+        "houseEdge": -0.040054
+       },
+       "delay5_k5": {
+        "n": 2452,
+        "houseEdge": -0.055421
+       },
+       "delay5_k10": {
+        "n": 2701,
+        "houseEdge": -0.073447
+       },
+       "delay8_k3": {
+        "n": 2165,
+        "houseEdge": -0.024389
+       },
+       "delay8_k5": {
+        "n": 2450,
+        "houseEdge": -0.039239
+       },
+       "delay8_k10": {
+        "n": 2698,
+        "houseEdge": -0.050451
+       }
+      },
+      "BOOST": {
+       "delay2_k3": {
+        "n": 2169,
+        "houseEdge": -0.112844
+       },
+       "delay2_k5": {
+        "n": 2454,
+        "houseEdge": -0.137592
+       },
+       "delay2_k10": {
+        "n": 2701,
+        "houseEdge": -0.16485
+       },
+       "delay3_k3": {
+        "n": 2168,
+        "houseEdge": -0.103983
+       },
+       "delay3_k5": {
+        "n": 2453,
+        "houseEdge": -0.129625
+       },
+       "delay3_k10": {
+        "n": 2701,
+        "houseEdge": -0.154629
+       },
+       "delay5_k3": {
+        "n": 2166,
+        "houseEdge": -0.087346
+       },
+       "delay5_k5": {
+        "n": 2452,
+        "houseEdge": -0.106952
+       },
+       "delay5_k10": {
+        "n": 2701,
+        "houseEdge": -0.133528
+       },
+       "delay8_k3": {
+        "n": 2165,
+        "houseEdge": -0.072671
+       },
+       "delay8_k5": {
+        "n": 2450,
+        "houseEdge": -0.089291
+       },
+       "delay8_k10": {
+        "n": 2698,
+        "houseEdge": -0.102409
+       }
+      }
+     }
+    },
+    "supraStats": {
+     "sigma1sPlainPpm": 59.52017907274098,
+     "sigma1sBipowerPpm": 50.145588845109806,
+     "zeroReturnPct": 48.73575993331481,
+     "acf1s": {
+      "1": -0.17734063134701175,
+      "2": -0.030663666026972184,
+      "3": 0.026042885465249587,
+      "4": 0.035456175735541315,
+      "5": 0.053576172137736716,
+      "6": 0.022223088134768098,
+      "7": -0.012596236423909562,
+      "8": 0.0537293738339939,
+      "9": 0.011414072390525835,
+      "10": 0.014196895916636582
+     },
+     "varianceRatio": {
+      "5": 0.7139029263490796,
+      "20": 0.929054895058256,
+      "30": 1.016402878120988,
+      "60": 0.9434664281675623
+     },
+     "absReturnPpm": {
+      "p50": 7.727776203503289,
+      "p99": 211.04539534977374,
+      "p999": 386.54812524163697,
+      "p9999": 515.0391429747935,
+      "max": 515.0391429747935
+     }
+    },
+    "binanceSameHourStats": {
+     "sigma1sPlainPpm": 90.93645693829083,
+     "sigma1sBipowerPpm": 70.28238772526589,
+     "zeroReturnPct": 58.43289802722978,
+     "acf1s": {
+      "1": -0.11275191457341827,
+      "2": -0.014155839170062893,
+      "3": 0.02144876463700105,
+      "4": 0.02306400367303339,
+      "5": 0.013690937678588084,
+      "6": -0.010943287827599867,
+      "7": -0.0020783886232582046,
+      "8": -0.012034312687475325,
+      "9": -0.027352588219189518,
+      "10": 0.0014967579232518832
+     },
+     "varianceRatio": {
+      "5": 0.8283036403139001,
+      "20": 0.7179485892443221,
+      "30": 0.6736560594069018,
+      "60": 0.5128101555268356
+     },
+     "absReturnPpm": {
+      "p50": 0,
+      "p99": 309.3740332061889,
+      "p999": 516.155672551033,
+      "p9999": 1031.565917062105,
+      "max": 1031.565917062105
+     }
+    },
+    "gameOnRecordedHour": {
+     "20": {
+      "CRUISE": {
+       "supra": {
+        "pTP": 0.088827,
+        "pTimeout": 0.898324,
+        "houseEdge": 0.025532,
+        "momentum5Edge": -0.044475
+       },
+       "binanceSameHour": {
+        "pTP": 0.178352,
+        "pTimeout": 0.777235,
+        "houseEdge": 0.028554,
+        "momentum5Edge": 0.023076
+       }
+      },
+      "BOOST": {
+       "supra": {
+        "pTP": 0.023184,
+        "pTimeout": 0.949302,
+        "houseEdge": 0.016654,
+        "momentum5Edge": -0.072661
+       },
+       "binanceSameHour": {
+        "pTP": 0.068575,
+        "pTimeout": 0.862709,
+        "houseEdge": 0.015552,
+        "momentum5Edge": 0.008264
+       }
+      },
+      "HYPER": {
+       "supra": {
+        "pTP": 0.00014,
+        "pTimeout": 0.972346,
+        "houseEdge": 0.037704,
+        "momentum5Edge": -0.044248
+       },
+       "binanceSameHour": {
+        "pTP": 0.001397,
+        "pTimeout": 0.92919,
+        "houseEdge": 0.044069,
+        "momentum5Edge": 0.041076
+       }
+      },
+      "WARP": {
+       "supra": {
+        "pTP": 0,
+        "pTimeout": 0.972486,
+        "houseEdge": 0.045344,
+        "momentum5Edge": -0.034107
+       },
+       "binanceSameHour": {
+        "pTP": 0,
+        "pTimeout": 0.930587,
+        "houseEdge": 0.054036,
+        "momentum5Edge": 0.052323
+       }
+      }
+     },
+     "30": {
+      "CRUISE": {
+       "supra": {
+        "pTP": 0.154342,
+        "pTimeout": 0.812185,
+        "houseEdge": 0.039582,
+        "momentum5Edge": -0.021543
+       },
+       "binanceSameHour": {
+        "pTP": 0.255462,
+        "pTimeout": 0.665406,
+        "houseEdge": 0.031923,
+        "momentum5Edge": 0.016975
+       }
+      },
+      "BOOST": {
+       "supra": {
+        "pTP": 0.055742,
+        "pTimeout": 0.882493,
+        "houseEdge": 0.016951,
+        "momentum5Edge": -0.063449
+       },
+       "binanceSameHour": {
+        "pTP": 0.113025,
+        "pTimeout": 0.773249,
+        "houseEdge": 0.014567,
+        "momentum5Edge": -0.007346
+       }
+      },
+      "HYPER": {
+       "supra": {
+        "pTP": 0.00042,
+        "pTimeout": 0.937815,
+        "houseEdge": 0.042054,
+        "momentum5Edge": -0.030116
+       },
+       "binanceSameHour": {
+        "pTP": 0.002521,
+        "pTimeout": 0.882493,
+        "houseEdge": 0.052432,
+        "momentum5Edge": 0.04356
+       }
+      },
+      "WARP": {
+       "supra": {
+        "pTP": 0,
+        "pTimeout": 0.938235,
+        "houseEdge": 0.051966,
+        "momentum5Edge": -0.017659
+       },
+       "binanceSameHour": {
+        "pTP": 0,
+        "pTimeout": 0.885014,
+        "houseEdge": 0.063505,
+        "momentum5Edge": 0.057368
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

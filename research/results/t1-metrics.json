@@ -1,0 +1,457 @@
+{
+ "generatedAt": "2026-09-26T10:14:18.469Z",
+ "main": {
+  "file": "data/rec-main-1790414012.ndjson",
+  "runId": "main-1790414012",
+  "startMs": 1790414012129,
+  "durationS": 3600.001,
+  "hz": 5,
+  "requests": {
+   "sent": 18000,
+   "ok": 18000,
+   "statusCounts": {
+    "200": 18000
+   },
+   "errorRatePct": 0,
+   "http429": 0,
+   "rttMs": {
+    "n": 18000,
+    "min": 64,
+    "p50": 69,
+    "p90": 80,
+    "p95": 95,
+    "p99": 235,
+    "p999": 560,
+    "max": 1601,
+    "mean": 75.65577777777777
+   },
+   "errorsSample": []
+  },
+  "proofSizeBytes": {
+   "2304": 18000
+  },
+  "perPair": {
+   "0": {
+    "roundsSeen": 3600,
+    "secondsSpanned": 3600,
+    "missingSeconds": 0,
+    "pctSecondsWithRound": 100,
+    "gaps": 0,
+    "gapHistogram": {},
+    "longestGapSec": 0,
+    "firstSeenMinusRoundStartMs": {
+     "n": 3600,
+     "min": 196,
+     "p50": 400,
+     "p90": 599,
+     "p95": 602,
+     "p99": 630,
+     "p999": 842,
+     "max": 1416,
+     "mean": 442.82444444444445
+    }
+   },
+   "1": {
+    "roundsSeen": 3600,
+    "secondsSpanned": 3600,
+    "missingSeconds": 0,
+    "pctSecondsWithRound": 100,
+    "gaps": 0,
+    "gapHistogram": {},
+    "longestGapSec": 0,
+    "firstSeenMinusRoundStartMs": {
+     "n": 3600,
+     "min": 196,
+     "p50": 400,
+     "p90": 599,
+     "p95": 602,
+     "p99": 630,
+     "p999": 842,
+     "max": 1416,
+     "mean": 442.82444444444445
+    }
+   },
+   "3": {
+    "roundsSeen": 3600,
+    "secondsSpanned": 3600,
+    "missingSeconds": 0,
+    "pctSecondsWithRound": 100,
+    "gaps": 0,
+    "gapHistogram": {},
+    "longestGapSec": 0,
+    "firstSeenMinusRoundStartMs": {
+     "n": 3600,
+     "min": 196,
+     "p50": 400,
+     "p90": 599,
+     "p95": 602,
+     "p99": 630,
+     "p999": 842,
+     "max": 1416,
+     "mean": 442.82444444444445
+    }
+   },
+   "10": {
+    "roundsSeen": 3600,
+    "secondsSpanned": 3600,
+    "missingSeconds": 0,
+    "pctSecondsWithRound": 100,
+    "gaps": 0,
+    "gapHistogram": {},
+    "longestGapSec": 0,
+    "firstSeenMinusRoundStartMs": {
+     "n": 3600,
+     "min": 196,
+     "p50": 400,
+     "p90": 599,
+     "p95": 602,
+     "p99": 630,
+     "p999": 842,
+     "max": 1416,
+     "mean": 442.82444444444445
+    }
+   },
+   "49": {
+    "roundsSeen": 3600,
+    "secondsSpanned": 3600,
+    "missingSeconds": 0,
+    "pctSecondsWithRound": 100,
+    "gaps": 0,
+    "gapHistogram": {},
+    "longestGapSec": 0,
+    "firstSeenMinusRoundStartMs": {
+     "n": 3600,
+     "min": 196,
+     "p50": 400,
+     "p90": 599,
+     "p95": 602,
+     "p99": 630,
+     "p999": 842,
+     "max": 1416,
+     "mean": 442.82444444444445
+    }
+   }
+  },
+  "allPairs": {
+   "firstSeenMinusRoundStartMs_recv": {
+    "n": 18000,
+    "min": 196,
+    "p50": 400,
+    "p90": 599,
+    "p95": 602,
+    "p99": 630,
+    "p999": 842,
+    "max": 1416,
+    "mean": 442.82444444444445
+   },
+   "firstSeenMinusRoundStartMs_sent": {
+    "n": 18000,
+    "min": -71,
+    "p50": 330,
+    "p90": 529,
+    "p95": 530,
+    "p99": 531,
+    "p999": 532,
+    "max": 729,
+    "mean": 366.2786111111111
+   },
+   "firstSeenMinusFeedTsMs": {
+    "n": 18000,
+    "min": 59,
+    "p50": 247,
+    "p90": 440,
+    "p95": 444,
+    "p99": 469,
+    "p999": 682,
+    "max": 1259,
+    "mean": 281.3952777777778
+   },
+   "tsMinusRoundMs": {
+    "n": 18000,
+    "min": 132,
+    "p50": 157,
+    "p90": 182,
+    "p95": 199,
+    "p99": 239,
+    "p999": 325,
+    "max": 345,
+    "mean": 161.42916666666667
+   },
+   "roundServedDurationMs": {
+    "n": 18000,
+    "min": 169,
+    "p50": 800,
+    "p90": 1000,
+    "p95": 1002,
+    "p99": 1018,
+    "p999": 1179,
+    "max": 1200,
+    "mean": 795.2394444444444
+   }
+  },
+  "consistency": {
+   "pairRounds": 18000,
+   "pairRoundsWithMoreThanOneValue": 0,
+   "pairRoundsWithMoreThanOneProofHash": 0,
+   "roundNotEqualFloorTs": 0,
+   "proofsWithMixedRounds": 0,
+   "servedRoundRegressions": 0
+  },
+  "bsc": {
+   "samples": 358,
+   "blockRate": {
+    "blocks": 7980,
+    "seconds": 3591,
+    "avgBlockTimeMs": 450
+   },
+   "latestBlockAgeAtObservationMs": {
+    "n": 358,
+    "min": 335,
+    "p50": 1936,
+    "p90": 3097,
+    "p95": 3341,
+    "p99": 3595,
+    "p999": 3683,
+    "max": 3683,
+    "mean": 1946.2513966480446
+   },
+   "rpcRttMs": {
+    "n": 358,
+    "min": 101,
+    "p50": 115,
+    "p90": 131,
+    "p95": 151,
+    "p99": 417,
+    "p999": 798,
+    "max": 798,
+    "mean": 122.26815642458101
+   },
+   "blockErrors": 0
+  }
+ },
+ "burst10Hz": {
+  "file": "data/rec-burst10-1790413981.ndjson",
+  "runId": "burst10-1790413981",
+  "startMs": 1790413981697,
+  "durationS": 30,
+  "hz": 10,
+  "requests": {
+   "sent": 300,
+   "ok": 300,
+   "statusCounts": {
+    "200": 300
+   },
+   "errorRatePct": 0,
+   "http429": 0,
+   "rttMs": {
+    "n": 300,
+    "min": 67,
+    "p50": 69,
+    "p90": 75,
+    "p95": 86,
+    "p99": 339,
+    "p999": 583,
+    "max": 583,
+    "mean": 77.13
+   },
+   "errorsSample": []
+  },
+  "proofSizeBytes": {
+   "2304": 300
+  },
+  "perPair": {
+   "0": {
+    "roundsSeen": 31,
+    "secondsSpanned": 31,
+    "missingSeconds": 0,
+    "pctSecondsWithRound": 100,
+    "gaps": 0,
+    "gapHistogram": {},
+    "longestGapSec": 0,
+    "firstSeenMinusRoundStartMs": {
+     "n": 31,
+     "min": 236,
+     "p50": 268,
+     "p90": 466,
+     "p95": 467,
+     "p99": 973,
+     "p999": 973,
+     "max": 973,
+     "mean": 339.93548387096774
+    }
+   },
+   "1": {
+    "roundsSeen": 31,
+    "secondsSpanned": 31,
+    "missingSeconds": 0,
+    "pctSecondsWithRound": 100,
+    "gaps": 0,
+    "gapHistogram": {},
+    "longestGapSec": 0,
+    "firstSeenMinusRoundStartMs": {
+     "n": 31,
+     "min": 236,
+     "p50": 268,
+     "p90": 466,
+     "p95": 467,
+     "p99": 973,
+     "p999": 973,
+     "max": 973,
+     "mean": 339.93548387096774
+    }
+   },
+   "3": {
+    "roundsSeen": 31,
+    "secondsSpanned": 31,
+    "missingSeconds": 0,
+    "pctSecondsWithRound": 100,
+    "gaps": 0,
+    "gapHistogram": {},
+    "longestGapSec": 0,
+    "firstSeenMinusRoundStartMs": {
+     "n": 31,
+     "min": 236,
+     "p50": 268,
+     "p90": 466,
+     "p95": 467,
+     "p99": 973,
+     "p999": 973,
+     "max": 973,
+     "mean": 339.93548387096774
+    }
+   },
+   "10": {
+    "roundsSeen": 31,
+    "secondsSpanned": 31,
+    "missingSeconds": 0,
+    "pctSecondsWithRound": 100,
+    "gaps": 0,
+    "gapHistogram": {},
+    "longestGapSec": 0,
+    "firstSeenMinusRoundStartMs": {
+     "n": 31,
+     "min": 236,
+     "p50": 268,
+     "p90": 466,
+     "p95": 467,
+     "p99": 973,
+     "p999": 973,
+     "max": 973,
+     "mean": 339.93548387096774
+    }
+   },
+   "49": {
+    "roundsSeen": 31,
+    "secondsSpanned": 31,
+    "missingSeconds": 0,
+    "pctSecondsWithRound": 100,
+    "gaps": 0,
+    "gapHistogram": {},
+    "longestGapSec": 0,
+    "firstSeenMinusRoundStartMs": {
+     "n": 31,
+     "min": 236,
+     "p50": 268,
+     "p90": 466,
+     "p95": 467,
+     "p99": 973,
+     "p999": 973,
+     "max": 973,
+     "mean": 339.93548387096774
+    }
+   }
+  },
+  "allPairs": {
+   "firstSeenMinusRoundStartMs_recv": {
+    "n": 155,
+    "min": 236,
+    "p50": 268,
+    "p90": 466,
+    "p95": 467,
+    "p99": 973,
+    "p999": 973,
+    "max": 973,
+    "mean": 339.93548387096774
+   },
+   "firstSeenMinusRoundStartMs_sent": {
+    "n": 155,
+    "min": -103,
+    "p50": 197,
+    "p90": 397,
+    "p95": 397,
+    "p99": 698,
+    "p999": 698,
+    "max": 698,
+    "mean": 245.51612903225808
+   },
+   "firstSeenMinusFeedTsMs": {
+    "n": 155,
+    "min": 75,
+    "p50": 120,
+    "p90": 325,
+    "p95": 329,
+    "p99": 819,
+    "p999": 819,
+    "max": 819,
+    "mean": 184.48387096774192
+   },
+   "tsMinusRoundMs": {
+    "n": 155,
+    "min": 133,
+    "p50": 154,
+    "p90": 162,
+    "p95": 188,
+    "p99": 292,
+    "p999": 292,
+    "max": 292,
+    "mean": 155.4516129032258
+   },
+   "roundServedDurationMs": {
+    "n": 155,
+    "min": 199,
+    "p50": 899,
+    "p90": 1097,
+    "p95": 1103,
+    "p99": 1130,
+    "p999": 1130,
+    "max": 1130,
+    "mean": 862.0967741935484
+   }
+  },
+  "consistency": {
+   "pairRounds": 155,
+   "pairRoundsWithMoreThanOneValue": 0,
+   "pairRoundsWithMoreThanOneProofHash": 0,
+   "roundNotEqualFloorTs": 0,
+   "proofsWithMixedRounds": 0,
+   "servedRoundRegressions": 0
+  },
+  "bsc": {
+   "samples": 0,
+   "blockRate": null,
+   "latestBlockAgeAtObservationMs": {
+    "n": 0,
+    "min": null,
+    "p50": null,
+    "p90": null,
+    "p95": null,
+    "p99": null,
+    "p999": null,
+    "max": null,
+    "mean": null
+   },
+   "rpcRttMs": {
+    "n": 0,
+    "min": null,
+    "p50": null,
+    "p90": null,
+    "p95": null,
+    "p99": null,
+    "p999": null,
+    "max": null,
+    "mean": null
+   },
+   "blockErrors": 0
+  }
+ }
+}

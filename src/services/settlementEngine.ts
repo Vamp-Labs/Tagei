@@ -1,5 +1,11 @@
+import { Direction } from '@bnbplay/shared/enums';
+import { barrierPrices, maxPayout } from '@bnbplay/shared/lane';
+import type { RoundTerms } from '@bnbplay/shared/path';
 import { ActiveTradeRound, PositionDirection } from '../types/game';
 import { AssetSymbol } from '../types/market';
+import { practiceLane, type PracticeLane } from '../game/lanes';
+import { markRound, type RoundMark } from '../game/roundMath';
+import { fromPrice18, roundCents, stake18ToUsd, toPrice18, usdToStake18 } from '../game/units';
 
 export interface SettlementConfig {
   targetThresholdPct: number; // e.g. 1.2%
@@ -130,5 +136,105 @@ export class SettlementEngine {
       isLossHit,
       targetProgressPct,
     };
+  }
+
+  public static practiceLane(asset: AssetSymbol, tier = 0): PracticeLane | null {
+    return practiceLane(asset, tier);
+  }
+
+  public static initLaneRound(
+    asset: AssetSymbol,
+    direction: PositionDirection,
+    stake: number,
+    exactRawPrice: number,
+    lane: PracticeLane,
+    now: number = Date.now()
+  ): ActiveTradeRound {
+    const stake18 = usdToStake18(stake);
+    const entry18 = toPrice18(exactRawPrice);
+    const side = direction === 'LONG' ? Direction.Long : Direction.Short;
+    const barriers = barrierPrices(side, entry18, lane.targetPpm, lane.stopPpm);
+    const max18 = maxPayout(stake18, lane.multiplierBps);
+    const entrySec = Math.floor(now / 1000);
+    return {
+      id: `practice_${now}_${Math.random().toString(36).substring(2, 7)}`,
+      asset,
+      direction,
+      stake,
+      entryPrice: exactRawPrice,
+      targetPrice: fromPrice18(barriers.target),
+      stopLossPrice: fromPrice18(barriers.stop),
+      targetPct: lane.targetPpm / 10_000,
+      stopLossPct: lane.stopPpm / 10_000,
+      startTime: now,
+      durationSeconds: lane.durationSec,
+      currentPrice: exactRawPrice,
+      currentPnl: 0,
+      currentMultiplier: 1.0,
+      mode: 'practice',
+      tier: lane.tier,
+      tierLabel: lane.label,
+      multiplierBps: lane.multiplierBps,
+      feeBps: lane.feeBps,
+      targetPpm: lane.targetPpm,
+      stopPpm: lane.stopPpm,
+      maxPayout: stake18ToUsd(max18),
+      entrySec,
+      endSec: entrySec + lane.durationSec,
+    };
+  }
+
+  public static laneTerms(round: ActiveTradeRound): RoundTerms | null {
+    const { targetPpm, stopPpm, multiplierBps, feeBps, entrySec, endSec } = round;
+    if (targetPpm === undefined || stopPpm === undefined || multiplierBps === undefined || feeBps === undefined) return null;
+    const stake = usdToStake18(round.stake);
+    const start = entrySec ?? Math.floor(round.startTime / 1000);
+    return {
+      direction: round.direction === 'LONG' ? Direction.Long : Direction.Short,
+      stake,
+      maxPayout: maxPayout(stake, multiplierBps),
+      entrySec: start,
+      endSec: endSec ?? start + round.durationSeconds,
+      targetPpm,
+      stopPpm,
+      multiplierBps,
+      feeBps,
+      maxJumpPpm: 1_000_000,
+      cashOutRequested: false,
+    };
+  }
+
+  public static evaluateLaneTick(
+    round: ActiveTradeRound,
+    exactRawPrice: number,
+    now: number = Date.now()
+  ): {
+    updatedRound: ActiveTradeRound;
+    isTargetHit: boolean;
+    isLossHit: boolean;
+    targetProgressPct: number;
+    mark: RoundMark | null;
+  } {
+    const terms = SettlementEngine.laneTerms(round);
+    if (!terms) {
+      return { ...SettlementEngine.evaluateTick(round, exactRawPrice), mark: null };
+    }
+    const mark = markRound(terms, toPrice18(round.entryPrice), toPrice18(exactRawPrice), Math.floor(now / 1000));
+    return {
+      updatedRound: {
+        ...round,
+        currentPrice: exactRawPrice,
+        currentPnl: mark.pnl,
+        currentMultiplier: Math.max(0, roundCents(mark.multiple)),
+      },
+      isTargetHit: mark.touch === 'target',
+      isLossHit: mark.touch === 'stop',
+      targetProgressPct: mark.progressPct,
+      mark,
+    };
+  }
+
+  public static markLive(terms: RoundTerms, entryPrice18: bigint, price18: bigint, sec: number): RoundMark {
+    return markRound(terms, entryPrice18, price18, sec);
   }
 }

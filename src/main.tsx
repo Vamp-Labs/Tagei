@@ -1,10 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
+import { Web3Providers } from './web3/providers';
 import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root');
+if (!rootElement) throw new Error('BNB PLAY: #root element is missing from index.html');
+
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <App />
+    <Web3Providers>
+      <App />
+    </Web3Providers>
   </React.StrictMode>
 );

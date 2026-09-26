@@ -12,6 +12,12 @@ export type GameStage =
 
 export type PositionDirection = 'LONG' | 'SHORT';
 
+export type RoundMode = 'practice' | 'live';
+
+export type TierLabel = 'CRUISE' | 'BOOST' | 'HYPER' | 'WARP';
+
+export type VoidReasonLabel = 'entry_invalid' | 'terminal_invalid' | 'checkpoint_gap' | 'stalled';
+
 export interface ActiveTradeRound {
   id: string;
   asset: AssetSymbol;
@@ -32,6 +38,22 @@ export interface ActiveTradeRound {
   exitPrice?: number;
   outcome?: 'win' | 'loss' | 'cashed_out' | 'timeout';
   settlementTxHash?: string;
+
+  mode?: RoundMode;
+  roundId?: string;
+  tier?: number;
+  tierLabel?: TierLabel;
+  laneVersion?: number;
+  multiplierBps?: number;
+  feeBps?: number;
+  targetPpm?: number;
+  stopPpm?: number;
+  maxPayout?: number;
+  entrySec?: number;
+  endSec?: number;
+  cashOutRequested?: boolean;
+  exitSec?: number;
+  voided?: boolean;
 }
 
 export interface TradeResult {
@@ -47,6 +69,21 @@ export interface TradeResult {
   timestamp: number;
   txHash: string;
   xpEarned: number;
+
+  mode?: RoundMode;
+  roundId?: string;
+  tier?: number;
+  tierLabel?: TierLabel;
+  payout?: number;
+  multiplierBps?: number;
+  feeBps?: number;
+  entrySec?: number;
+  decisionSec?: number;
+  durationSec?: number;
+  voided?: boolean;
+  voidReason?: VoidReasonLabel | null;
+  openTxHash?: string;
+  explorerUrl?: string;
 }
 
 export interface LastRoundSummary {
@@ -75,4 +112,5 @@ export interface UserSettings {
   soundEnabled: boolean;
   hapticsEnabled: boolean;
   useLiveBinance: boolean;
+  practiceMode?: boolean;
 }

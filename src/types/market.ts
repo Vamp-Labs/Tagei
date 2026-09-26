@@ -65,6 +65,36 @@ export interface PriceTick {
   volume24h?: number;
 }
 
+export type FeedMode = 'practice' | 'live';
+
+export type FeedSource = 'mock' | 'hub' | 'binance' | 'script' | 'none';
+
+export type OracleHealth = 'ok' | 'degraded' | 'down';
+
+export type ExactRoundSource = 'hub' | 'mock' | 'script';
+
+export interface ExactRound {
+  asset: AssetSymbol;
+  price: number;
+  price18: bigint;
+  sec: number;
+  roundMs: number;
+  tsMs: number;
+  source: ExactRoundSource;
+  lagMs: number | null;
+  receivedAtMs: number;
+}
+
+export interface MarketFeedStatus {
+  mode: FeedMode;
+  asset: AssetSymbol;
+  source: FeedSource;
+  exact: boolean;
+  stale: boolean;
+  oracle: OracleHealth | null;
+  lastPriceAtMs: number | null;
+}
+
 export interface MarketTrackPoint {
   price: number;
   timestamp: number;

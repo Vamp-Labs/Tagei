@@ -57,7 +57,12 @@ export class EwmaSigma {
   private readonly lambda: number;
   count = 0;
 
-  constructor(halfLifeSec = 300, private readonly warmupN = 30) {
+  private readonly warmupN: number;
+
+
+  constructor(halfLifeSec = 300, warmupN = 30) {
+
+    this.warmupN = warmupN;
     this.lambda = Math.exp(Math.log(0.5) / halfLifeSec);
   }
 

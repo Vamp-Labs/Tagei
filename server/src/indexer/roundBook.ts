@@ -50,7 +50,14 @@ export class ChainRoundBook implements RoundBook {
   private readonly active = new Map<string, string>();
   private readonly listeners = new Set<(r: ChainRound, change: RoundChange) => void>();
 
-  constructor(private readonly keepSettled = 5000) {}
+  private readonly keepSettled: number;
+
+
+  constructor(keepSettled = 5000) {
+
+    this.keepSettled = keepSettled;
+
+  }
 
   // ── port ──────────────────────────────────────────────────────────────────
 

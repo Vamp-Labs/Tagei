@@ -29,7 +29,14 @@ export class VoidWatchdog {
   private running = false;
   voided = 0;
 
-  constructor(private readonly o: WatchdogOptions) {}
+  private readonly o: WatchdogOptions;
+
+
+  constructor(o: WatchdogOptions) {
+
+    this.o = o;
+
+  }
 
   start(): void {
     this.timer = setInterval(() => void this.tick(), this.o.intervalMs ?? 5000);

@@ -72,12 +72,36 @@ class Heads implements HeadTracker {
   private lastWsMs = 0;
   private polling = false;
 
+  private readonly ws: PublicClient | undefined;
+
+  private readonly http: PublicClient;
+
+  private readonly pollMs: number;
+
+  private readonly log: Logger;
+
+
   constructor(
-    private readonly ws: PublicClient | undefined,
-    private readonly http: PublicClient,
-    private readonly pollMs: number,
-    private readonly log: Logger,
-  ) {}
+
+    ws: PublicClient | undefined,
+
+    http: PublicClient,
+
+    pollMs: number,
+
+    log: Logger,
+
+  ) {
+
+    this.ws = ws;
+
+    this.http = http;
+
+    this.pollMs = pollMs;
+
+    this.log = log;
+
+  }
 
   latest(): Head | undefined {
     return this.head;

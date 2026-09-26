@@ -7,7 +7,14 @@ export class RoundRing {
   private readonly rows: OracleRound[] = [];
   private readonly bySec = new Map<number, OracleRound>();
 
-  constructor(private readonly windowSec: number) {}
+  private readonly windowSec: number;
+
+
+  constructor(windowSec: number) {
+
+    this.windowSec = windowSec;
+
+  }
 
   get size(): number {
     return this.rows.length;
@@ -74,7 +81,14 @@ export class ProofIndex {
   private readonly byPairSec = new Map<string, Hex>();
   private readonly bySec = new Map<number, Hex>();
 
-  constructor(private readonly windowSec: number) {}
+  private readonly windowSec: number;
+
+
+  constructor(windowSec: number) {
+
+    this.windowSec = windowSec;
+
+  }
 
   has(hash: Hex): boolean {
     return this.byHash.has(hash);

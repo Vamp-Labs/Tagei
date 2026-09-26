@@ -6,11 +6,18 @@ import { faucetAbi } from '../recorder/abi.ts';
 import type { ChainTxSender, SenderHandle } from '../relayer/sender.ts';
 
 export class FaucetDripper {
+  private readonly faucet: Address;
+  private readonly sender: ChainTxSender;
+  private readonly amountUsd: number;
+
   constructor(
-    private readonly faucet: Address,
-    private readonly sender: ChainTxSender,
-    private readonly amountUsd: number,
+    faucet: Address,
+    sender: ChainTxSender,
+    amountUsd: number,
   ) {
+    this.faucet = faucet;
+    this.sender = sender;
+    this.amountUsd = amountUsd;
     if (sender.key !== 'ops') throw new Error('faucet drips must use the ops key');
   }
 

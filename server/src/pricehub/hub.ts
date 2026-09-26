@@ -22,21 +22,31 @@ const WINDOW_SEC = 30 * 60;
 const TRACKED = new Set<number>(SUPRA_PAIR_IDS);
 
 export class SecondMissedError extends Error {
+  readonly pairId: number;
+  readonly sec: number;
+
   constructor(
-    readonly pairId: number,
-    readonly sec: number,
+    pairId: number,
+    sec: number,
   ) {
     super(`round ${sec} of pair ${pairId} was never observed (a newer round arrived first)`);
+    this.pairId = pairId;
+    this.sec = sec;
     this.name = 'SecondMissedError';
   }
 }
 
 export class WaitTimeoutError extends Error {
+  readonly pairId: number;
+  readonly sec: number;
+
   constructor(
-    readonly pairId: number,
-    readonly sec: number,
+    pairId: number,
+    sec: number,
   ) {
     super(`timed out waiting for round ${sec} of pair ${pairId}`);
+    this.pairId = pairId;
+    this.sec = sec;
     this.name = 'WaitTimeoutError';
   }
 }
@@ -95,6 +105,8 @@ export interface HubMetrics {
   newProofs: number;
   nonCanonical: number;
   regressions: number;
+  /** A different value for a (pair, second) already seen (never observed on Supra). */
+  conflicts: number;
   roundsByPair: Record<number, number>;
   missingByPair: Record<number, number>;
   missingSeconds: { pairId: number; sec: number }[];
@@ -168,6 +180,7 @@ export class SupraPriceHub implements PriceHub {
       newProofs: 0,
       nonCanonical: 0,
       regressions: 0,
+      conflicts: 0,
       roundsByPair: Object.fromEntries(SUPRA_PAIR_IDS.map((p) => [p, 0])),
       missingByPair: Object.fromEntries(SUPRA_PAIR_IDS.map((p) => [p, 0])),
       missingSeconds: [],
@@ -455,9 +468,13 @@ export class SupraPriceHub implements PriceHub {
       const ring = this.rings.get(r.pairId) as RoundRing;
       const last = ring.latest();
       if (last && r.sec <= last.sec) {
-        if (!ring.get(r.sec)) {
+        const known = ring.get(r.sec);
+        if (!known) {
           this.metrics.regressions++;
           late.push(r); // archived for backfill, never emitted out of order
+        } else if (known.price18 !== r.price18) {
+          this.metrics.conflicts++;
+          this.log.warn('conflicting value for a known round', { pairId: r.pairId, sec: r.sec });
         }
         continue;
       }

@@ -24,11 +24,24 @@ export class PgTxLog implements TxLog {
   private timer: NodeJS.Timeout;
   private flushing: Promise<void> | undefined;
 
+  private readonly db: AnyPgDb;
+
+  private readonly log: Logger;
+
+
   constructor(
-    private readonly db: AnyPgDb,
-    private readonly log: Logger = silentLogger,
+
+    db: AnyPgDb,
+
+    log: Logger = silentLogger,
+
     flushMs = 250,
+
   ) {
+
+    this.db = db;
+
+    this.log = log;
     this.timer = setInterval(() => void this.flush(), flushMs);
     this.timer.unref?.();
   }

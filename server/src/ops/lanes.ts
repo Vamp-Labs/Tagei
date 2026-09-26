@@ -80,7 +80,11 @@ export class MemoryLaneChangeStore implements LaneChangeStore {
 }
 
 export class PgLaneChangeStore implements LaneChangeStore {
-  constructor(private readonly db: AnyPgDb) {}
+  private readonly db: AnyPgDb;
+
+  constructor(db: AnyPgDb) {
+    this.db = db;
+  }
   async insert(row: LaneChangeRow) {
     await this.db.insert(laneChanges).values(row);
   }
@@ -120,7 +124,12 @@ export class AdaptiveLanes {
   private readonly inflight = new Set<string>();
   readonly last = new Map<number, AssetEvaluation>();
 
-  constructor(private readonly o: AdaptiveLanesOptions) {
+  private readonly o: AdaptiveLanesOptions;
+
+
+  constructor(o: AdaptiveLanesOptions) {
+
+    this.o = o;
     this.store = o.store ?? new MemoryLaneChangeStore();
     this.log = o.log ?? silentLogger;
   }

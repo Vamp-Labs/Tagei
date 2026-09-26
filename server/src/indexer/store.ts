@@ -181,10 +181,16 @@ function reviveArgs(name: string, args: Record<string, unknown>): Record<string,
 }
 
 export class PgIndexerStore implements IndexerStore {
+  private readonly db: AnyPgDb;
+  private readonly id: string;
+
   constructor(
-    private readonly db: AnyPgDb,
-    private readonly id = 'arena',
-  ) {}
+    db: AnyPgDb,
+    id = 'arena',
+  ) {
+    this.db = db;
+    this.id = id;
+  }
 
   async loadCursor() {
     const rows = await this.db.select().from(indexerState).where(eq(indexerState.id, this.id)).limit(1);

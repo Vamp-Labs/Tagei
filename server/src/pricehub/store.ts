@@ -92,12 +92,30 @@ export class PgOracleStore implements OracleStore {
   private flushing: Promise<void> | undefined;
   private readonly timer: NodeJS.Timeout;
 
+  private readonly db: AnyPgDb;
+
+  private readonly log: Logger;
+
+  private readonly maxQueue: number;
+
+
   constructor(
-    private readonly db: AnyPgDb,
-    private readonly log: Logger = silentLogger,
+
+    db: AnyPgDb,
+
+    log: Logger = silentLogger,
+
     flushMs = 250,
-    private readonly maxQueue = 20_000,
+
+    maxQueue = 20_000,
+
   ) {
+
+    this.db = db;
+
+    this.log = log;
+
+    this.maxQueue = maxQueue;
     this.timer = setInterval(() => void this.flush(), flushMs);
     this.timer.unref?.();
   }

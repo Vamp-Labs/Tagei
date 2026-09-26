@@ -43,7 +43,12 @@ export class SupraMonitor {
   private readonly proxies: { pull: Address; storage: Address; committeeVerifier: Address };
   lastVerifiedAtMs = 0;
 
-  constructor(private readonly o: SupraMonitorOptions) {
+  private readonly o: SupraMonitorOptions;
+
+
+  constructor(o: SupraMonitorOptions) {
+
+    this.o = o;
     this.log = o.log ?? silentLogger;
     this.proxies = o.proxies ?? { pull: bscTestnet.supra.pull, storage: bscTestnet.supra.storage, committeeVerifier: bscTestnet.supra.committeeVerifier };
   }

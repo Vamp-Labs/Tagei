@@ -63,19 +63,6 @@
   --color-profit: var(--color-lucky);
   --color-loss: var(--color-amber);
 
-  /* LEGACY BRIDGE — deleted in E0-final */
-  --color-bnb-yellow: var(--color-gold);
-  --color-bnb-yellow-bright: var(--color-gold-bright);
-  --color-long: var(--color-lucky);
-  --color-short: var(--color-amber);
-  --color-bg-0: var(--color-canvas);
-  --color-bg-1: var(--color-well);
-  --color-panel-soft: var(--color-control);
-  --color-text-1: var(--color-ink);
-  --color-text-2: var(--color-ink-secondary);
-  --color-text-3: var(--color-ink-muted);
-  --font-mono: var(--font-sans);
-  --font-mono--font-feature-settings: "tnum";
 
   --font-sans: "Figtree", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
 
@@ -128,11 +115,6 @@
     --sa-top: env(safe-area-inset-top, 0px);
     --sa-bottom: env(safe-area-inset-bottom, 0px);
 
-    /* LEGACY BRIDGE — deleted in E0-final. Kept out of @theme: --color-cta exists, so a text-cta utility must stay a color. */
-    --text-hero-price: var(--text-display);
-    --text-screen-title: var(--text-section);
-    --text-cta: var(--text-label);
-    --text-metadata: var(--text-micro);
   }
 
   html,
@@ -216,29 +198,6 @@
     padding-top: calc(var(--sa-top) + 0.75rem);
   }
 
-  /* LEGACY BRIDGE — deleted in E0-final */
-  .glass-panel {
-    background: var(--color-panel);
-    border: 1px solid var(--color-line);
-  }
-
-  .glow-green {
-    box-shadow: var(--shadow-glow-lucky);
-  }
-
-  .glow-magenta,
-  .glow-magenta-sm {
-    box-shadow: none;
-  }
-
-  .text-glow-green,
-  .text-glow-magenta {
-    text-shadow: none;
-  }
-
-  .pulse-glow-cta {
-    animation: pulseGlow 1.1s ease-in-out 1;
-  }
 
   .animate-ring-expand {
     animation: ringExpand 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;

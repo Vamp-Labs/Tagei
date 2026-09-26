@@ -11,9 +11,6 @@ export const LUCKY_TEXT_SIZES = [
   'caption',
   'micro',
   'numeral',
-  'hero-price',
-  'screen-title',
-  'metadata',
 ] as const;
 
 export const LUCKY_SHADOWS = ['glow-lucky', 'glow-hot', 'glow-gold', 'lift'] as const;

@@ -1,4 +1,5 @@
 import type { Address } from 'viem';
+import { DEPLOYMENTS_JSON } from './abi.ts';
 
 // BSC testnet facts verified on 2026-09-26 (research/spike-report.md).
 export const bscTestnet = {
@@ -41,8 +42,10 @@ export interface Deployment {
   faucet: Address;
 }
 
-/** Filled by `pnpm abi:sync` from contracts/deployments/<chainId>.json (F2). */
-export const DEPLOYMENTS: Partial<Record<number, Deployment>> = {};
+/** Filled by `tools/abi-sync.ts` from contracts/deployments/<chainId>.json (F2). */
+export const DEPLOYMENTS: Partial<Record<number, Deployment>> = Object.fromEntries(
+  Object.entries(DEPLOYMENTS_JSON).map(([chainId, d]) => [Number(chainId), d as Deployment]),
+);
 
 export const explorerTxUrl = (hash: string): string => `${bscTestnet.explorer}/tx/${hash}`;
 export const explorerAddressUrl = (address: string): string => `${bscTestnet.explorer}/address/${address}`;

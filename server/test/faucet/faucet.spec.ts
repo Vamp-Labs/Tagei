@@ -67,7 +67,7 @@ describe('POST /v1/faucet/claim', () => {
   });
 
   it('is unavailable without a faucet address and requires a session', async () => {
-    const h = makeHarness({ deps: { contracts: null } });
+    const h = makeHarness({ env: { CHAIN_ID: '31337' }, deps: { contracts: null } }); // chain with no baked-in deployment
     const { token } = await h.login(undefined, 'wallet');
     expect((await h.request('/v1/faucet/claim', { method: 'POST', token })).status).toBe(503);
     expect((await h.request('/v1/faucet/claim', { method: 'POST' })).status).toBe(401);

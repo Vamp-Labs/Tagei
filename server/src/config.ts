@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { bscTestnet } from '@bnbplay/shared/chain';
+import { bscTestnet, DEPLOYMENTS } from '@bnbplay/shared/chain';
 
 const csv = (fallback: readonly string[]) =>
   z
@@ -79,6 +79,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const cfg = parsed.data;
   if (cfg.NODE_ENV === 'production' && cfg.JWT_SECRET === 'dev-only-change-me') {
     throw new Error('JWT_SECRET must be set in production');
+  }
+  // Fall back to the generated deployment (tools/abi-sync.ts) when no address is pinned by env,
+  // so a fresh deploy is picked up automatically without touching every ARENA_* var by hand.
+  const deployment = DEPLOYMENTS[cfg.CHAIN_ID];
+  if (deployment) {
+    cfg.ARENA_ADDRESS ??= deployment.arena;
+    cfg.CHECKPOINT_ORACLE_ADDRESS ??= deployment.checkpointOracle;
+    cfg.FAUCET_ADDRESS ??= deployment.faucet;
+    cfg.ARENA_DEPLOY_BLOCK ??= deployment.startBlock;
   }
   return cfg;
 }

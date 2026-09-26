@@ -1,0 +1,12 @@
+{
+  "arena": "0x8F1E4A377372E7E1d9fb10185c4bb038cF54e439",
+  "chainId": 97,
+  "checkpointOracle": "0xcFA4634C911F8b713e50086Ef6a332C87c2a4010",
+  "commit": "8e7578f925a1d9a583949e5109160190ee52350c",
+  "faucet": "0xc7cEE3515171E06B49E1590b7A8C1d85ac65006C",
+  "signedCheckpointOracle": "0x8a8F45aAabB5ca222E3F4C820a6e60E5F0BdF968",
+  "signedPriceVerifier": "0x23b8d943180B3329eb0eEB89852d20C55D37a097",
+  "startBlock": 133344481,
+  "supraPriceVerifier": "0x12789fEcd699Dee6B6032C546270A27500b1ea79",
+  "testUsd": "0x4c0bEdD4C4C4f34c2C6cF02172A66953FDF4eC50"
+}

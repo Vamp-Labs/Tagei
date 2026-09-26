@@ -34,22 +34,22 @@
     "maxPerAddress": "2000000000000000000000"
   },
   "addresses": {
-    "deployer": "0xcA5391C789fdabf872BdB447d73D9739bBF006f3",
+    "deployer": "0x47575C31c8146022FaB38dFF5ce883b5e55F6785",
     "relayer": "0x18E82917289AF4E518AC7dd705008033870d6410",
     "recorder": "0xB9Bf2913bfc2C8eE30Ab7CBa539B21c500963C71",
     "ops": "0xeeC1c0a3044b8554430ad9139686b192b1DE0005"
   },
   "roles": {
-    "admin": "0xcA5391C789fdabf872BdB447d73D9739bBF006f3",
+    "admin": "0x47575C31c8146022FaB38dFF5ce883b5e55F6785",
     "config": [
-      "0xcA5391C789fdabf872BdB447d73D9739bBF006f3"
+      "0x47575C31c8146022FaB38dFF5ce883b5e55F6785"
     ],
     "pauser": [
-      "0xcA5391C789fdabf872BdB447d73D9739bBF006f3",
+      "0x47575C31c8146022FaB38dFF5ce883b5e55F6785",
       "0xeeC1c0a3044b8554430ad9139686b192b1DE0005"
     ],
     "treasury": [
-      "0xcA5391C789fdabf872BdB447d73D9739bBF006f3"
+      "0x47575C31c8146022FaB38dFF5ce883b5e55F6785"
     ],
     "faucetOperator": [
       "0xeeC1c0a3044b8554430ad9139686b192b1DE0005"

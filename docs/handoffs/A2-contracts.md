@@ -14,7 +14,7 @@
 
 1. Scaffold the Foundry project:
    - `forge init --no-git contracts`;
-   - dependencies via **Soldeer** (`forge soldeer install forge-std~… @openzeppelin-contracts~5.x`), **no git submodules**;
+   - dependencies via **Soldeer** (`forge soldeer install forge-std~1 @openzeppelin-contracts~5.7.0`, remap `@openzeppelin/contracts/=dependencies/@openzeppelin-contracts-5.7.0/`), **no git submodules**;
    - `foundry.toml`: solc 0.8.30, evm `cancun`, optimizer 1000 runs; fuzz runs 1024; invariant runs 256 / depth 128;
    - `fs_permissions` read for `./test/fixtures`, `./config`, `../packages/shared/vectors`, `../research/fixtures`; read-write for `./deployments`;
    - `[rpc_endpoints] bsc_testnet = "${BSC_TESTNET_RPC_URL}"`;
@@ -23,10 +23,13 @@
    - `src/BnbPlayArena.sol`
    - `src/types/ArenaTypes.sol`
    - `src/libraries/{LaneMath,Intents}.sol`
-   - `src/oracle/{CheckpointOracle,SupraPriceVerifier,SignedPriceVerifier}.sol`
+   - `src/oracle/{CheckpointOracle,StatelessSupraVerifier,SignedPriceVerifier}.sol` (port `research/poc/src/StatelessSupraVerifier.sol`, using OZ `MerkleProof.multiProofVerify`; the stateful `SupraPriceVerifier` is optional P1)
    - `src/oracle/interfaces/*` (vendored `ISupraOraclePull`, `ISupraSValueFeed`, plus ours)
    - `src/token/{TestUSD,TestUSDFaucet}.sol`
-3. Mocks: `test/mocks/MockSupraPull.sol` (reproduces F1 stored-value behaviour) and `MockCheckpointOracle.sol`.
+3. Mocks:
+   - `test/mocks/MockSupraCommitteeVerifier.sol`, whose `requireHashVerified_V2` accepts roots registered by the test. Tests use it to build synthetic 5-pair proofs (LE leaves + OZ multiproof) for any price path.
+   - `MockCheckpointOracle.sol` for pure Arena tests.
+   - `MockSupraPull.sol` only if you build the stateful P1 fallback.
 4. Tests per F1a §10: unit, fuzz, invariant (with the griefer handler), **differential** against `../packages/shared/vectors/*.json` (every case), and fork against `../research/fixtures/supra-97-*.json`.
 5. Scripts:
    - `script/Deploy.s.sol` (reads `config/97.json`, writes `deployments/97.json`);

@@ -16,7 +16,8 @@
     "./sse": "./src/sse.ts",
     "./progression": "./src/progression.ts",
     "./pix": "./src/pix.ts",
-    "./vectors/*": "./vectors/*"
+    "./vectors/*": "./vectors/*",
+    "./supra": "./src/supra.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

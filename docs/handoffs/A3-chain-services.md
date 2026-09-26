@@ -49,7 +49,7 @@
 ## Definition of done
 
 - `pnpm --filter @bnbplay/server typecheck && pnpm --filter @bnbplay/server test` green.
-- Integration test on anvil (a stub ABI from F1a until A2's MockSupraPull lands, then the real one) with a fake Supra REST server: open → record 21 s → TP, SL, timeout, cash-out, void; kill and restart the recorder mid-round; reorg.
+- Integration test on anvil (a stub ABI from F1a until A2's contracts + `MockSupraCommitteeVerifier` land, then the real ones) with a fake Supra REST server: open → record 21 s → TP, SL, timeout, cash-out, void; kill and restart the recorder mid-round; reorg.
 - The hub runs for 10 minutes against the real Supra endpoint with no missed seconds (log proof).
 
 ## Constraints
@@ -57,3 +57,16 @@
 - Only A0 generates migrations: provide the drizzle schema files and A0 runs `db:generate`.
 - Code against `ports.ts`, `bus.ts` and the shared schemas; never import A4 modules.
 - Wire nothing in `server/src/index.ts`. Export a `start(deps)` function per module and A0 wires them.
+
+## v2 notes (after the A1 spike)
+
+- **Stateless verification.** Late and backfilled `record` calls are valid.
+  - The recorder archives **every** proof (Postgres; dedupe by hash).
+  - It backfills any missing second of an open round from the archive until `endSec + STALL_AFTER_SEC (60 s)`.
+  - Inclusion target is soft, ≈ t+2 s, for snappy UX.
+- **Record on demand.** Record only the seconds covered by open rounds. Batching 2–5 seconds per tx is allowed. Recording 24/7 would cost ≈ 2.4–4 tBNB/day.
+- **Polling.** 5 Hz, phase-aligned between round+150 ms and round+950 ms (rounds appear +0.2–0.65 s after the round start). Reject non-canonical feeds with `isCanonicalRound`.
+- **Chain I/O.** Track heads over **WSS** (`wss://bsc-testnet-rpc.publicnode.com`); HTTP "latest" from the bnbchain.org RPCs is ≈ 1.9 s stale. Send txs through two RPCs. Use publicnode for archive reads and forks.
+- **Redundancy.** Build the proof archiver so that a second instance (`ROLE=archiver`, P1) can run on another network. Both upsert into the same `oracle_proofs` table.
+- **Adaptive lanes (ops, pending the user's G0 decision).** A job that recomputes σ₁ₛ from the hub every 5–15 min and calls `setLane` when the calibrated T/S drift by more than 20 %, bounded within [0.5×, 2×] of `research/lane-params.json`. Keep it behind a flag.
+- **Supra monitoring.** Watch `Upgraded` on the Supra proxies and committee key changes (owner `0xaF90…4B7A`), and alert.

@@ -17,7 +17,15 @@ export const bscTestnet = {
     restUrl: 'https://rpc-testnet-dora-2.supra.com',
     pull: '0x6Cd59830AAD978446e6cc7f6cc173aF7656Fb917' as Address,
     storage: '0x004d42225631F6bec6503a281Ed4c233810CBC29' as Address,
+    /** BLS committee verifier (UUPS proxy) — the stateless verification entry point. */
+    committeeVerifier: '0x8694E798112a9Df06d9Ccc772967A5AeCfb24320' as Address,
+    /** Owner of the Supra proxies; monitor its Upgraded and key-rotation events. */
+    owner: '0xaF90E04a87743312000607d0F6a0519892454B7A' as Address,
+    /** Supra rejects rounds more than this far ahead of block.timestamp·1000 (IncorrectFutureUpdate). */
+    futureToleranceMs: 3000,
   },
+  /** Archive-capable RPC for anvil forks; the bnbchain.org RPCs prune state after ~200 blocks. */
+  forkRpc: 'https://bsc-testnet-rpc.publicnode.com',
 } as const;
 
 export interface Deployment {

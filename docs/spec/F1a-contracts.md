@@ -1,4 +1,10 @@
-# F1a — Contracts & settlement rules (frozen)
+# F1a — Contracts & settlement rules (frozen, v2)
+
+> **v2 (after the A1 spike, `research/spike-report.md`).**
+> - The P0 price verifier is **`StatelessSupraVerifier`**. It checks the committee BLS signature via Supra's `requireHashVerified_V2`, then the little-endian leaf multiproof. **Do not build on `verifyOracleProofV2`.**
+> - Constants change to `ENTRY_DELAY_SEC = 3`, `STALL_AFTER_SEC = 60`, default duration 30 s, and a per-asset `maxJumpPpm`.
+> - Late or backfilled checkpoint records are valid, so the `CheckpointGap` void only applies to verifiers without late verification.
+> - Where this file and v1 wording disagree, the v2 notes win.
 
 Source of truth for arithmetic and evaluation: `packages/shared/src/{lane,path,eip712,constants,enums}.ts`. Solidity must reproduce them **bit for bit**. The golden vectors in `packages/shared/vectors/*.json` are the acceptance test.
 
@@ -11,10 +17,21 @@ Supra DORA-2 is the only free, sub-second oracle on chain 97, and it has one har
 We therefore:
 
 1. Record every second's 5-pair proof into our own append-only `CheckpointOracle` while any round is active.
-2. Let the player **commit without a price**: `entrySec = block.timestamp + 2`.
+2. Let the player **commit without a price**: `entrySec = block.timestamp + 3`.
 3. Settle from the **full recorded path**, where the first barrier touched wins.
 
 Nobody can choose a price. The operator is trusted for liveness only: the worst it can cause is a void (stake refunded).
+
+**v2 — stateless verification (measured by A1).**
+- `StatelessSupraVerifier` calls Supra's committee verifier `requireHashVerified_V2(root, sigs, committeeId)`, a permissionless view at proxy `0x8694E798112a9Df06d9Ccc772967A5AeCfb24320`.
+- It then checks the OpenZeppelin multiproof over little-endian leaves: `keccak256(LE32(pair) ‖ LE128(price) ‖ LE64(ts) ‖ LE16(decimals) ‖ LE64(round))`, identical to `supraLeaf` in `packages/shared/src/supra.ts`.
+- It returns **each proof's own round**, including historical ones. F1 therefore no longer applies:
+  - late or backfilled records are valid;
+  - anyone can record;
+  - nobody can force a gap by pushing a newer proof;
+  - there is no hard inclusion deadline.
+- Cost ≈ 266–300k gas per 5-pair proof, versus ≈ 460k stateful.
+- Reference PoC: `research/poc/src/StatelessSupraVerifier.sol`. Use OZ `MerkleProof.multiProofVerify` in production.
 
 ## 2. Contracts
 
@@ -22,7 +39,8 @@ Nobody can choose a price. The operator is trusted for liveness only: the worst 
 |---|---|---|
 | `TestUSD` | ERC-20, 18 decimals, EIP-2612 permit | `MINTER_ROLE` (faucet, deployer) |
 | `TestUSDFaucet` | Drips tUSD into a player's Arena ledger via `arena.depositFor` (cooldown + per-address cap) | `OPERATOR_ROLE` (backend ops key), admin |
-| `SupraPriceVerifier` | Wraps Supra pull `verifyOracleProofV2`; validates outputs; normalises prices to 18 decimals | — |
+| `StatelessSupraVerifier` (**P0**) | Decodes `OracleProofV2`. Checks each committee via `requireHashVerified_V2`, then the LE-leaf multiproof against `root`. Validates each feed: tracked pair, `decimals == 18`, `round % 1000 == 0`, `round ≤ ts < round + 1000`, and `round ≤ block.timestamp·1000 + 3000` (Supra's own future bound). `supportsLateVerification() = true` | — (the Supra verifier address is an immutable constructor arg) |
+| `SupraPriceVerifier` (optional, P1) | Stateful fallback via `verifyOracleProofV2`. It must accept a feed only when the returned `round` equals the proof's round (F1 guard). `supportsLateVerification() = false` | — |
 | `SignedPriceVerifier` | Backup: EIP-712 `PriceBatch` signed by a backend key. `isTrusted() = true`; the UI labels such rounds | `SIGNER_ADMIN_ROLE` |
 | `CheckpointOracle` | Permissionless `record(proof)`; set-once price per (pair, second); range reads | none (immutable; bound to one verifier) |
 | `BnbPlayArena` | Ledger, house pool, versioned lanes, rounds, settlement | `DEFAULT_ADMIN`, `CONFIG`, `PAUSER`, `TREASURY` — **no relayer or keeper role** |
@@ -71,7 +89,7 @@ struct WithdrawIntent  { address player; address to; uint256 amount; uint256 non
 
 interface IPriceVerifier {
     struct VerifiedPrice { uint32 pairId; uint64 roundMs; uint64 tsMs; uint256 price18; }
-    function verify(bytes calldata proof) external returns (VerifiedPrice[] memory); // Supra may return a NEWER stored round
+    function verify(bytes calldata proof) external returns (VerifiedPrice[] memory); // stateless: returns the proof's OWN rounds (history OK); stateful fallback may return a newer stored round
     function latestRoundMs(uint32 pairId) external view returns (uint64);           // Supra: storage.getRound(pair)
     function supportsLateVerification() external view returns (bool);              // Supra false, Signed true
     function sourceId() external view returns (bytes32);                            // "SUPRA_DORA2_PULL_V2" | "SIGNED_BACKEND_V1"
@@ -160,7 +178,9 @@ interface IBnbPlayArena {
 Custom errors (names are frozen because the backend maps them to API codes):
 `InvalidSignature`, `IntentExpired(uint48)`, `AssetDisabled(uint8)`, `LaneDisabled(uint8,uint8)`, `LaneVersionMismatch(uint32,uint32)`, `OracleMismatch(uint8,uint8)`, `StakeOutOfRange(uint256,uint256,uint256)`, `InsufficientBalance(uint256,uint256)`, `PlayerHasOpenRound(uint256)`, `InsufficientHouseLiquidity(uint256,uint256)`, `UtilizationCapExceeded(uint256,uint256)`, `MaxPayoutExceeded(uint256,uint256)`, `EntryNotInFuture(uint40,uint40)`, `ExitNotInFuture(uint40,uint40)`, `RoundNotOpen(uint256)`, `NotRoundPlayer(uint256,address)`, `CashOutAlreadyRequested(uint256)`, `CashOutTooLate(uint256,uint40,uint40)`, `NotDecidable(uint256,uint40)`, `NotVoidable(uint256,uint256)`, `InvalidLane()`, `HouseEdgeViolated()`, `ZeroAmount()`.
 
-`SupraPriceVerifier` reverts `NonCanonicalRound` unless `round % 1000 == 0 && ts >= round && ts - round < 1000`, and requires `0 < price <= type(uint128).max` after scaling to 18 decimals.
+Both Supra verifiers revert `NonCanonicalRound` unless `round % 1000 == 0 && ts >= round && ts - round < 1000`. They require `0 < price <= type(uint128).max` after scaling to 18 decimals, and revert `FutureRound` when `round > block.timestamp·1000 + 3000`.
+
+**Verifier rotation.** Supra can upgrade its verifier or rotate committee keys; monitor `Upgraded` and key events on the owner `0xaF90…4B7A`. Rotation means deploying a new `StatelessSupraVerifier` + `CheckpointOracle`, then `addOracle` + `setActiveOracle`: the registry is append-only and only affects new rounds. Open rounds whose seconds can no longer be verified stall and void after `STALL_AFTER_SEC`.
 
 ## 4. EIP-712
 
@@ -180,7 +200,7 @@ SessionGrant(address player,address sessionKey,uint128 maxStakePerRound,uint128 
 
 ## 5. Constants
 
-`ENTRY_DELAY_SEC = 2`, `EXIT_DELAY_SEC = 2`, `STALL_AFTER_SEC = 300`, `MAX_RANGE = 256`, `MAX_IDS = 100`.
+`ENTRY_DELAY_SEC = 3`, `EXIT_DELAY_SEC = 2`, `STALL_AFTER_SEC = 60`, `MAX_RANGE = 256`, `MAX_IDS = 100`. The default lane duration is 30 s. Per-asset `maxJumpPpm` from `research/lane-params.json`: BNB 15000, BTC 10000, ETH 15000, SOL 20000, DOGE 40000.
 
 | Parameter | Allowed range |
 |---|---|
@@ -223,8 +243,8 @@ setLane guard             : (M-1e4)*S + max(0, M-2e4)*gapMarginPpm <= 1e4*T   el
      - no touch at `endSec` → `CashedOut` (if requested) or `Timeout`, payout `interior(...)`.
    - `decisionSec = sec` in all cases.
 4. **Missing handling:**
-   - `isPermanentlyMissing(sec)` → **void `CheckpointGap`**;
-   - otherwise `block.timestamp > endSec + 300` → **void `Stalled`**;
+   - `isPermanentlyMissing(sec)` → **void `CheckpointGap`**. This is always false for late-capable (stateless) oracles, where a gap can be backfilled until the stall deadline;
+   - otherwise `block.timestamp > endSec + STALL_AFTER_SEC (60)` → **void `Stalled`**;
    - otherwise revert `NotDecidable(roundId, sec)` (`previewSettle` returns `decidable = false, missingSec`).
 5. **Payouts and events:**
    - A void pays exactly `stake`.
@@ -232,8 +252,8 @@ setLane guard             : (M-1e4)*S + max(0, M-2e4)*gapMarginPpm <= 1e4*T   el
    - `exitPrice` = the checkpoint price at `decisionSec` (0 for voids). This is the real sampled price (PRD §37), not the threshold.
 
 **Guards:**
-- open: `entrySec = now + 2 > latestKnownSec(pair)`.
-- cash-out: `exitSec = max(now + 2, entrySec + 1)` must be `> latestKnownSec(pair)` and `< endSec` (else `CashOutTooLate`). On success `endSec = exitSec` and `cashOutRequested = true`.
+- open: `entrySec = now + ENTRY_DELAY_SEC (3) > latestKnownSec(pair)` (for stateless oracles `latestKnownSec` = `lastRecordedSec`).
+- cash-out: `exitSec = max(now + EXIT_DELAY_SEC (2), entrySec + 1)` must be `> latestKnownSec(pair)` and `< endSec` (else `CashOutTooLate`). On success `endSec = exitSec` and `cashOutRequested = true`.
 
 ## 8. Ledger
 
@@ -267,7 +287,7 @@ Admin can never touch open rounds or player balances.
 | Fuzz | Payout ≤ max; monotone in price; LONG/SHORT mirror; rounding favours the house; random 21-point paths vs the reference |
 | Invariant | Handler with 5 players + in-order recorder + **griefer** that pushes newer mock rounds to create gaps + admin actions + donations |
 | Differential | Read `../packages/shared/vectors/{lane,path,eip712}-vectors.json` field by field (big numbers are decimal strings); assert every case. Add `fs_permissions = [{ access = "read", path = "../packages/shared/vectors" }]` |
-| Fork (97) | Using `research/fixtures/supra-97-*.json` (captured by A1): fork just before the capture block, record the proofs in order, assert prices/gas, then replay an older proof and assert the stored-value behaviour (F1) |
+| Fork (97) | Fork with **`https://bsc-testnet-rpc.publicnode.com`** (bnbchain.org RPCs prune state after ~200 blocks) at `blockBeforeFirstProof` (133261858) of `research/fixtures/supra-97-1790414769.json`. Record the 23 proofs in order, `vm.warp(round_i/1000 + 1)` before each (Supra future bound). Assert prices and gas. Then (a) stateless: record an OLDER proof after a newer one and assert its own historical price is stored; (b) stateful fallback, if built: assert the F1 guard rejects the stored-newer value |
 
 `MockSupraPull` must reproduce F1: if the proof round is not newer than the stored one, return the stored value.
 

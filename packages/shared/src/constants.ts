@@ -1,4 +1,6 @@
-// Frozen protocol constants (F1a). Solidity mirrors every value here.
+// Frozen protocol constants (F1a v2). Solidity mirrors every value here.
+// ENTRY_DELAY 3 s, STALL_AFTER 60 s and the 30 s default duration follow the A1 spike
+// (research/spike-report.md §5–6).
 
 export const CHAIN_ID = 97;
 
@@ -7,10 +9,11 @@ export const BPS = 10_000n;
 export const PRICE_DECIMALS = 18;
 export const STAKE_DECIMALS = 18;
 
-export const ENTRY_DELAY_SEC = 2;
+export const ENTRY_DELAY_SEC = 3;
 export const EXIT_DELAY_SEC = 2;
-export const STALL_AFTER_SEC = 300;
+export const STALL_AFTER_SEC = 60;
 
+export const DEFAULT_DURATION_SEC = 30;
 export const MIN_DURATION_SEC = 5;
 export const MAX_DURATION_SEC = 120;
 export const MIN_MULTIPLIER_BPS = 10_001;

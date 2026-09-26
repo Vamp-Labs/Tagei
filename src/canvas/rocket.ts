@@ -8,24 +8,24 @@ const TIME_UNITS_PER_SECOND = 3.0;
 const DEFAULT_FRAME_SECONDS = 1 / 60;
 const SOOT_STROKE_SHARE = 0.8;
 
-/** Surface points on the fuselage with outward normals, sampled off the new nose/cylinder/tail-taper outline. */
+/** Surface points on the fuselage with outward normals, resampled off the lozenge outline (tangent-derived). */
 const HULL_SKIN: readonly [number, number, number, number][] = [
-  [20.5, -3.2, 0.55, -0.83],
-  [17.5, -6.2, 0.3, -0.95],
-  [13.5, -8.4, 0.12, -0.99],
-  [8.0, -8.75, 0.02, -1.0],
-  [0.0, -8.8, 0.0, -1.0],
-  [-6.5, -8.5, -0.08, -0.99],
-  [-11.5, -7.7, -0.28, -0.96],
-  [-15.0, -6.0, -0.55, -0.83],
-  [-15.0, 6.0, -0.55, 0.83],
-  [-11.5, 7.7, -0.28, 0.96],
-  [-6.5, 8.5, -0.08, 0.99],
-  [0.0, 8.8, 0.0, 1.0],
-  [8.0, 8.75, 0.02, 1.0],
-  [13.5, 8.4, 0.12, 0.99],
-  [17.5, 6.2, 0.3, 0.95],
-  [20.5, 3.2, 0.55, 0.83],
+  [20.7, -1.96, 0.734, -0.679],
+  [16.01, -5.06, 0.401, -0.916],
+  [9.25, -7.11, 0.202, -0.979],
+  [1.29, -8.17, 0.069, -0.997],
+  [-7.0, -8.28, -0.042, -0.999],
+  [-13.52, -7.62, -0.391, -0.921],
+  [-16.05, -5.46, -0.839, -0.545],
+  [-17.0, -3.0, -0.986, -0.164],
+  [-17.0, 3.0, -0.986, 0.164],
+  [-16.05, 5.46, -0.839, 0.545],
+  [-13.52, 7.62, -0.391, 0.921],
+  [-7.0, 8.28, -0.042, 0.999],
+  [1.29, 8.17, 0.069, 0.997],
+  [9.25, 7.11, 0.202, 0.979],
+  [16.01, 5.06, 0.401, 0.916],
+  [20.7, 1.96, 0.734, 0.679],
 ];
 
 export class RocketAvatar {
@@ -82,6 +82,7 @@ export class RocketAvatar {
   private jitterY: number = 0;
   private readonly fuselage: Path2D;
   private readonly fins: Path2D;
+  private readonly finGloss: Path2D;
   private readonly nozzleBell: Path2D;
   private readonly veins: Path2D;
   private readonly visorArc: Path2D;
@@ -114,44 +115,51 @@ export class RocketAvatar {
 
     // Built once. Re-specifying this bezier every frame for the tint, vein
     // clip and rim light would be four extra path constructions per frame.
-    // Nose cone (tight curvature reaching near-full radius fast) and
-    // cylindrical mid-body (near-parallel sides) are two distinct bezier
-    // segments rather than one long taper, then a short boat-tail into the fins.
+    // One sweeping bezier per side from the nose tip into a short tail-neck
+    // curve — a single lozenge taper, not a nose-cone-then-cylinder join.
     this.fuselage = new Path2D();
     this.fuselage.moveTo(22, 0);
-    this.fuselage.bezierCurveTo(19.5, -6.6, 15, -8.6, 12, -8.7);
-    this.fuselage.bezierCurveTo(5, -8.8, -3, -8.6, -9.5, -8.3);
-    this.fuselage.bezierCurveTo(-13, -8.0, -15, -6.8, -16.5, -5.5);
-    this.fuselage.lineTo(-16.5, 5.5);
-    this.fuselage.bezierCurveTo(-15, 6.8, -13, 8.0, -9.5, 8.3);
-    this.fuselage.bezierCurveTo(-3, 8.6, 5, 8.8, 12, 8.7);
-    this.fuselage.bezierCurveTo(15, 8.6, 19.5, 6.6, 22, 0);
+    this.fuselage.bezierCurveTo(19, -7, 2, -9.3, -11, -8.0);
+    this.fuselage.bezierCurveTo(-14, -8.3, -16.5, -6.0, -17, -3.0);
+    this.fuselage.lineTo(-17, 3.0);
+    this.fuselage.bezierCurveTo(-16.5, 6.0, -14, 8.3, -11, 8.0);
+    this.fuselage.bezierCurveTo(2, 9.3, 19, 7, 22, 0);
     this.fuselage.closePath();
 
-    // Three flared fins in one Path2D so the fanned tail costs one fill and
-    // one stroke instead of one pair per blade: an "up" fin and two fanned
-    // "down" fins, each a curved sail rather than a flat triangle.
+    // Two large swept deltas (up, down) in one Path2D. Each is a leading-edge
+    // sweep out to the tip and a trailing-edge sweep back, closed by a short
+    // straight root edge the hull fill covers — one fill/stroke pair for both.
     this.fins = new Path2D();
-    this.fins.moveTo(-8.5, -8.0);
-    this.fins.quadraticCurveTo(-14.0, -11.5, -20.0, -14.0);
-    this.fins.quadraticCurveTo(-17.0, -11.8, -14.0, -6.2);
+    this.fins.moveTo(-2.5, -6.8);
+    this.fins.quadraticCurveTo(-9, -11.5, -18.5, -14.0);
+    this.fins.quadraticCurveTo(-14, -10.8, -10, -7.2);
     this.fins.closePath();
-    this.fins.moveTo(-7.0, 8.2);
-    this.fins.quadraticCurveTo(-10.5, 11.8, -15.0, 14.0);
-    this.fins.quadraticCurveTo(-13.0, 11.3, -9.5, 6.9);
-    this.fins.closePath();
-    this.fins.moveTo(-11.5, 7.6);
-    this.fins.quadraticCurveTo(-16.0, 10.2, -20.0, 12.5);
-    this.fins.quadraticCurveTo(-18.0, 9.3, -15.0, 6.3);
+    this.fins.moveTo(-2.5, 6.8);
+    this.fins.quadraticCurveTo(-9, 11.5, -18.5, 14.0);
+    this.fins.quadraticCurveTo(-14, 10.8, -10, 7.2);
     this.fins.closePath();
 
-    // Tapered engine bell: narrow at the throat where it meets the hull,
-    // flaring to a wider exit rim.
+    // Gloss facet along each fin's leading edge. Deliberately oversized and
+    // clipped to `fins` at paint time so it never has to hug the fin outline.
+    this.finGloss = new Path2D();
+    this.finGloss.moveTo(-2.5, -6.3);
+    this.finGloss.quadraticCurveTo(-9, -11.0, -18.5, -14.0);
+    this.finGloss.lineTo(-16.5, -12.3);
+    this.finGloss.quadraticCurveTo(-8, -9.6, -4, -6.6);
+    this.finGloss.closePath();
+    this.finGloss.moveTo(-2.5, 6.3);
+    this.finGloss.quadraticCurveTo(-9, 11.0, -18.5, 14.0);
+    this.finGloss.lineTo(-16.5, 12.3);
+    this.finGloss.quadraticCurveTo(-8, 9.6, -4, 6.6);
+    this.finGloss.closePath();
+
+    // Tapered engine bell: narrow at the throat where it meets the tail
+    // neck, flaring to a wider exit rim.
     this.nozzleBell = new Path2D();
-    this.nozzleBell.moveTo(-14.5, -2.0);
-    this.nozzleBell.bezierCurveTo(-16.0, -2.2, -17.7, -2.9, -19.0, -4.2);
-    this.nozzleBell.lineTo(-19.0, 4.2);
-    this.nozzleBell.bezierCurveTo(-17.7, 2.9, -16.0, 2.2, -14.5, 2.0);
+    this.nozzleBell.moveTo(-15.5, -2.3);
+    this.nozzleBell.bezierCurveTo(-17.2, -2.6, -18.8, -3.4, -19.8, -4.6);
+    this.nozzleBell.lineTo(-19.8, 4.6);
+    this.nozzleBell.bezierCurveTo(-18.8, 3.4, -17.2, 2.6, -15.5, 2.3);
     this.nozzleBell.closePath();
 
     // Three conduits, each defined tail -> nose so a negative lineDashOffset
@@ -165,9 +173,9 @@ export class RocketAvatar {
     this.veins.moveTo(-9.5, -2.0);
     this.veins.bezierCurveTo(-3, 0.6, 3, 1.4, 11.5, 0.2);
 
-    // Full porthole, centered inside the cylindrical mid-body.
+    // Big porthole, sat between the nose tip and the gold band.
     this.visorArc = new Path2D();
-    this.visorArc.arc(10.5, 0, 4.2, 0, Math.PI * 2);
+    this.visorArc.arc(8.5, 0, 2.3, 0, Math.PI * 2);
     this.visorArc.closePath();
   }
 
@@ -716,11 +724,18 @@ export class RocketAvatar {
       ctx.restore();
     }
 
-    // Tail Fins — one up, two fanned down, all in one Path2D
+    // Tail Fins — two large swept deltas, drawn before the hull so its edge
+    // covers the roots. Gloss facet clips to `fins`, so its own path can stay
+    // oversized rather than tracking the fin outline exactly.
     ctx.fillStyle = ROCKET.finFill;
-    ctx.strokeStyle = ROCKET.finEdge;
-    ctx.lineWidth = 1.5;
     ctx.fill(this.fins);
+    ctx.save();
+    ctx.clip(this.fins);
+    ctx.fillStyle = ROCKET.finGloss;
+    ctx.fill(this.finGloss);
+    ctx.restore();
+    ctx.strokeStyle = ROCKET.finEdge;
+    ctx.lineWidth = 1.6;
     ctx.stroke(this.fins);
 
     // Main fuselage. The path is built once in the constructor and reused for
@@ -781,15 +796,11 @@ export class RocketAvatar {
       ctx.setLineDash([]);
     }
 
-    // b. BNB Gold Stripe Accent — inside the clip, so soot browns it out too
+    // b. Wide gold band ~60% back from the nose, plus a narrower collar band
+    //    at the tail neck — both inside the clip, so soot browns them too.
     ctx.fillStyle = ROCKET.stripe;
-    ctx.beginPath();
-    ctx.moveTo(0.5, -8.3);
-    ctx.lineTo(6, -7.2);
-    ctx.lineTo(4.5, 7.2);
-    ctx.lineTo(-0.5, 8.3);
-    ctx.closePath();
-    ctx.fill();
+    ctx.fillRect(-4.5, -12, 7, 24);
+    ctx.fillRect(-16.6, -12, 2.2, 24);
 
     // c. Profit tint. 'overlay' multiplies the dark end and screens the light
     //    end, so the plating keeps its value structure and only takes the hue —
@@ -952,13 +963,13 @@ export class RocketAvatar {
         : 1;
 
     ctx.fillStyle = this.grad(`visor|${gk}`, () => {
-      const g = ctx.createLinearGradient(6.5, -4.2, 14.5, 4.2);
+      const g = ctx.createLinearGradient(6.2, -2.3, 10.8, 2.3);
       if (scorch > 0.15) {
         const k = scorch;
         g.addColorStop(0, mix(ROCKET.visorScorchLight, ROCKET.visorScorchSink, k));
         g.addColorStop(1, mix(ROCKET.visorScorchDark, ROCKET.visorScorchFloor, k));
       } else {
-        // Cockpit glass base is a cool neutral, tinted by the charge tier.
+        // Porthole iris is a saturated blue base, tinted by the charge tier.
         g.addColorStop(0, mix(ROCKET.visorBase, col.lift.hex, visorHot));
         g.addColorStop(1, mix(ROCKET.visorDeep, col.hex, visorHot * 0.7));
       }
@@ -969,9 +980,14 @@ export class RocketAvatar {
     ctx.fill(this.visorArc);
     ctx.restore();
 
+    // Bold gold ring border, per the reference; a thin inner line underneath
+    // reads as the glass lip.
+    ctx.strokeStyle = ROCKET.stripe;
+    ctx.lineWidth = 1.8 + visorHot * 0.5;
+    ctx.stroke(this.visorArc);
     ctx.strokeStyle =
-      scorch > 0.3 ? ROCKET.glass.a(0.5 + 0.3 * flick) : TONE.ink.a(0.7 + visorHot * 0.3);
-    ctx.lineWidth = 1 + visorHot * 0.6;
+      scorch > 0.3 ? ROCKET.glass.a(0.5 + 0.3 * flick) : TONE.ink.a(0.5 + visorHot * 0.3);
+    ctx.lineWidth = 0.7;
     ctx.stroke(this.visorArc);
 
     if (this.currentPnl <= -6.0) {
@@ -980,28 +996,27 @@ export class RocketAvatar {
       ctx.strokeStyle = ROCKET.glass.a(0.35 + 0.35 * flick);
       ctx.lineWidth = 0.7;
       ctx.beginPath();
-      ctx.moveTo(8.8, -3.9);
-      ctx.lineTo(10.6, -0.8);
-      ctx.lineTo(9.6, 2.4);
-      ctx.moveTo(10.6, -0.8);
-      ctx.lineTo(13.7, -1.7);
-      ctx.moveTo(10.6, -0.8);
-      ctx.lineTo(12.0, 3.6);
+      ctx.moveTo(7.6, -2.1);
+      ctx.lineTo(8.55, -0.44);
+      ctx.lineTo(8.0, 1.3);
+      ctx.moveTo(8.55, -0.44);
+      ctx.lineTo(10.25, -0.93);
+      ctx.moveTo(8.55, -0.44);
+      ctx.lineTo(9.3, 1.97);
       ctx.stroke();
       ctx.restore();
     }
 
-    // Cockpit specular reflection glint
-    const gr = 1.2 + visorHot * 1.1;
+    // Porthole specular — a bold highlight toward the upper-left plus a
+    // small secondary dot, per the reference.
+    const glintX = 7.8 + (this.reduced ? 0 : Math.sin(this.time * 1.7) * 0.14);
+    const gr = 0.85 + visorHot * 0.5;
     ctx.fillStyle = TONE.ink.a(0.85 + visorHot * 0.15);
     ctx.beginPath();
-    ctx.arc(
-      9.6 + (this.reduced ? 0 : Math.sin(this.time * 1.7) * 0.25),
-      -1.7,
-      gr * (scorch > 0.3 ? 0.55 : 1),
-      0,
-      Math.PI * 2
-    );
+    ctx.arc(glintX, -0.8, gr * (scorch > 0.3 ? 0.55 : 1), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(9.0, 0.15, 0.32 * (scorch > 0.3 ? 0.55 : 1), 0, Math.PI * 2);
     ctx.fill();
 
     // Anamorphic cross flare — two 1px lines, the cheapest "this is bright"
@@ -1011,16 +1026,20 @@ export class RocketAvatar {
       ctx.strokeStyle = TONE.ink.a(0.55 * fl);
       ctx.lineWidth = 0.8;
       ctx.beginPath();
-      ctx.moveTo(9.6 - 5 * fl, -1.7);
-      ctx.lineTo(9.6 + 5 * fl, -1.7);
-      ctx.moveTo(9.6, -1.7 - 3.4 * fl);
-      ctx.lineTo(9.6, -1.7 + 3.4 * fl);
+      ctx.moveTo(glintX - 2.7 * fl, -0.8);
+      ctx.lineTo(glintX + 2.7 * fl, -0.8);
+      ctx.moveTo(glintX, -0.8 - 1.9 * fl);
+      ctx.lineTo(glintX, -0.8 + 1.9 * fl);
       ctx.stroke();
     }
 
-    // Thruster Nozzle — tapered engine bell, cached in the constructor
+    // Thruster Nozzle — tapered engine bell, cached in the constructor, with
+    // a gold collar where the throat meets the tail neck.
     ctx.fillStyle = ROCKET.nozzle;
     ctx.fill(this.nozzleBell);
+    ctx.strokeStyle = ROCKET.stripe;
+    ctx.lineWidth = 1.3 * comp;
+    ctx.stroke(this.nozzleBell);
 
     // Aerodynamic Sonic Vapor Condensation Cone (Forms at high speed / target lock >= 80% or profit >= $6)
     const shouldShowCone = (this.targetProgressPct >= 80 || this.currentPnl >= 6.0) && !this.isDrifting;

@@ -17,7 +17,9 @@
     "./progression": "./src/progression.ts",
     "./pix": "./src/pix.ts",
     "./vectors/*": "./vectors/*",
-    "./supra": "./src/supra.ts"
+    "./supra": "./src/supra.ts",
+    "./abi": "./src/abi.ts",
+    "./templates": "./src/templates/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

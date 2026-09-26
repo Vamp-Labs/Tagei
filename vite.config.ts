@@ -13,6 +13,17 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // Keep the web3 stack out of the entry chunk so the Market Track paints first.
+        manualChunks: {
+          web3: ['viem', 'wagmi', '@tanstack/react-query'],
+          zod: ['zod'],
+        },
+      },
+    },
+  },
   server: {
     port: 3000,
     host: true,

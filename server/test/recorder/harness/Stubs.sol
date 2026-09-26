@@ -261,14 +261,19 @@ contract StubArena {
     function getRound(uint256 id) external view returns (Round memory) { return rounds[id]; }
 }
 
+// Mirrors the real TestUSDFaucet surface: drip(address) pays the configured amount.
 contract StubFaucet {
-    event Dripped(address indexed player, uint256 amount);
+    event Dripped(address indexed player, uint256 amount, uint256 totalDripped);
     StubArena public immutable arena;
     address public immutable operator;
+    uint256 public constant dripAmount = 100e18;
+    mapping(address => uint256) public totalDripped;
     constructor(StubArena a, address op) { arena = a; operator = op; }
-    function drip(address player, uint256 amount) external {
+    function drip(address player) external returns (uint256 amount) {
         require(msg.sender == operator, "operator");
+        amount = dripAmount;
+        totalDripped[player] += amount;
         arena.depositFor(player, amount);
-        emit Dripped(player, amount);
+        emit Dripped(player, amount, totalDripped[player]);
     }
 }

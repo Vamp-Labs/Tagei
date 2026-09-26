@@ -16,7 +16,7 @@ const bool = (fallback: boolean) =>
 const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().default(8787),
-  ROLE: z.enum(['all', 'api', 'worker']).default('all'),
+  ROLE: z.enum(['all', 'api', 'worker', 'archiver']).default('all'),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   DATABASE_URL: z.string().optional(),
   DB_POOL_MAX: z.coerce.number().int().default(10),

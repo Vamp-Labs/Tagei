@@ -15,7 +15,7 @@ describe('POST /v1/faucet/claim', () => {
     const job = h.ops.jobs[0];
     expect(job).toMatchObject({ key: 'ops', kind: 'faucet', to: '0x2222222222222222222222222222222222222222', intentId: claimId });
     const call = decodeFunctionData({ abi: faucetAbi, data: job?.data ?? '0x' });
-    expect(call.args).toEqual([account.address, 100n * E18]);
+    expect(call.args).toEqual([account.address]); // amount is the faucet's on-chain dripAmount
 
     const again = await h.request('/v1/faucet/claim', { method: 'POST', token });
     expect(again.status).toBe(429);

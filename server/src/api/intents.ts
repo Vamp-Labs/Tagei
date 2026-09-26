@@ -1,6 +1,6 @@
 // Tracks the player intents A4 hands to a TxSender and translates the senders'
-// `tx.step` bus events into player-facing `settlement.step` SSE events. Steps for
-// A3's own jobs (settle / void) are attributed through the RoundBook.
+// `tx.step` bus events into player-facing `settlement.step` SSE events for A4's own
+// jobs (open, cash-out, withdraw, faucet).
 
 import type { Address, Hex } from 'viem';
 import type { ErrorCode } from '@bnbplay/shared/dto';
@@ -17,9 +17,9 @@ const KIND_MAP: Partial<Record<TxKind, SettlementKind>> = {
   cashout: 'cashout',
   withdraw: 'withdraw',
   faucet: 'faucet',
-  settle: 'settle',
-  record_settle: 'settle',
-  void: 'void',
+  // settle / record_settle / void are A3 recorder and watchdog jobs: their senders emit
+  // `settlement.step` directly for every affected player (multi-round aware), so they are
+  // deliberately not translated here to avoid duplicates.
 };
 
 const HASH32 = /^0x[0-9a-fA-F]{64}$/;

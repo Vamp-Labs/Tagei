@@ -8,7 +8,6 @@ import type { ChainTxSender, SenderHandle } from '../relayer/sender.ts';
 export class FaucetDripper {
   private readonly faucet: Address;
   private readonly sender: ChainTxSender;
-  private readonly amountUsd: number;
 
   constructor(
     faucet: Address,
@@ -17,18 +16,17 @@ export class FaucetDripper {
   ) {
     this.faucet = faucet;
     this.sender = sender;
-    this.amountUsd = amountUsd;
+    void amountUsd; // amount is set on-chain (TestUSDFaucet.dripAmount)
     if (sender.key !== 'ops') throw new Error('faucet drips must use the ops key');
   }
 
-  /** Default amount = FAUCET_AMOUNT_USD tUSD (18 decimals). */
-  drip(player: Address, opts: { intentId?: string; amountWei?: bigint } = {}): SenderHandle {
-    const amount = opts.amountWei ?? BigInt(Math.round(this.amountUsd * 100)) * 10n ** 16n;
+  /** The drip amount is the faucet's on-chain `dripAmount` (100 tUSD by default). */
+  drip(player: Address, opts: { intentId?: string } = {}): SenderHandle {
     return this.sender.enqueue({
       key: 'ops',
       kind: 'faucet',
       to: this.faucet,
-      data: encodeFunctionData({ abi: faucetAbi, functionName: 'drip', args: [player, amount] }),
+      data: encodeFunctionData({ abi: faucetAbi, functionName: 'drip', args: [player] }),
       intentId: opts.intentId,
       priority: 50,
       playerSteps: { kind: 'faucet', intentId: opts.intentId, targets: [{ player }] },

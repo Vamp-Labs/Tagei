@@ -22,8 +22,9 @@ const TURNSTILE_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify
 
 export type DripEncoder = (player: Address, amount: bigint) => Hex;
 
-export const encodeDrip: DripEncoder = (player, amount) =>
-  encodeFunctionData({ abi: faucetAbi, functionName: 'drip', args: [player, amount] });
+// The on-chain faucet drips its configured `dripAmount`; `amount` is only used for off-chain accounting.
+export const encodeDrip: DripEncoder = (player, _amount) =>
+  encodeFunctionData({ abi: faucetAbi, functionName: 'drip', args: [player] });
 
 export interface FaucetServiceDeps {
   store: FaucetStore;

@@ -41,11 +41,11 @@ Every row reuses the timing already in the code; only colour, glow and property 
 | Home (02) | Price bump 1→1.04→1 in 280 ms. "PLAY NOW!" pulses once. The chevron bob loops (1.6 s). The active-position banner uses `slideDown`. | MICRO, STANDARD | No bump, no bob, banner fades |
 | Asset selector (03) | The sheet rises. The selected tile gets `glow-lucky` and a check (MICRO). The price re-counts. | STANDARD / MICRO | Instant select; the sheet fades |
 | Trade setup (08) | Copy fades, asset chips slide down, and the panel rises (§8, 350–500 ms). The LONG (lucky) or SHORT (info) wash uses MICRO. The amount counts. "HOLD TO LAUNCH!" pulses once, only when a direction is set. | STANDARD, MICRO | Crossfade; amounts snap |
-| Hold (any hot CTA) | Ring stroke draws over 400 ms linear. The glow `drop-shadow` grows as the hold fills. Scale creeps to 1.015. A white release burst plays for 320 ms. | linear, `POP_EASE` | Already gated: no ring, no scale, no burst; commit is instant |
+| Hold (any hot CTA) | Ring stroke draws over 700 ms linear (F1c). The glow `drop-shadow` grows as the hold fills. Scale creeps to 1.015. A white release burst plays for 320 ms. | linear, `POP_EASE` | Already gated: no ring, no scale, no burst; commit is instant |
 | Launch (§15) | Controls fade down, the entry locks in the neutral entry colour (`ink-soft`), and `ringExpand` goes out from the entry in `control-ring`. The existing `animate-ping` ring and the `animate-bounce` rocket icon are removed. | HERO, `ringExpand` | One static "ENTRY LOCKED" frame, then Live |
 | Live (09) | The live dot pulses (lucky). P&L gains use the `pop` 320 ms juice; losses use the same 320 ms on `out` with no overshoot. HUD pills stay static. "HOLD TO CASH OUT!" pulses once. | MICRO | Numbers snap; the dot is solid |
 | Outcome win (11) | The badge appears, then the number, then the payout line (stagger 0.07/0.05). A lucky bloom plays behind them (0.55 s). The `text-glow-green` class is removed from the number. | HERO + `pop` | Card fades in at 200 ms; no bloom |
-| Outcome loss (11b) | "ROUND COMPLETE" card: opacity plus y 16→0 only (drop the 0.88 scale). The number is amber. | HERO | Fade at 200 ms or less |
+| Outcome loss (11b) | "ROUND COMPLETE" card: opacity plus y 16→0 only (drop the 0.88 scale). The number is loss red (#ff3b30). | HERO | Fade at 200 ms or less |
 | Settlement (12) | Step icon swap (STANDARD in, MICRO out). Step label rises 8 px. | STANDARD / MICRO | Crossfade |
 | Result win / cash-out (13, 13c) | Card rises, then the children stagger 0.06/0.04, then XP counts (800 ms), then the XP pill pops (0.15 s delay). The hot "TRADE AGAIN!" pulses once. | HERO, `pop` | Final values only; no pulse |
 | Result loss (13b) | Same rise and stagger. Amber numbers settle on `out`. Secondary "Trade again" plus a "Review round" link. No pulse and no confetti. | HERO | Final values |
@@ -83,9 +83,9 @@ Every row reuses the timing already in the code; only colour, glow and property 
 ### 5. Canvas FX tone
 - **Win:** the boom tints toward `lucky`. The ring expand, the trail brightening and the endpoint flash all use lucky. Coins are `gold`, `gold-deep` and `gold-bright`.
 - **Loss:**
-  - Mist, sparks, embers, lamps and scorch use `amber`, `gold-deep` and `ink-muted`.
+  - Mist, sparks, embers, lamps and scorch use `red` (loss), `gold-deep` and `ink-muted`.
   - The engine goes quiet, then drifts.
-  - Per-frame random colours become a stable amber.
+  - Per-frame random colours become a stable loss red.
 - **Info:** the projected SHORT path only. The entry line and ring are neutral (`CANVAS.entry` = `ink-soft`, `CANVAS.entryRing` = `control-ring`), so blue only means SHORT.
 - **Banned:** hot, red, magenta and cyan.
 - **Strobe:** the hazard lamp is capped at 2.5 Hz or less. Today it reaches 3.5 Hz; clamp its frequency ceiling and keep its envelope.

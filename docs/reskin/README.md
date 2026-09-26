@@ -22,7 +22,7 @@ This re-skin rebuilds every BNB PLAY screen in the **Lucky Games** design system
 | LONG | `dir-long` = `lucky` + ▲ icon | Direction colors are only for direction. |
 | SHORT | `dir-short` = `info` #2dbdf1 + ▼ icon | Never borrows an outcome color. |
 | Profit / win | `profit` = `lucky` + sign | |
-| Loss | `loss` = `amber` #f08204 + sign | Calm, not punitive (PRD §22-24). No red anywhere. |
+| Loss | `loss` = `red` #ff3b30 + sign + text (user decision, 2026-09-27) | Still calm copy, not punitive (PRD §22-24); never colour alone (PRD §35). Amber stays for partial-progress only. |
 | BNB coin, level-up, Pro | `premium` = `gold` | Gold means nothing else. |
 
 - **Scope:** rebuild each screen from Lucky parts wherever the job matches.

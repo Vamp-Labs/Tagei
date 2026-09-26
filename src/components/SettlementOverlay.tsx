@@ -1,12 +1,14 @@
-import React from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import React, { useState } from 'react';
+import { AnimatePresence, motion, type Variants } from 'motion/react';
 import { explorerTxUrl } from '@bnbplay/shared/chain';
-import { STANDARD, MICRO, useMotionPref } from '../ui/motion';
+import { EASE_OUT, MICRO, STANDARD, cardVariants, useMotionPref } from '../ui/motion';
 import { SettlementStep } from '../services/web3Service';
-import { Scrim, Icon, Pill, SignedAmount, formatHash, formatPrice, type IconName } from '../ui/lucky';
-import { cn } from '../ui/cn';
+import { Scrim, Icon, Pill, SignedAmount, formatHash, formatPrice } from '../ui/lucky';
 import type { SettleReason } from './game/liveRoundController';
 import { PRACTICE_PILL, PRACTICE_SETTLE_COPY, SETTLE_FAILED_BODY, SETTLE_FAILED_TITLE, TIME_UP_COPY } from './game/roundDisplay';
+import { ChainRing } from './outcome/settlement/ChainRing';
+import { ChainStepper } from './outcome/settlement/ChainStepper';
+import { failedFallbackIndex, phaseOf, runningIndex, stepDescription, stepsFor } from './outcome/settlement/steps';
 
 interface SettlementOverlayProps {
   step: SettlementStep;
@@ -18,24 +20,15 @@ interface SettlementOverlayProps {
   exitPrice?: number | null;
 }
 
-const STEP_ORDER: SettlementStep[] = ['preparing', 'signing', 'submitted', 'confirmed'];
+const CHILD_STAGGER = 0.04;
+const CHILD_RISE_PX = 8;
+const HASH_REVEAL_DELAY = 0.08;
+const HASH_REVEAL_SECONDS = 0.32;
+const EXTERNAL_ICON_SIZE = 16;
 
-const STEP_GLYPH_SIZE = 28;
-
-const STEP_META: Record<SettlementStep, { icon: IconName; caption: string; index: number }> = {
-  idle: { icon: 'bolt', caption: 'Preparing', index: 0 },
-  preparing: { icon: 'bolt', caption: 'Preparing', index: 0 },
-  signing: { icon: 'key', caption: 'Signing', index: 1 },
-  submitted: { icon: 'broadcast', caption: 'Broadcasting', index: 2 },
-  confirmed: { icon: 'check', caption: 'Confirmed', index: 3 },
-  failed: { icon: 'close', caption: 'Not confirmed', index: 2 },
-};
-
-const RING_SIZE = 104;
-const RING_STROKE = 6;
-const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
-const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
-const CAPTION_RISE_PX = 8;
+const REDUCED_CARD: Variants = { hidden: { opacity: 0 }, visible: { opacity: 1 } };
+const CHILD: Variants = { hidden: { opacity: 0, y: CHILD_RISE_PX }, visible: { opacity: 1, y: 0 } };
+const REDUCED_CHILD: Variants = { hidden: { opacity: 0 }, visible: { opacity: 1 } };
 
 function reasonLine(reason: SettleReason | undefined, exitPrice: number | null | undefined): string | null {
   if (reason === 'time') return TIME_UP_COPY;
@@ -43,6 +36,20 @@ function reasonLine(reason: SettleReason | undefined, exitPrice: number | null |
   if (reason === 'target') return 'TARGET HIT · settling the payout';
   if (reason === 'stop') return 'STOP REACHED · settling the round';
   return null;
+}
+
+function titleFor(failed: boolean, practice: boolean, confirmed: boolean): string {
+  if (failed) return SETTLE_FAILED_TITLE;
+  if (practice) return confirmed ? 'Practice round complete' : 'Closing practice round…';
+  return confirmed ? 'Confirmed on BNB Chain' : 'Settling on BNB Chain…';
+}
+
+function useActiveIndex(step: SettlementStep, variant: 'live' | 'practice'): number {
+  const running = runningIndex(step, variant);
+  const [lastRunning, setLastRunning] = useState(running ?? failedFallbackIndex(variant));
+  if (running !== null && running !== lastRunning) setLastRunning(running);
+  const steps = stepsFor(variant).length;
+  return running ?? Math.min(lastRunning, steps - 1);
 }
 
 export const SettlementOverlay: React.FC<SettlementOverlayProps> = ({
@@ -56,22 +63,16 @@ export const SettlementOverlay: React.FC<SettlementOverlayProps> = ({
 }) => {
   const reduced = useMotionPref();
   const practice = variant === 'practice';
-  const failed = step === 'failed';
-  const meta = STEP_META[step];
-  const isConfirmed = step === 'confirmed';
-  const progress = isConfirmed ? 1 : meta.index / (STEP_ORDER.length - 1);
-  const tone = failed ? 'loss' : isConfirmed ? 'lucky' : 'gold';
+  const steps = stepsFor(variant);
+  const phase = phaseOf(step);
+  const failed = phase === 'failed';
+  const confirmed = phase === 'confirmed';
+  const activeIndex = useActiveIndex(step, variant);
   const context = practice ? null : reasonLine(reason, exitPrice);
-
-  const title = failed
-    ? SETTLE_FAILED_TITLE
-    : practice
-      ? isConfirmed
-        ? 'Practice round complete'
-        : 'Closing practice round…'
-      : isConfirmed
-        ? 'Confirmed on BNB Chain'
-        : 'Settling on BNB Chain…';
+  const title = titleFor(failed, practice, confirmed);
+  const child = reduced ? REDUCED_CHILD : CHILD;
+  const showTx = !practice && !!txHash;
+  const announcement = stepDescription(steps, activeIndex, phase);
 
   return (
     <Scrim
@@ -79,125 +80,116 @@ export const SettlementOverlay: React.FC<SettlementOverlayProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1, zIndex: 40, transition: STANDARD }}
       exit={{ opacity: 0, zIndex: 10, transition: MICRO }}
-      className="absolute inset-0 z-40 flex flex-col items-center justify-center p-6 pointer-events-auto"
+      className="absolute inset-0 z-40 flex flex-col items-center justify-center px-4 py-6 pointer-events-auto"
     >
-      <div className="lg-card w-full max-w-sm p-6 flex flex-col items-center text-center">
+      <motion.div
+        variants={reduced ? REDUCED_CARD : cardVariants}
+        initial="hidden"
+        animate="visible"
+        exit={{ opacity: 0, transition: MICRO }}
+        transition={{ ...STANDARD, staggerChildren: CHILD_STAGGER }}
+        className="lg-card w-full max-w-sm px-5 py-6 flex flex-col items-center text-center"
+      >
+        <p aria-live="polite" className="sr-only">
+          {announcement}
+        </p>
         {practice && (
-          <Pill size="sm" className="mb-4">
-            {PRACTICE_PILL}
-          </Pill>
+          <motion.div variants={child} transition={STANDARD} className="mb-4">
+            <Pill size="sm">{PRACTICE_PILL}</Pill>
+          </motion.div>
         )}
-        {context && <p className="mb-4 text-micro font-bold uppercase tracking-[0.08em] text-ink-soft tabular-nums">{context}</p>}
+        {context && (
+          <motion.p
+            variants={child}
+            transition={STANDARD}
+            className="mb-4 text-micro font-bold uppercase tracking-[0.08em] text-ink-soft tabular-nums"
+          >
+            {context}
+          </motion.p>
+        )}
 
-        <div className="relative mb-4" style={{ width: RING_SIZE, height: RING_SIZE }}>
-          <svg width={RING_SIZE} height={RING_SIZE} className="-rotate-90" aria-hidden="true">
-            <circle cx={RING_SIZE / 2} cy={RING_SIZE / 2} r={RING_RADIUS} strokeWidth={RING_STROKE} fill="none" className="stroke-well" />
-            <motion.circle
-              cx={RING_SIZE / 2}
-              cy={RING_SIZE / 2}
-              r={RING_RADIUS}
-              strokeWidth={RING_STROKE}
-              fill="none"
-              className={cn(tone === 'lucky' && 'stroke-lucky-bar', tone === 'gold' && 'stroke-gold', tone === 'loss' && 'stroke-loss')}
-              strokeLinecap="round"
-              strokeDasharray={RING_CIRCUMFERENCE}
-              initial={false}
-              animate={{ strokeDashoffset: RING_CIRCUMFERENCE * (1 - progress) }}
-              transition={reduced ? { duration: 0 } : STANDARD}
-            />
-          </svg>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <AnimatePresence mode="wait">
+        <motion.div variants={child} transition={STANDARD} className="mb-5">
+          <ChainRing steps={steps} activeIndex={activeIndex} phase={phase} reduced={reduced} />
+        </motion.div>
+
+        <motion.div variants={child} transition={STANDARD} className="w-full mb-5">
+          <ChainStepper steps={steps} activeIndex={activeIndex} phase={phase} reduced={reduced} />
+        </motion.div>
+
+        <motion.h3 variants={child} transition={STANDARD} className="grid text-section text-ink mb-1" aria-live="polite">
+          <AnimatePresence initial={false}>
+            <motion.span
+              key={title}
+              className="[grid-area:1/1]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={MICRO}
+            >
+              {title}
+            </motion.span>
+          </AnimatePresence>
+        </motion.h3>
+
+        <motion.div variants={child} transition={STANDARD}>
+          {failed ? (
+            <div className="flex flex-col gap-1">
+              <p className="text-caption text-ink-soft">{SETTLE_FAILED_BODY}</p>
+              <p className="text-micro text-ink-muted">retrying… the round stays open until it settles</p>
+            </div>
+          ) : (
+            <p className="text-caption text-ink-muted tabular-nums">
+              {practice ? `${PRACTICE_SETTLE_COPY} · ` : 'Outcome '}
+              {estimate && <span aria-hidden="true">≈ </span>}
+              {estimate && <span className="sr-only">about </span>}
+              <SignedAmount value={pnl} className="font-bold" />
+            </p>
+          )}
+        </motion.div>
+
+        <motion.div variants={child} transition={STANDARD} className="w-full">
+          <AnimatePresence initial={false}>
+            {showTx && (
               <motion.div
-                key={step}
-                initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.6, rotate: -20 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0, transition: STANDARD }}
-                exit={{ opacity: 0, scale: reduced ? 1 : 0.6, transition: MICRO }}
-                className={cn(
-                  'w-14 h-14 rounded-md flex items-center justify-center',
-                  tone === 'lucky' && 'bg-lucky-bar text-on-lucky',
-                  tone === 'gold' && 'bg-gold text-on-gold shadow-glow-gold',
-                  tone === 'loss' && 'bg-well text-loss ring-2 ring-inset ring-loss',
-                )}
+                key="tx"
+                className="-mx-1 -mb-1 overflow-hidden px-1 pb-1"
+                initial={reduced ? { opacity: 0 } : { opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: reduced ? 'auto' : 0 }}
+                transition={MICRO}
               >
-                <Icon name={meta.icon} size={STEP_GLYPH_SIZE} strokeWidth={isConfirmed ? 3 : 2.4} />
+                <a
+                  href={explorerTxUrl(txHash)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`View transaction ${formatHash(txHash)} on BscScan testnet`}
+                  className="mt-5 w-full min-h-12 flex items-center justify-between gap-3 px-4 rounded-md bg-well text-caption"
+                >
+                  <span className="flex items-center gap-2 min-w-0">
+                    <span className="text-ink-muted">Tx</span>
+                    <span className="relative min-w-0 truncate tabular-nums font-semibold text-ink-secondary">
+                      {formatHash(txHash)}
+                      {!reduced && (
+                        <motion.span
+                          aria-hidden="true"
+                          className="absolute inset-0 origin-right bg-well"
+                          initial={{ scaleX: 1 }}
+                          animate={{ scaleX: 0 }}
+                          transition={{ delay: HASH_REVEAL_DELAY, duration: HASH_REVEAL_SECONDS, ease: EASE_OUT }}
+                        />
+                      )}
+                    </span>
+                  </span>
+                  <span className="flex items-center gap-1.5 font-bold text-ink-secondary shrink-0">
+                    BscScan
+                    <Icon name="external" size={EXTERNAL_ICON_SIZE} />
+                  </span>
+                </a>
               </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
-
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={step}
-            initial={reduced ? { opacity: 0 } : { opacity: 0, y: CAPTION_RISE_PX }}
-            animate={{ opacity: 1, y: 0, transition: MICRO }}
-            exit={{ opacity: 0, transition: MICRO }}
-            className={cn(
-              'text-micro font-bold uppercase tracking-[0.08em] mb-3',
-              tone === 'lucky' && 'text-lucky',
-              tone === 'gold' && 'text-gold',
-              tone === 'loss' && 'text-loss',
             )}
-          >
-            {meta.caption}
-          </motion.span>
-        </AnimatePresence>
-
-        <div className="flex items-center gap-1.5 mb-4" aria-hidden="true">
-          {STEP_ORDER.map((s, idx) => {
-            const filled = idx <= meta.index || isConfirmed;
-            return (
-              <span
-                key={s}
-                className={cn(
-                  'w-1.5 h-1.5 rounded-full transition-colors duration-300',
-                  !filled && 'bg-control-ring',
-                  filled && tone === 'lucky' && 'bg-lucky-bar',
-                  filled && tone === 'gold' && 'bg-gold',
-                  filled && tone === 'loss' && 'bg-loss',
-                )}
-              />
-            );
-          })}
-        </div>
-
-        <h3 className="text-section text-ink mb-1" aria-live="polite">
-          {title}
-        </h3>
-
-        {failed ? (
-          <div className="mb-5 flex flex-col gap-1">
-            <p className="text-caption text-ink-soft">{SETTLE_FAILED_BODY}</p>
-            <p className="text-micro text-ink-muted">retrying… the round stays open until it settles</p>
-          </div>
-        ) : (
-          <p className="text-caption text-ink-muted mb-5">
-            {practice ? `${PRACTICE_SETTLE_COPY} · ` : 'Outcome '}
-            {estimate && <span aria-hidden="true">≈ </span>}
-            {estimate && <span className="sr-only">about </span>}
-            <SignedAmount value={pnl} className="font-bold" />
-          </p>
-        )}
-
-        {!practice && txHash && (
-          <a
-            href={explorerTxUrl(txHash)}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`View transaction ${formatHash(txHash)} on BscScan testnet`}
-            className="w-full min-h-12 flex items-center justify-between gap-3 px-4 rounded-md bg-well text-caption"
-          >
-            <span className="flex items-center gap-2 min-w-0">
-              <span className="text-ink-muted">Tx</span>
-              <span className="tabular-nums font-semibold text-ink-secondary truncate">{formatHash(txHash)}</span>
-            </span>
-            <span className="flex items-center gap-1.5 font-bold text-ink-secondary shrink-0">
-              BscScan
-              <Icon name="external" size={16} />
-            </span>
-          </a>
-        )}
-      </div>
+          </AnimatePresence>
+        </motion.div>
+      </motion.div>
     </Scrim>
   );
 };

@@ -1,4 +1,23 @@
+import { useSyncExternalStore } from 'react';
+import { useReducedMotionConfig } from 'motion/react';
 import type { Transition, Variants } from 'motion/react';
+
+export const useMotionPref = () => !!useReducedMotionConfig();
+
+const REDUCE_QUERY = '(prefers-reduced-motion: reduce)';
+
+const subscribeReducedMotion = (onChange: () => void) => {
+  if (typeof window === 'undefined' || !window.matchMedia) return () => {};
+  const query = window.matchMedia(REDUCE_QUERY);
+  query.addEventListener('change', onChange);
+  return () => query.removeEventListener('change', onChange);
+};
+
+const readReducedMotion = () =>
+  typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia(REDUCE_QUERY).matches;
+
+export const usePrefersReducedMotion = () =>
+  useSyncExternalStore(subscribeReducedMotion, readReducedMotion, () => false);
 
 /**
  * Spring tokens mapped onto the PRD §32 motion tiers. Every DOM animation

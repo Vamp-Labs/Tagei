@@ -1,146 +1,260 @@
 @import "tailwindcss";
+@import "./ui/lucky/lucky.css";
 
-/* =====================================================================
- * DESIGN TOKENS — docs/DESIGN_TOKENS.md is the source of truth.
- * "80% calm fintech + 20% premium game": a restrained BNB-yellow/green/
- * red-pink palette. Cyan is retired — it is not a fifth semantic color.
- * ===================================================================== */
-@theme {
-  --color-bnb-yellow: #F0B90B;
-  --color-bnb-yellow-bright: #FFD21E;
-  --color-long: #00E89A;
-  --color-short: #FF3B6B;
-  --color-profit: #00E89A;
-  --color-loss: #FF3B6B;
-
-  --color-bg-0: #050914;
-  --color-bg-1: #09111F;
-  --color-panel: rgba(13, 24, 41, 0.88);
-  --color-panel-soft: rgba(16, 30, 50, 0.72);
-  --color-line: rgba(130, 160, 200, 0.18);
-  --color-text-1: #F5F7FB;
-  --color-text-2: #9AA8BD;
-  --color-text-3: #65758C;
-
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-
-  /* Radius scale — overrides Tailwind's defaults, per docs/DESIGN_TOKENS.md.
-     Avoid making every object a pill: reserve rounded-full for pills/dots. */
-  --radius-sm: 10px;
-  --radius-md: 16px;
-  --radius-lg: 22px;
-  --radius-xl: 28px;
-
-  /* Typography scale, named per docs/DESIGN_TOKENS.md's bands rather than
-     overloading Tailwind's own text-xl/2xl, which other utilities rely on.
-     Generates text-hero-price / text-screen-title / etc. utility classes. */
-  --text-hero-price: 2.25rem;    /* 36px, within the 32-40 band */
-  --text-screen-title: 1.375rem; /* 22px, within the 20-24 band */
-  --text-cta: 1.125rem;          /* 18px, upper end — a CTA should read confidently */
-  --text-body: 1rem;             /* 16px, upper end of 14-16 for legibility */
-  --text-metadata: 0.8125rem;    /* 13px, within the 12-13 band */
-  --text-micro: 0.6875rem;       /* 11px, within the 10-12 band */
+@font-face {
+  font-family: "Figtree";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("/fonts/figtree/figtree-latin-var.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-:root {
-  color-scheme: dark;
+@theme static {
+  --color-canvas: #030d19;
+  --color-sheet: #111b2d;
+  --color-panel: #1a263b;
+  --color-well: #0e1726;
+  --color-tile: #0a111c;
+  --color-control: #1b263e;
+  --color-control-hover: #232d44;
+  --color-lobby: #0a1e42;
+  --color-lobby-raised: #172747;
+  --color-lobby-active: #142959;
+  --color-hero-sky: #b0c4f5;
+  --color-hero-indigo: #4452a8;
+  --color-frame: #255bd0;
+  --color-frame-muted: #2d5295;
+  --color-line: #243149;
+  --color-control-ring: #667490;
+
+  --color-ink: #ffffff;
+  --color-ink-soft: #d8e4f2;
+  --color-ink-secondary: #bcd1ef;
+  --color-ink-muted: #9eb4d0;
+  --color-ink-faint: #61769a;
+
+  --color-lucky: #1ef66d;
+  --color-lucky-bar: #04f233;
+  --color-lucky-tint: #123326;
+  --color-on-lucky: #041a0c;
+  --color-gold: #fcbe20;
+  --color-gold-bright: #fbd50b;
+  --color-gold-deep: #c37f09;
+  --color-on-gold: #1b1405;
+  --color-hot: #f80757;
+  --color-hot-light: #fd3b73;
+  --color-on-hot: #ffffff;
+  --color-info: #2dbdf1;
+  --color-amber: #f08204;
+  --color-focus: #1ef66d;
+  --color-coin-usd: #feb300;
+  --color-coin-eur: #1d47b9;
+  --color-coin-btc: #fd9600;
+  --color-coin-usdt: #02af88;
+
+  --color-cta: var(--color-hot);
+  --color-cta-light: var(--color-hot-light);
+  --color-on-cta: var(--color-on-hot);
+  --color-brand: var(--color-lucky);
+  --color-premium: var(--color-gold);
+  --color-dir-long: var(--color-lucky);
+  --color-dir-short: var(--color-info);
+  --color-profit: var(--color-lucky);
+  --color-loss: var(--color-amber);
+
+  /* LEGACY BRIDGE — deleted in E0-final */
+  --color-bnb-yellow: var(--color-gold);
+  --color-bnb-yellow-bright: var(--color-gold-bright);
+  --color-long: var(--color-lucky);
+  --color-short: var(--color-amber);
+  --color-bg-0: var(--color-canvas);
+  --color-bg-1: var(--color-well);
+  --color-panel-soft: var(--color-control);
+  --color-text-1: var(--color-ink);
+  --color-text-2: var(--color-ink-secondary);
+  --color-text-3: var(--color-ink-muted);
+  --font-mono: var(--font-sans);
+  --font-mono--font-feature-settings: "tnum";
+
+  --font-sans: "Figtree", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --text-display: 2.25rem;
+  --text-display--line-height: 2.5rem;
+  --text-display--font-weight: 800;
+  --text-display--letter-spacing: -0.01em;
+  --text-amount: 1.875rem;
+  --text-amount--line-height: 2.125rem;
+  --text-amount--font-weight: 700;
+  --text-title: 1.625rem;
+  --text-title--line-height: 1.875rem;
+  --text-title--font-weight: 700;
+  --text-section: 1.375rem;
+  --text-section--line-height: 1.75rem;
+  --text-section--font-weight: 600;
+  --text-body: 1.25rem;
+  --text-body--line-height: 1.625rem;
+  --text-body--font-weight: 500;
+  --text-label: 1.125rem;
+  --text-label--line-height: 1.375rem;
+  --text-label--font-weight: 600;
+  --text-label--letter-spacing: 0.01em;
+  --text-caption: 1rem;
+  --text-caption--line-height: 1.25rem;
+  --text-caption--font-weight: 500;
+  --text-micro: 0.8125rem;
+  --text-micro--line-height: 1rem;
+  --text-micro--font-weight: 500;
+  --text-numeral: 1.375rem;
+  --text-numeral--line-height: 1.5rem;
+  --text-numeral--font-weight: 800;
+
+  --radius-sm: 0.625rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 2.25rem;
+
+  --shadow-glow-lucky: 0 0 0 2px #04f233, 0 0 18px rgb(4 242 51 / 0.35);
+  --shadow-glow-hot: 0 6px 18px rgb(248 7 87 / 0.45);
+  --shadow-glow-gold: 0 8px 24px rgb(252 190 32 / 0.35);
+  --shadow-lift: 0 12px 32px rgb(0 0 0 / 0.45);
 }
 
-body {
-  font-family: var(--font-sans);
-  background-color: var(--color-bg-0);
-  /* Dark space environment stays (README.md "Visual language"), but the
-     nebula glow is re-tinted off cyan — brand yellow + long/short only. */
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(240, 185, 11, 0.07), transparent 70%),
-    radial-gradient(circle at 85% 30%, rgba(0, 232, 154, 0.04), transparent 50%),
-    radial-gradient(circle at 15% 70%, rgba(255, 59, 107, 0.035), transparent 50%);
-  min-height: 100vh;
-  margin: 0;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
+@layer base {
+  :root {
+    color-scheme: dark;
+    --tap-min: 48px;
+    --tap-primary: 72px;
+    --sa-top: env(safe-area-inset-top, 0px);
+    --sa-bottom: env(safe-area-inset-bottom, 0px);
+
+    /* LEGACY BRIDGE — deleted in E0-final. Kept out of @theme: --color-cta exists, so a text-cta utility must stay a color. */
+    --text-hero-price: var(--text-display);
+    --text-screen-title: var(--text-section);
+    --text-cta: var(--text-label);
+    --text-metadata: var(--text-micro);
+  }
+
+  html,
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    overscroll-behavior: none;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    margin: 0;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-lucky);
+    color: var(--color-on-lucky);
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  * {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  :root[data-motion="reduce"] *,
+  :root[data-motion="reduce"] *::before,
+  :root[data-motion="reduce"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
-/* Glow utilities. "Very limited glow" — kept for the primary CTA and the
- * rocket/trade visualization (the product's declared 20% premium-game slice),
- * not for general chrome. Cyan variants are gone; green/magenta repoint to
- * the long/short tokens above rather than the old neon hexes. */
-.glow-yellow {
-  box-shadow: 0 0 25px rgba(240, 185, 11, 0.45);
+@layer components {
+  .app-frame {
+    position: fixed;
+    inset: 0;
+    margin-inline: auto;
+    max-width: 28rem;
+    contain: layout;
+  }
+
+  .pilot-drawer {
+    right: 0;
+    left: auto;
+    border-left: 1px solid var(--color-frame-muted);
+    border-right: 0;
+  }
+
+  .pad-safe-bottom {
+    padding-bottom: calc(var(--sa-bottom) + 1rem);
+  }
+
+  .pad-safe-top {
+    padding-top: calc(var(--sa-top) + 0.75rem);
+  }
+
+  /* LEGACY BRIDGE — deleted in E0-final */
+  .glass-panel {
+    background: var(--color-panel);
+    border: 1px solid var(--color-line);
+  }
+
+  .glow-green {
+    box-shadow: var(--shadow-glow-lucky);
+  }
+
+  .glow-magenta,
+  .glow-magenta-sm {
+    box-shadow: none;
+  }
+
+  .text-glow-green,
+  .text-glow-magenta {
+    text-shadow: none;
+  }
+
+  .pulse-glow-cta {
+    animation: pulseGlow 1.1s ease-in-out 1;
+  }
+
+  .animate-ring-expand {
+    animation: ringExpand 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+  }
 }
 
-.glow-yellow-sm {
-  box-shadow: 0 0 12px rgba(240, 185, 11, 0.35);
-}
-
-.glow-green {
-  box-shadow: 0 0 22px rgba(0, 232, 154, 0.45);
-}
-
-.glow-green-sm {
-  box-shadow: 0 0 12px rgba(0, 232, 154, 0.3);
-}
-
-.glow-magenta {
-  box-shadow: 0 0 22px rgba(255, 59, 107, 0.45);
-}
-
-.glow-magenta-sm {
-  box-shadow: 0 0 12px rgba(255, 59, 107, 0.3);
-}
-
-.text-glow-yellow {
-  text-shadow: 0 0 16px rgba(240, 185, 11, 0.6);
-}
-
-.text-glow-green {
-  text-shadow: 0 0 14px rgba(0, 232, 154, 0.55);
-}
-
-.text-glow-magenta {
-  text-shadow: 0 0 14px rgba(255, 59, 107, 0.55);
-}
-
-/* Glass panel — the shared surface for sheets, cards and modals. */
-.glass-panel {
-  background: var(--color-panel);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--color-line);
-}
-
-.glass-panel-subtle {
-  background: var(--color-panel-soft);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--color-line);
-}
-
-/* Primary-CTA pulse. Bounded, not infinite — "glow only when actionable"
- * means a brief acknowledgment when a CTA becomes actionable, not an
- * always-on ambient loop. Callers apply this class only while the action
- * is genuinely available (see PreTradePanel/LiveTradeOverlay/ResultPanel). */
 @keyframes pulseGlow {
-  0% {
-    box-shadow: 0 0 15px rgba(240, 185, 11, 0.35);
-    transform: scale(1);
+  0%,
+  100% {
+    box-shadow: var(--shadow-glow-hot);
   }
   50% {
-    box-shadow: 0 0 30px rgba(240, 185, 11, 0.6);
-    transform: scale(1.008);
-  }
-  100% {
-    box-shadow: 0 0 15px rgba(240, 185, 11, 0.35);
-    transform: scale(1);
+    box-shadow: 0 6px 26px rgb(248 7 87 / 0.7), 0 0 0 3px rgb(253 59 115 / 0.35);
   }
 }
 
-.pulse-glow-cta {
-  animation: pulseGlow 1.1s ease-in-out 1;
-}
-
-/* Ring shockwave animation */
 @keyframes ringExpand {
   0% {
     transform: scale(0.8);
@@ -150,10 +264,6 @@ body {
     transform: scale(2.2);
     opacity: 0;
   }
-}
-
-.animate-ring-expand {
-  animation: ringExpand 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
 }
 
 @keyframes slideDown {
@@ -167,10 +277,6 @@ body {
   }
 }
 
-.animate-slide-down {
-  animation: slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
 @keyframes slideLeft {
   0% {
     opacity: 0;
@@ -180,84 +286,4 @@ body {
     opacity: 1;
     transform: translateX(0);
   }
-}
-
-.animate-slide-left {
-  animation: slideLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Hide scrollbars */
-::-webkit-scrollbar {
-  display: none;
-}
-* {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-
-/* =====================================================================
- * APP SHELL — fixed frame, safe-area insets, touch-target minimums.
- * The reach-tier/thumb-arc/handedness system from the old cockpit-dock
- * navigation is retired along with that navigation model; these are the
- * parts that remain true regardless of nav model.
- * ===================================================================== */
-
-:root {
-  /* Touch targets. docs/DESIGN_TOKENS.md: "touch targets at least 44x44";
-     primary CTA "minimum 52px height". 48/72 satisfy both with margin. */
-  --tap-min: 48px;
-  --tap-primary: 72px;
-
-  /* index.html sets viewport-fit=cover, so content runs under the notch
-     and the home indicator unless we pay these back. */
-  --sa-top: env(safe-area-inset-top, 0px);
-  --sa-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-/* The app frame is fixed rather than 100dvh: dvh re-measures as mobile
-   Safari collapses its URL bar, which would slide fixed UI mid-interaction.
-   Fixed positioning is also the correct standalone-PWA shell. */
-.app-frame {
-  position: fixed;
-  inset: 0;
-  margin-inline: auto;
-  max-width: 28rem;
-}
-
-/* The profile drawer's right-edge slide-over. */
-.pilot-drawer {
-  right: 0;
-  left: auto;
-  border-left: 1px solid var(--color-line);
-  border-right: 0;
-}
-
-/* Safe-area helpers, so the magic numbers live in one place. */
-.pad-safe-bottom {
-  padding-bottom: calc(var(--sa-bottom) + 1rem);
-}
-
-.pad-safe-top {
-  padding-top: calc(var(--sa-top) + 0.75rem);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* The frame is fixed, so nothing should rubber-band behind it — and a 100vh
-   minimum would only create an overflow the height of iOS Safari's URL bar. */
-html,
-body {
-  overscroll-behavior: none;
-  min-height: 0;
-  height: 100%;
-  overflow: hidden;
 }

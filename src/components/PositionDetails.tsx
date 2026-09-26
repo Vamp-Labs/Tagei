@@ -1,7 +1,19 @@
-import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { Sheet } from '../ui/Sheet';
+import { cn } from '../ui/cn';
 import { ActiveTradeRound } from '../types/game';
 import { SUPPORTED_ASSETS } from '../types/market';
+import {
+  DirectionChip,
+  SheetHeader,
+  SignedAmount,
+  StatTable,
+  formatAmount,
+  formatLeverage,
+  formatPct,
+  formatPrice,
+  signOf,
+  type StatTone,
+} from '../ui/lucky';
 
 interface PositionDetailsProps {
   round: ActiveTradeRound;
@@ -11,6 +23,11 @@ interface PositionDetailsProps {
    * if the engine's constant ever changes. */
   leverage: number;
 }
+
+const ROW_TONE: Record<string, StatTone> = {
+  'Target Price': 'profit',
+  'Stop Loss': 'loss',
+};
 
 /**
  * docs/UI_UX_SPEC.md §8. Every row except "Est. Liquidation" comes straight
@@ -30,66 +47,43 @@ export const PositionDetails: React.FC<PositionDetailsProps> = ({ round, onClose
     ? round.entryPrice * (1 - 1 / leverage)
     : round.entryPrice * (1 + 1 / leverage);
 
-  const fmt = (v: number) => `$${v.toLocaleString(undefined, { minimumFractionDigits: dp, maximumFractionDigits: dp })}`;
+  const fmt = (v: number) => formatPrice(v, { unit: 'USDT', decimals: dp });
 
   const rows: [string, string][] = [
     ['Entry Price', fmt(round.entryPrice)],
     ['Current Price', fmt(round.currentPrice)],
     ['Target Price', fmt(round.targetPrice)],
     ['Stop Loss', fmt(round.stopLossPrice)],
-    ['Stake', `$${round.stake.toFixed(2)}`],
-    ['Leverage', `${leverage}x`],
+    ['Stake', formatAmount(round.stake, 'USDT', { sign: 'never' })],
+    ['Leverage', formatLeverage(leverage)],
     ['Est. Liquidation', fmt(liquidationPrice)],
   ];
 
+  const status = round.outcome ? 'closed' : 'live';
+
   return (
     <Sheet onClose={onClose}>
-      <div className="px-5 pt-1 pb-4">
-        <h2 className="text-[length:var(--text-screen-title)] font-black text-[color:var(--color-text-1)] mb-3">
-          Position Details
-        </h2>
+      <SheetHeader
+        title="Position Details"
+        subtitle={`${status} · ${round.asset}/USDT`}
+        action={<DirectionChip direction={round.direction} size="sm" />}
+      />
 
-        <div className="flex items-center justify-between mb-4">
-          <div
-            className="flex items-center gap-1.5 px-3 h-8 rounded-full font-mono text-[length:var(--text-metadata)] font-bold"
-            style={{
-              color: isLong ? 'var(--color-long)' : 'var(--color-short)',
-              backgroundColor: isLong ? 'rgba(0,232,154,0.12)' : 'rgba(255,59,107,0.12)',
-            }}
+      <div className="flex flex-col gap-3 px-6 pb-3">
+        <div className="flex flex-col items-center gap-1 py-4 rounded-lg bg-panel">
+          <span className="text-micro font-semibold uppercase tracking-[0.08em] text-ink-muted">P&amp;L</span>
+          <SignedAmount value={round.currentPnl} className="text-display" />
+          <span
+            className={cn(
+              'text-caption font-semibold tabular-nums',
+              signOf(pct, 1) < 0 ? 'text-loss' : 'text-profit'
+            )}
           >
-            {isLong ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
-            <span>{round.direction} · {leverage}x</span>
-          </div>
-          <div className="text-right font-mono">
-            <div
-              className="text-[length:var(--text-body)] font-black"
-              style={{ color: round.currentPnl >= 0 ? 'var(--color-long)' : 'var(--color-short)' }}
-            >
-              {round.currentPnl >= 0 ? '+' : '-'}${Math.abs(round.currentPnl).toFixed(2)}
-            </div>
-            <div className="text-[length:var(--text-micro)] text-[color:var(--color-text-3)]">
-              ({pct >= 0 ? '+' : ''}{pct.toFixed(1)}%)
-            </div>
-          </div>
+            {formatPct(pct, { decimals: 1 })}
+          </span>
         </div>
 
-        <div className="rounded-[var(--radius-md)] border border-[color:var(--color-line)] overflow-hidden">
-          {rows.map(([label, value], i) => (
-            <div
-              key={label}
-              className={`flex items-center justify-between px-4 h-12 ${
-                i > 0 ? 'border-t border-[color:var(--color-line)]' : ''
-              }`}
-            >
-              <span className="text-[length:var(--text-metadata)] text-[color:var(--color-text-2)]">
-                {label}
-              </span>
-              <span className="font-mono text-[length:var(--text-metadata)] font-bold text-[color:var(--color-text-1)]">
-                {value}
-              </span>
-            </div>
-          ))}
-        </div>
+        <StatTable rows={rows.map(([label, value]) => ({ label, value, tone: ROW_TONE[label] }))} />
       </div>
     </Sheet>
   );

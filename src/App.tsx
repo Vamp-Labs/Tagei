@@ -20,11 +20,14 @@ import { Menu } from './components/Menu';
 import { PixChat } from './components/PixChat';
 import { PositionDetails } from './components/PositionDetails';
 import { Sheet } from './ui/Sheet';
+import { usePrefersReducedMotion } from './ui/motion';
+import { ConfettiLayer } from './ui/lucky/Confetti';
 
 import { marketFeed } from './services/marketFeed';
 import { SettlementEngine, DEFAULT_CONFIG } from './services/settlementEngine';
 import { web3Service, WalletState, SettlementStep } from './services/web3Service';
 import { soundEngine } from './services/audioHaptics';
+import { useDevScene } from './dev/useDevScene';
 
 import { AssetSymbol, PriceTick, SUPPORTED_ASSETS } from './types/market';
 import {
@@ -36,6 +39,7 @@ import {
   UserProgression,
   UserSettings,
 } from './types/game';
+type ActiveSheet = 'none' | 'menu' | 'asset-selector' | 'pix-chat' | 'position-details';
 export const App: React.FC = () => {
   // State Machine
   const [stage, setStage] = useState<GameStage>('HOME');
@@ -89,6 +93,11 @@ export const App: React.FC = () => {
     hapticsEnabled: true,
     useLiveBinance: false,
   });
+  const osReduced = usePrefersReducedMotion();
+  const reduced = settings.reducedMotion || osReduced;
+  useEffect(() => {
+    document.documentElement.dataset.motion = reduced ? 'reduce' : 'full';
+  }, [reduced]);
 
   // Warp streak callback for asset switching
   const warpTriggerRef = useRef<(() => void) | null>(null);
@@ -398,7 +407,6 @@ export const App: React.FC = () => {
   // Trade Setup sheet is NOT tracked here: its visibility is simply
   // `stage === 'PRE_TRADE'`, so it works whether opened via swipe-up, via
   // "Trade Again", or via the dev SimulationBar's own stage jumps.
-  type ActiveSheet = 'none' | 'menu' | 'asset-selector' | 'pix-chat' | 'position-details';
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>('none');
 
   const assetOrder = Object.keys(SUPPORTED_ASSETS) as AssetSymbol[];
@@ -432,10 +440,12 @@ export const App: React.FC = () => {
     setActiveSheet('none');
   };
 
+  const devScene = useDevScene({ setStage, setCurrentAsset, setSelectedDirection, setActiveRound, setTargetProgressPct, setJustLeveledUp, setSettlementStep, setSettlementTxHash, setLastResult, setLastRoundSummary, setProgression, setIsSettingsOpen, setIsProfileOpen, setIsMissionToastOpen, setSettings, setActiveSheet, handleConnectWallet, handlePlayNow });
   return (
-    <MotionConfig reducedMotion={settings.reducedMotion ? 'always' : 'user'}>
-      <div className="app-frame relative flex flex-col w-full overflow-hidden bg-[color:var(--color-bg-0)] font-sans sm:border-x sm:border-[color:var(--color-line)]">
+    <MotionConfig reducedMotion={reduced ? 'always' : 'never'}>
+      <div className="app-frame flex flex-col w-full overflow-hidden bg-lobby font-sans sm:border-x sm:border-frame">
         <Header wallet={wallet} onOpenMenu={() => setActiveSheet('menu')} />
+        <ConfettiLayer />
 
         <main id="track-stage" className="relative flex-1 flex flex-col overflow-hidden">
           {/* Continuous 60 FPS Market Track Canvas (Full Viewport 100% Bleed) */}
@@ -447,16 +457,13 @@ export const App: React.FC = () => {
               lastRound={lastRoundSummary}
               targetProgressPct={targetProgressPct}
               currentAsset={currentAsset}
-              reducedMotion={settings.reducedMotion}
+              reducedMotion={reduced}
               onWarpTrigger={(fn) => {
                 warpTriggerRef.current = fn;
               }}
               cashOutSignal={cashOutSignal}
             />
           </div>
-
-          {/* Ambient depth vignette */}
-          <div className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-b from-[color:var(--color-bg-0)]/55 via-transparent to-[color:var(--color-bg-0)]/75" />
 
           {/* Swipe anywhere on the track to cycle assets — secondary to the
               tap-the-asset-name path now that Asset Selector exists. */}
@@ -481,7 +488,7 @@ export const App: React.FC = () => {
           {/* Bottom content — Home hero, active-trade HUD, or a resolving
               indicator. Not a sheet: an active round is a persistent state
               the player doesn't dismiss, unlike Trade Setup/Menu/etc. */}
-          <div className="relative z-20 mt-auto w-full px-4 pt-2 pad-safe-bottom flex flex-col gap-3 pointer-events-none">
+          <div className="relative z-20 mt-auto w-full px-6 pt-2 pad-safe-bottom flex flex-col gap-3 pointer-events-none">
             <AnimatePresence>
               {stage === 'HOME' && activeRound && (
                 <div className="pointer-events-auto">
@@ -519,11 +526,12 @@ export const App: React.FC = () => {
               )}
 
               {(stage === 'TARGET_HIT' || stage === 'LOSS_HIT' || stage === 'SETTLING') && (
-                <div className="flex items-center justify-center gap-2 h-16 text-[length:var(--text-metadata)] font-bold uppercase tracking-widest text-[color:var(--color-text-3)]">
-                  <span
-                    className="w-1.5 h-1.5 rounded-full animate-ping"
-                    style={{ backgroundColor: 'var(--color-bnb-yellow)' }}
-                  />
+                <div
+                  role="status"
+                  aria-live="polite"
+                  className="flex items-center justify-center gap-2 h-16 text-micro font-semibold uppercase tracking-[0.08em] text-ink-muted"
+                >
+                  <span aria-hidden="true" className="w-2 h-2 rounded-full bg-ink-muted" />
                   <span>Resolving round</span>
                 </div>
               )}
@@ -672,18 +680,20 @@ export const App: React.FC = () => {
         />
 
         {/* UI Mock Simulation Toolbar */}
-        <SimulationBar
-          currentStage={stage}
-          autoResolveEnabled={autoResolveEnabled}
-          onToggleAutoResolve={() => setAutoResolveEnabled((prev) => !prev)}
-          onSimulateLiveLong={handleSimulateLiveLong}
-          onSetStage={handleSetStage}
-          onSimulatePriceBump={handleSimulatePriceBump}
-          onSimulateTargetHit={handleSimulateTargetHit}
-          onSimulateLossHit={handleSimulateLossHit}
-          onSimulateCashOut={handleSimulateCashOut}
-          onTriggerMissionToast={() => setIsMissionToastOpen(true)}
-        />
+        {!devScene.active || devScene.sim ? (
+          <SimulationBar
+            currentStage={stage}
+            autoResolveEnabled={autoResolveEnabled}
+            onToggleAutoResolve={() => setAutoResolveEnabled((prev) => !prev)}
+            onSimulateLiveLong={handleSimulateLiveLong}
+            onSetStage={handleSetStage}
+            onSimulatePriceBump={handleSimulatePriceBump}
+            onSimulateTargetHit={handleSimulateTargetHit}
+            onSimulateLossHit={handleSimulateLossHit}
+            onSimulateCashOut={handleSimulateCashOut}
+            onTriggerMissionToast={() => setIsMissionToastOpen(true)}
+          />
+        ) : null}
       </div>
     </MotionConfig>
   );

@@ -1,0 +1,9 @@
+var\(--color-(bnb-yellow(-bright)?|long|short|bg-[01]|panel-soft|text-[123])\)
+--text-(hero-price|screen-title|cta|metadata)
+glass-panel
+glow-(green|magenta)
+text-glow-
+pulse-glow-cta
+rounded-\[var\(--radius
+text-\[color:var\(--color-
+text-\[length:var\(--text-

@@ -1,8 +1,9 @@
 import { motion } from 'motion/react';
-import { STANDARD } from '../ui/motion';
+import { STANDARD, useMotionPref } from '../ui/motion';
 import React, { useEffect, useState } from 'react';
-import { Lock, Rocket } from 'lucide-react';
+import { Rocket } from 'lucide-react';
 import { soundEngine } from '../services/audioHaptics';
+import { DirectionChip, Icon, formatPrice } from '../ui/lucky';
 
 interface LaunchCountdownProps {
   entryPrice: number;
@@ -10,12 +11,22 @@ interface LaunchCountdownProps {
   onLaunchComplete: () => void;
 }
 
+const PHASE_LABEL = {
+  locking: 'LOCKING ENTRY…',
+  charging: 'IGNITION SEQUENCE',
+  liftoff: 'LIFTOFF',
+} as const;
+
+const REDUCED_LABEL = 'ENTRY LOCKED';
+
 export const LaunchCountdown: React.FC<LaunchCountdownProps> = ({
   entryPrice,
   direction,
   onLaunchComplete,
 }) => {
+  const reduced = useMotionPref();
   const [phase, setPhase] = useState<'locking' | 'charging' | 'liftoff'>('locking');
+  const chipDirection = direction === 'LONG' || direction === 'SHORT' ? direction : null;
 
   useEffect(() => {
     soundEngine.playLaunchIgnition();
@@ -46,34 +57,34 @@ export const LaunchCountdown: React.FC<LaunchCountdownProps> = ({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={STANDARD}
-      className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none bg-black/25 backdrop-blur-[2px]"
+      className="absolute inset-0 z-30 flex flex-col items-center justify-center pointer-events-none bg-canvas/25"
     >
       {/* Shockwave expanding ring (PRD §15) */}
       <div className="relative flex items-center justify-center">
-        <div className="absolute w-36 h-36 rounded-full border-2 border-[#00FFA3] animate-ring-expand" />
-        <div className="absolute w-48 h-48 rounded-full border border-[#00F0FF]/60 animate-ping opacity-40" />
+        {!reduced && (
+          <div className="absolute w-36 h-36 rounded-full border-2 border-control-ring animate-ring-expand" />
+        )}
 
-        {/* Center Launch Badge */}
-        <div className="relative glass-panel px-6 py-4 rounded-3xl border border-white/20 flex flex-col items-center gap-1.5 shadow-[0_0_40px_rgba(0,255,163,0.35)]">
-          <div className="flex items-center gap-2 text-xs font-black tracking-widest text-[#00FFA3] uppercase">
-            <Rocket className="w-4 h-4 animate-bounce" />
-            <span>
-              {phase === 'locking'
-                ? 'LOCKING ENTRY...'
-                : phase === 'charging'
-                ? 'IGNITION SEQUENCE'
-                : 'LIFTOFF!'}
+        <div
+          role="status"
+          className="relative flex flex-col items-center gap-2 px-6 py-4 rounded-lg bg-panel shadow-lift"
+        >
+          <div className="flex items-center gap-2 text-micro font-extrabold uppercase tracking-[0.08em] text-lucky">
+            <Rocket aria-hidden="true" className="w-4 h-4" />
+            <span>{reduced ? REDUCED_LABEL : PHASE_LABEL[phase]}</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-numeral tabular-nums text-ink">
+            <span className="text-ink-muted inline-flex">
+              <Icon name="lock" size={18} />
             </span>
+            <span>{formatPrice(entryPrice, { unit: 'USDT' })}</span>
           </div>
 
-          <div className="flex items-center gap-1.5 font-mono text-xl font-black text-white">
-            <Lock className="w-4 h-4 text-[#00F0FF]" />
-            <span>${entryPrice.toFixed(2)}</span>
+          <div className="flex items-center gap-2 text-micro font-semibold uppercase tracking-[0.08em] text-ink-muted">
+            {chipDirection ? <DirectionChip direction={chipDirection} size="sm" /> : <span>{direction}</span>}
+            <span>position engaged</span>
           </div>
-
-          <span className="text-[11px] font-bold text-[#F0B90B] tracking-wider uppercase">
-            {direction} POSITION ENGAGED
-          </span>
         </div>
       </div>
     </motion.div>

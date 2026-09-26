@@ -1,8 +1,11 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { STANDARD, MICRO } from '../ui/motion';
-import { CheckCircle2, ExternalLink, ShieldCheck, Zap, Key, Radio } from 'lucide-react';
+import { ExternalLink, Key, Radio, Zap } from 'lucide-react';
+import { STANDARD, MICRO, useMotionPref } from '../ui/motion';
 import { SettlementStep } from '../services/web3Service';
+import { Scrim, Icon, SignedAmount, formatHash } from '../ui/lucky';
+import { cn } from '../ui/cn';
+import { GLYPH_STROKE } from './outcome/tokens';
 
 interface SettlementOverlayProps {
   step: SettlementStep;
@@ -12,19 +15,19 @@ interface SettlementOverlayProps {
 
 const STEP_ORDER: SettlementStep[] = ['preparing', 'signing', 'submitted', 'confirmed'];
 
-/** Icon + one-line caption per step — the "signing" moment now has its own
- * glyph (Key) rather than being one label among four always-visible ones. */
+const STEP_GLYPH_SIZE = 28;
+
 const stepMeta = (s: SettlementStep) => {
   switch (s) {
     case 'signing':
-      return { icon: <Key className="w-7 h-7" />, caption: 'Signing', index: 1 };
+      return { icon: <Key size={STEP_GLYPH_SIZE} strokeWidth={GLYPH_STROKE} aria-hidden="true" />, caption: 'Signing', index: 1 };
     case 'submitted':
-      return { icon: <Radio className="w-7 h-7" />, caption: 'Broadcasting', index: 2 };
+      return { icon: <Radio size={STEP_GLYPH_SIZE} strokeWidth={GLYPH_STROKE} aria-hidden="true" />, caption: 'Broadcasting', index: 2 };
     case 'confirmed':
-      return { icon: <CheckCircle2 className="w-7 h-7" />, caption: 'Confirmed', index: 3 };
+      return { icon: <Icon name="check" size={STEP_GLYPH_SIZE} strokeWidth={3} />, caption: 'Confirmed', index: 3 };
     case 'preparing':
     default:
-      return { icon: <Zap className="w-7 h-7" />, caption: 'Preparing', index: 0 };
+      return { icon: <Zap size={STEP_GLYPH_SIZE} strokeWidth={GLYPH_STROKE} aria-hidden="true" />, caption: 'Preparing', index: 0 };
   }
 };
 
@@ -32,37 +35,32 @@ const RING_SIZE = 104;
 const RING_STROKE = 6;
 const RING_RADIUS = (RING_SIZE - RING_STROKE) / 2;
 const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+const CAPTION_RISE_PX = 8;
 
 export const SettlementOverlay: React.FC<SettlementOverlayProps> = ({ step, txHash, pnl }) => {
+  const reduced = useMotionPref();
   const meta = stepMeta(step);
   const isConfirmed = step === 'confirmed';
   const progress = isConfirmed ? 1 : meta.index / (STEP_ORDER.length - 1);
-  const accent = isConfirmed ? 'var(--color-long)' : 'var(--color-bnb-yellow)';
 
   return (
-    <motion.div
+    <Scrim
+      tone="dim"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1, zIndex: 40, transition: STANDARD }}
       exit={{ opacity: 0, zIndex: 10, transition: MICRO }}
-      className="absolute inset-0 z-40 flex flex-col items-center justify-center p-6 backdrop-blur-md pointer-events-auto"
-      style={{ backgroundColor: 'rgba(5,9,20,0.75)' }}
+      className="absolute inset-0 z-40 flex flex-col items-center justify-center p-6 pointer-events-auto"
     >
-      <div
-        className="w-full max-w-sm glass-panel rounded-[var(--radius-xl)] p-6 border flex flex-col items-center text-center"
-        style={{ borderColor: 'rgba(240,185,11,0.3)', boxShadow: '0 0 50px rgba(240,185,11,0.25)' }}
-      >
-        {/* Circular progress ring — replaces the old 4-node horizontal
-            pipeline. A single glyph morphs per SettlementStep at its
-            center, so "signing" is a Key icon appearing, not a text row. */}
+      <div className="lg-card w-full max-w-sm p-6 flex flex-col items-center text-center">
         <div className="relative mb-4" style={{ width: RING_SIZE, height: RING_SIZE }}>
-          <svg width={RING_SIZE} height={RING_SIZE} className="-rotate-90">
+          <svg width={RING_SIZE} height={RING_SIZE} className="-rotate-90" aria-hidden="true">
             <circle
               cx={RING_SIZE / 2}
               cy={RING_SIZE / 2}
               r={RING_RADIUS}
               strokeWidth={RING_STROKE}
               fill="none"
-              stroke="rgba(255,255,255,0.08)"
+              className="stroke-well"
             />
             <motion.circle
               cx={RING_SIZE / 2}
@@ -70,23 +68,25 @@ export const SettlementOverlay: React.FC<SettlementOverlayProps> = ({ step, txHa
               r={RING_RADIUS}
               strokeWidth={RING_STROKE}
               fill="none"
-              stroke={accent}
+              className={isConfirmed ? 'stroke-lucky-bar' : 'stroke-gold'}
               strokeLinecap="round"
               strokeDasharray={RING_CIRCUMFERENCE}
               initial={false}
               animate={{ strokeDashoffset: RING_CIRCUMFERENCE * (1 - progress) }}
-              transition={STANDARD}
+              transition={reduced ? { duration: 0 } : STANDARD}
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
             <AnimatePresence mode="wait">
               <motion.div
                 key={step}
-                initial={{ opacity: 0, scale: 0.6, rotate: -20 }}
+                initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.6, rotate: -20 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0, transition: STANDARD }}
-                exit={{ opacity: 0, scale: 0.6, transition: MICRO }}
-                className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                style={{ backgroundColor: accent, color: '#050914', boxShadow: `0 0 35px ${isConfirmed ? 'rgba(0,232,154,0.55)' : 'rgba(240,185,11,0.5)'}` }}
+                exit={{ opacity: 0, scale: reduced ? 1 : 0.6, transition: MICRO }}
+                className={cn(
+                  'w-14 h-14 rounded-md flex items-center justify-center',
+                  isConfirmed ? 'bg-lucky-bar text-on-lucky' : 'bg-gold text-on-gold shadow-glow-gold'
+                )}
               >
                 {meta.icon}
               </motion.div>
@@ -94,69 +94,64 @@ export const SettlementOverlay: React.FC<SettlementOverlayProps> = ({ step, txHa
           </div>
         </div>
 
-        {/* Single current-step caption, not four persistent labels. */}
         <AnimatePresence mode="wait">
           <motion.span
             key={step}
-            initial={{ opacity: 0, y: -4 }}
+            initial={reduced ? { opacity: 0 } : { opacity: 0, y: CAPTION_RISE_PX }}
             animate={{ opacity: 1, y: 0, transition: MICRO }}
             exit={{ opacity: 0, transition: MICRO }}
-            className="text-[11px] font-mono font-bold tracking-widest uppercase mb-3"
-            style={{ color: accent }}
+            className={cn(
+              'text-micro font-bold uppercase tracking-[0.08em] mb-3',
+              isConfirmed ? 'text-lucky' : 'text-gold'
+            )}
           >
             {meta.caption}
           </motion.span>
         </AnimatePresence>
 
-        {/* Tiny at-a-glance progress dots, no labels. */}
-        <div className="flex items-center gap-1.5 mb-4">
+        <div className="flex items-center gap-1.5 mb-4" aria-hidden="true">
           {STEP_ORDER.map((s, idx) => {
             const filled = idx <= meta.index || isConfirmed;
             return (
               <span
                 key={s}
-                className="w-1.5 h-1.5 rounded-full transition-colors duration-300"
-                style={{ backgroundColor: filled ? accent : 'rgba(255,255,255,0.15)' }}
+                className={cn(
+                  'w-1.5 h-1.5 rounded-full transition-colors duration-300',
+                  !filled && 'bg-control-ring',
+                  filled && (isConfirmed ? 'bg-lucky-bar' : 'bg-gold')
+                )}
               />
             );
           })}
         </div>
 
-        <h3 className="text-base font-black uppercase tracking-wider mb-1 font-mono text-[color:var(--color-text-1)]">
-          {isConfirmed ? (
-            <span className="text-glow-green" style={{ color: 'var(--color-long)' }}>
-              CONFIRMED ON-CHAIN
-            </span>
-          ) : (
-            'SETTLING ON BNB CHAIN...'
-          )}
+        <h3 className="text-section text-ink mb-1" aria-live="polite">
+          {isConfirmed ? 'Confirmed on BNB Chain' : 'Settling on BNB Chain…'}
         </h3>
 
-        <div className="text-xs font-mono mb-5 text-[color:var(--color-text-3)]">
-          Outcome:{' '}
-          <span className="font-bold" style={{ color: pnl >= 0 ? 'var(--color-long)' : 'var(--color-short)' }}>
-            {pnl < 0 ? '-' : '+'}${Math.abs(pnl).toFixed(2)}
-          </span>
-        </div>
+        <p className="text-caption text-ink-muted mb-5">
+          Outcome <SignedAmount value={pnl} className="font-bold" />
+        </p>
 
         {txHash && (
           <a
             href={`https://bscscan.com/tx/${txHash}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full flex items-center justify-between px-3 py-1.5 rounded-xl border text-[11px] font-mono transition-colors"
-            style={{ backgroundColor: 'var(--color-bg-0)', borderColor: 'var(--color-line)', color: 'var(--color-text-2)' }}
+            aria-label={`View transaction ${formatHash(txHash)} on BscScan`}
+            className="w-full min-h-12 flex items-center justify-between gap-3 px-4 rounded-md bg-well text-caption"
           >
-            <span className="flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5" style={{ color: 'var(--color-long)' }} />
-              Tx: {txHash.slice(0, 8)}...{txHash.slice(-6)}
+            <span className="flex items-center gap-2 min-w-0">
+              <span className="text-ink-muted">Tx</span>
+              <span className="tabular-nums font-semibold text-ink-secondary truncate">{formatHash(txHash)}</span>
             </span>
-            <span className="flex items-center gap-1 font-bold" style={{ color: 'var(--color-bnb-yellow)' }}>
-              BSC <ExternalLink className="w-3 h-3" />
+            <span className="flex items-center gap-1.5 font-bold text-ink-secondary shrink-0">
+              BscScan
+              <ExternalLink size={16} strokeWidth={GLYPH_STROKE} aria-hidden="true" />
             </span>
           </a>
         )}
       </div>
-    </motion.div>
+    </Scrim>
   );
 };

@@ -1,110 +1,121 @@
-# BNB PLAY — Design Tokens & Component Rules
+# BNB PLAY: design tokens (Lucky Games)
 
-## Color system
+This file is the source of truth for BNB PLAY's look.
 
-```css
---bnb-yellow: #F0B90B;
---bnb-yellow-bright: #FFD21E;
---long: #00E89A;
---short: #FF3B6B;
---profit: #00E89A;
---loss: #FF3B6B;
---bg-0: #050914;
---bg-1: #09111F;
---panel: rgba(13, 24, 41, 0.88);
---panel-soft: rgba(16, 30, 50, 0.72);
---line: rgba(130, 160, 200, 0.18);
---text-1: #F5F7FB;
---text-2: #9AA8BD;
---text-3: #65758C;
-```
+- **The re-skin program:** [`docs/reskin/`](reskin/README.md). It covers the decisions, the epics and the rubric.
+- **The shared primitives and their props:** [`docs/reskin/CONTRACTS.md`](reskin/CONTRACTS.md).
+- **The legacy → Lucky mapping:** [`docs/reskin/TOKEN_MAP.md`](reskin/TOKEN_MAP.md).
+- **Motion:** [`docs/reskin/MOTION.md`](reskin/MOTION.md).
+- **Where the code lives:**
+  - Tokens are declared in `src/index.css` (`@theme static`, so every variable is emitted).
+  - JavaScript and the canvas read the same values from `src/ui/lucky/palette.ts`. A test (`src/ui/lucky/palette.spec.ts`) keeps the two in sync.
 
-## Color grammar
-- Yellow = brand + primary action
-- Green = LONG + profit
-- Red/pink = SHORT + loss
-- White/gray = neutral
-- Cyan should not become a fifth primary semantic color
+## Surfaces: the ladder
 
-## Typography
-Use a modern grotesk/sans for UI, tabular numerals for prices.
+`canvas → sheet → panel → well → tile`. Every step inward is darker, never lighter.
 
-```text
-Hero price        32–40
-Screen title      20–24
-Primary CTA       16–18
-Body              14–16
-Metadata          12–13
-Micro label       10–12
-```
+| Token | Value | Utility | Use |
+|---|---|---|---|
+| `canvas` | #030d19 | `bg-canvas` | Page background behind the frame |
+| `sheet` | #111b2d | `bg-sheet` | Bottom sheets, result card, modals (`.lg-sheet`, `.lg-card`) |
+| `panel` | #1a263b | `bg-panel` | Grouped sections on a sheet (`Panel`) |
+| `well` | #0e1726 | `bg-well` | Rows inset in a panel (`StatTable`, `WalletRow`, `Toggle`) |
+| `tile` | #0a111c | `bg-tile` | Tiles and progress tracks, the darkest inset |
+| `control` / `control-hover` | #1b263e / #232d44 | `bg-control` | Secondary buttons, icon discs |
+| `lobby` / `lobby-raised` / `lobby-active` | #0a1e42 / #172747 / #142959 | `bg-lobby` | The track stage and the frame only |
+| `hero-sky` / `hero-indigo` | #b0c4f5 / #4452a8 | | The hero art stage |
+| `frame` / `frame-muted` | #255bd0 / #2d5295 | `border-frame` | The 1px outline of the app frame and of sheets |
+| `line` | #243149 | `border-line` | Hairlines |
+| `control-ring` | #667490 | | Unselected radios, the offline status dot |
 
-## Radius
-```css
---radius-sm: 10px;
---radius-md: 16px;
---radius-lg: 22px;
---radius-xl: 28px;
-```
-Avoid making every object a pill.
+## Text
 
-## Spacing
-Use an 8-point system.
+| Token | Value | Use |
+|---|---|---|
+| `ink` | #ffffff | Headings, values |
+| `ink-soft` | #d8e4f2 | Sub-titles |
+| `ink-secondary` | #bcd1ef | Secondary button labels, tab labels |
+| `ink-muted` | #9eb4d0 | Meta, timers, labels |
+| `ink-faint` | #61769a | Only at 20px and up, and only for information that repeats nearby |
 
-```text
-4   micro
-8   tight
-12  compact
-16  standard
-24  section
-32  major
-40+ hero
-```
+## Accents and roles
 
-# Component rules
+Each accent has exactly one job. Always use the role name in feature code.
 
-## Primary CTA
-Examples:
-- Connect Wallet
-- Hold to Launch
-- Trade Again
+| Role | Maps to | Rule |
+|---|---|---|
+| `cta` | `hot` #f80757, gradient `hot-light` → `hot` | One hot element per screen, count badges aside. White label only when bold and at least 19px. |
+| `brand` | `lucky` #1ef66d | The brand word in two-tone headings |
+| `dir-long` | `lucky` + the tri-up icon | Direction only |
+| `dir-short` | `info` #2dbdf1 + the tri-down icon | Direction only. Never an outcome colour. |
+| `profit` | `lucky` + a sign | Gains |
+| `loss` | `amber` #f08204 + a sign | Calm, not punitive. There is no red anywhere. |
+| `premium` | `gold` #fcbe20 | The BNB coin, level-up and Pro. Gold means nothing else. |
+| `focus` | `lucky` | A 2px ring with a 2px offset, applied globally with `:focus-visible` |
 
-Rules:
-- BNB yellow
-- full width
-- minimum 52px height
-- high contrast black text
-- glow only when actionable
+Supporting tokens:
+- `lucky-bar` #04f233 is for progress fills, the selected glow and check badges.
+- `lucky-tint` #123326 is the selected-row wash.
+- `on-lucky`, `on-gold` and `on-hot` are the label colours on those fills.
+- `coin-usd`, `coin-eur`, `coin-btc` and `coin-usdt` are the currency discs.
 
-## LONG / SHORT control
-Neutral: dark, subtle border.
+## Type
 
-Selected LONG: green border/glow.
+The only family is Figtree (variable 400–900), vendored at `public/fonts/figtree/`. It has tabular figures and the U+2212 minus. It has no triangle glyphs, so draw direction triangles with `<Icon name="tri-up|tri-down">`.
 
-Selected SHORT: red/pink border/glow.
+| Utility | Size / line / weight | Use |
+|---|---|---|
+| `text-display` | 36 / 40 / 800, −0.01em | Screen hero numbers and titles |
+| `text-amount` | 30 / 34 / 700 | Balances and P&L |
+| `text-title` | 26 / 30 / 700 | Sheet titles |
+| `text-section` | 22 / 28 / 600 | Panel titles |
+| `text-body` | 20 / 26 / 500 | Helper lines |
+| `text-label` | 18 / 22 / 600, 0.01em | Uppercase labels, tabs; the hot CTA at 800 |
+| `text-caption` | 16 / 20 / 500 | Sub-lines |
+| `text-micro` | 13 / 16 / 500 | The smallest text allowed |
+| `text-numeral` | 22 / 24 / 800 | Badge and ring numbers |
 
-Do not color both simultaneously.
+Every number gets `tabular-nums`. Nothing is smaller than 13px.
 
-## Bottom sheet
-Use for trade setup, asset selector, and detail views.
+## Shape, depth, texture
 
-Rules:
-- rounded top corners
-- visible drag handle
-- background blur
-- clear hierarchy
-- max 85% screen height
+- **Radius:**
+  - `rounded-sm` 10: the CTA and pills.
+  - `rounded-md` 14: tiles and rows.
+  - `rounded-lg` 20: panels and cards.
+  - `rounded-xl` 36: sheets and the frame.
+  - `rounded-full`: discs and badges.
+  - These override Tailwind's keywords on purpose.
+- **Shadows:**
+  - `shadow-glow-lucky`: the selected tile or row, and the win badge.
+  - `shadow-glow-hot`: the CTA and count badges.
+  - `shadow-glow-gold`: coins, Pro and the level-up flash.
+  - `shadow-lift`: sheets, the hero card and the result card.
+  - No other glows, and never on text.
+- **Texture:**
+  - Faint 135° stripes (`.lg-stripes`) go only on tiles and progress fills.
+  - The only UI gradient is the hot CTA or badge. The canvas world is exempt.
 
-## PIX bubble
-- max 1–2 lines
-- disappears automatically
-- use only for meaningful events
-- avoid constant chatter
+## Copy
 
-## Accessibility
-- minimum body text 14 px
-- touch targets at least 44×44
-- do not use color alone for LONG/SHORT
-- support reduced motion
-- maintain chart-label contrast
-- avoid rapid flashing
-- haptics complement, never replace, visual feedback
+- **The hot CTA** is UPPERCASE and ends with one "!". No other text uses "!".
+- **Casing:** labels are UPPERCASE, titles are Title Case, and status sub-lines are lowercase.
+- **Amounts** come from `formatAmount` / `formatPrice` in `src/ui/lucky/format.ts`: "+2.16 USDT", "−1.62 USDT". The code goes after the number, the minus is the true minus sign, and there is no "$".
+- **After a loss,** the copy is calm sentence case. No pressure to replay.
+- **No emoji, dingbats or text-art faces** in the UI. Use `Icon` or the Lucky art.
+
+## Z scale
+
+| z | Layer |
+|---|---|
+| 0 | canvas |
+| 15 | track swipe layer |
+| 20 | HUD, PIX, bottom stack |
+| 30 | header |
+| 35 | outcome banner |
+| 40 | sheets, result, settlement |
+| 45 | confetti (`ConfettiLayer`) |
+| 50 | modal, drawer, toast |
+| 60 | dev tools (SimulationBar) |
+
+`.app-frame` has `contain: layout`, so `fixed` overlays position against the phone frame rather than the browser window.

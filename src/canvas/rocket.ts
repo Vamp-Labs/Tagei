@@ -1,33 +1,12 @@
 import { PositionDirection } from '../types/game';
 import { ParticleSystem } from './particles';
+import { mix } from '../ui/lucky/palette';
+import { CLEAR, ROCKET, TONE, Tone, chargeTone, damageTone } from './theme';
 
-type RGB = [number, number, number];
-
-/** Charge ladder by tier magnitude; index 0 is the idle steel hull. */
-// Cyan retired (docs/DESIGN_TOKENS.md: "not a fifth primary semantic
-// color") — the top tier escalates into bright brand-yellow instead of a
-// foreign hue, keeping the ladder's visual escalation without introducing one.
-const CHARGE_LADDER: RGB[] = [
-  [226, 232, 240],
-  [240, 185, 11],  // --bnb-yellow
-  [0, 232, 154],   // --long
-  [255, 210, 30],  // --bnb-yellow-bright ("hyperdrive")
-  [235, 251, 255],
-];
-const DAMAGE_LADDER: RGB[] = [
-  [148, 163, 184],
-  [255, 122, 0],
-  [255, 59, 107],  // --short / --loss
-  [255, 30, 78],
-  [255, 70, 70],
-];
-
-const rgba = (c: RGB, a: number) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${a})`;
-const mixRGB = (a: RGB, b: RGB, t: number): RGB => [
-  a[0] + (b[0] - a[0]) * t,
-  a[1] + (b[1] - a[1]) * t,
-  a[2] + (b[2] - a[2]) * t,
-];
+const LAMP_MAX_HZ = 2.5;
+const TIME_UNITS_PER_SECOND = 3.0;
+const DEFAULT_FRAME_SECONDS = 1 / 60;
+const SOOT_STROKE_SHARE = 0.8;
 
 /** Surface points on the fuselage with outward normals, sampled off the bezier. */
 const HULL_SKIN: readonly [number, number, number, number][] = [
@@ -56,7 +35,8 @@ export class RocketAvatar {
   public targetAngle: number = 0;
   public hoverOffset: number = 0;
   public engineActive: boolean = true;
-  public thrusterColor: string = '#00E89A';
+  public thrusterColor: string = ROCKET.profitFlame.hex;
+  private thrusterTone: Tone = ROCKET.profitFlame;
   public boostIntensity: number = 1.0;
   public isTargetHit: boolean = false;
   public isDrifting: boolean = false;
@@ -103,7 +83,9 @@ export class RocketAvatar {
   private readonly visorArc: Path2D;
   /** Gradient coordinates resolve against the CTM at paint time, so caching is safe. */
   private gradCache = new Map<string, CanvasGradient>();
-  private trail: { x: number; y: number; climb: number }[] = [];
+  private edgeKey: number = -1;
+  private edgeColor: string = ROCKET.hullEdge;
+  private trail: { x: number; y: number; climb: number; good: boolean }[] = [];
 
   /**
    * Organic ticks peak near 0.14 raw while the demo toolbar reaches 7.6 — a
@@ -114,11 +96,11 @@ export class RocketAvatar {
   private static readonly MAX = 6.0;
   private static readonly DENOM = Math.log1p(RocketAvatar.MAX / RocketAvatar.REF);
 
-  /** this.time advances 0.05/frame ~ 3.0/s, so sin(time * HZ * f) runs at f Hz. */
-  private static readonly HZ = (2 * Math.PI) / 3.0;
+  /** this.time advances TIME_UNITS_PER_SECOND per real second, so sin(time * HZ * f) runs at f Hz. */
+  private static readonly HZ = (2 * Math.PI) / TIME_UNITS_PER_SECOND;
 
   /** Tier colour ladder by magnitude; losses have their own colour. */
-  private static readonly TIER_COLORS = ['#F0B90B', '#00E89A', '#FFD21E', '#FFFFFF'];
+  private static readonly TIER_COLORS = ROCKET.tiers;
 
   constructor() {
     this.x = 100;
@@ -168,14 +150,13 @@ export class RocketAvatar {
   }
 
   /** Colour for the current tier, blended across the band so the ladder is continuous. */
-  private tierRGB(): RGB {
+  private tierTone(): Tone {
     if (this.tier > 0) {
-      const i = Math.min(4, this.tier);
       const frac = Math.max(0, Math.min(1, (this.currentPnl - this.tier * 2.5) / 2.5));
-      return mixRGB(CHARGE_LADDER[i], CHARGE_LADDER[Math.min(4, i + 1)], frac * 0.6);
+      return chargeTone(this.tier, frac);
     }
-    if (this.tier < 0) return DAMAGE_LADDER[Math.min(4, -this.tier)];
-    return CHARGE_LADDER[0];
+    if (this.tier < 0) return damageTone(-this.tier);
+    return chargeTone(0, 0);
   }
 
   /** Clears the hull between rounds so soot never carries over. */
@@ -202,7 +183,7 @@ export class RocketAvatar {
   }
 
   private tierColor(): string {
-    if (this.tier < 0) return '#FF3B6B';
+    if (this.tier < 0) return ROCKET.tierLoss;
     const i = Math.min(3, Math.max(0, Math.abs(this.tier) - 1));
     return RocketAvatar.TIER_COLORS[i];
   }
@@ -253,23 +234,27 @@ export class RocketAvatar {
 
   public setPlayerDirection(direction: PositionDirection | null, isGood: boolean) {
     if (!direction) {
-      this.thrusterColor = '#F0B90B'; // BNB gold default
+      this.thrusterTone = ROCKET.idleFlame;
+      this.thrusterColor = this.thrusterTone.hex;
       this.boostIntensity = 1.0;
       return;
     }
 
+    this.thrusterTone = isGood ? ROCKET.profitFlame : ROCKET.lossFlame;
+    this.thrusterColor = this.thrusterTone.hex;
     if (direction === 'LONG') {
-      this.thrusterColor = isGood ? '#00E89A' : '#F0B90B';
       this.boostIntensity = isGood ? 1.6 : 0.8;
     } else {
-      // SHORT
-      this.thrusterColor = isGood ? '#00E89A' : '#FF3B6B';
       this.boostIntensity = isGood ? 1.5 : 0.7;
     }
   }
 
-  public update(particles: ParticleSystem, reducedMotion: boolean = false) {
-    this.time += 0.05;
+  public update(
+    particles: ParticleSystem,
+    reducedMotion: boolean = false,
+    dtSeconds: number = DEFAULT_FRAME_SECONDS
+  ) {
+    this.time += dtSeconds * TIME_UNITS_PER_SECOND;
     // render() has no access to the flag, and the motion-reactive visuals
     // below it must honour it too (PRD §35).
     this.reduced = reducedMotion;
@@ -323,7 +308,12 @@ export class RocketAvatar {
     if (reducedMotion) {
       this.trail.length = 0;
     } else {
-      this.trail.push({ x: this.x, y: this.y + this.hoverOffset, climb: this.climbSignal() });
+      this.trail.push({
+        x: this.x,
+        y: this.y + this.hoverOffset,
+        climb: this.climbSignal(),
+        good: this.currentPnl >= 0,
+      });
       if (this.trail.length > 18) this.trail.shift();
     }
 
@@ -472,7 +462,7 @@ export class RocketAvatar {
             this.angle,
             Math.random() > 0.5 ? 1 : -1,
             Math.min(1, signal * 1.6),
-            this.currentPnl >= 8 ? '#FFD21E' : '#00E89A'
+            this.currentPnl >= 8 ? ROCKET.surgeHyper : ROCKET.surgeGood
           );
         }
 
@@ -493,7 +483,7 @@ export class RocketAvatar {
           // winning dives, and PRD §18 calls that a success state — it must
           // not throw red damage embers.
           const good = this.favour >= 0;
-          const accent = this.currentPnl >= 8 ? '#FFD21E' : '#00E89A';
+          const accent = this.currentPnl >= 8 ? ROCKET.surgeHyper : ROCKET.surgeGood;
 
           if (good) {
             particles.emitClimbBurst(nozzleX, nozzleY, this.angle, power, accent);
@@ -501,7 +491,7 @@ export class RocketAvatar {
             this.chargePulse = Math.max(this.chargePulse, power);
           } else {
             particles.emitDiveEmbers(nozzleX, nozzleY, power);
-            particles.emitGForceRing(this.x, actualY, '#FF3B6B', power * 0.7);
+            particles.emitGForceRing(this.x, actualY, ROCKET.surgeBad, power * 0.7);
             this.impactFlash = Math.max(this.impactFlash, power);
           }
 
@@ -514,8 +504,8 @@ export class RocketAvatar {
 
   /**
    * Drawn in world space, before the rocket's own transform, so the ribbon
-   * traces the path actually flown. Colour keys off the climb at each sample,
-   * which makes a reversal read instantly: green behind, red ahead.
+   * traces the path actually flown. Colour keys off the P&L sign at each
+   * sample and intensity off the climb, so a winning SHORT dive stays lucky.
    */
   private renderTrail(ctx: CanvasRenderingContext2D) {
     if (this.reduced || this.trail.length < 3) return;
@@ -526,13 +516,11 @@ export class RocketAvatar {
       const a = this.trail[i - 1];
       const b = this.trail[i];
       const t = i / this.trail.length;
-      const climb = b.climb;
-      const intensity = Math.min(1, Math.abs(climb) * 2.2);
+      const intensity = Math.min(1, Math.abs(b.climb) * 2.2);
 
-      ctx.strokeStyle =
-        climb >= 0
-          ? `rgba(0, 255, 163, ${t * 0.5 * intensity})`
-          : `rgba(255, 0, 85, ${t * 0.45 * intensity})`;
+      ctx.strokeStyle = b.good
+        ? ROCKET.trailGood.a(t * 0.5 * intensity)
+        : ROCKET.trailBad.a(t * 0.45 * intensity);
       ctx.lineWidth = t * (2 + intensity * 6);
       ctx.beginPath();
       ctx.moveTo(a.x, a.y);
@@ -549,36 +537,28 @@ export class RocketAvatar {
 
     ctx.save();
 
-    // Airframe turbulent vibration jitter when deep in loss
-    let jitterX = 0;
-    let jitterY = 0;
-    if (this.currentPnl <= -3.0 && !this.isDrifting) {
-      const jitterAmp = Math.min(2.8, (Math.abs(this.currentPnl) - 2.5) * 0.45);
-      jitterX = (Math.random() - 0.5) * jitterAmp;
-      jitterY = (Math.random() - 0.5) * jitterAmp;
-    }
-
-    ctx.translate(this.x + jitterX, drawY + jitterY);
+    // Airframe jitter comes from update(), which already gates it on reduced motion
+    ctx.translate(this.x + this.jitterX, drawY + this.jitterY);
     ctx.rotate(this.angle);
     // Stretch along travel, pinch across it — conserves apparent volume, so
     // the rocket reads as accelerating rather than just being scaled up.
     ctx.scale(1 + this.stretch, 1 - this.stretch * 0.55);
 
     // Dynamic flame length & color based on real-time PnL
-    let effectiveFlameColor = this.thrusterColor;
+    let flame = this.thrusterTone;
     let baseFlameLen = 16 + (this.boostIntensity - 1) * 14;
 
     if (this.currentPnl > 0) {
       // Escalating profit flame length
       const profitBoost = Math.min(38, this.currentPnl * 2.8);
       baseFlameLen = 18 + profitBoost;
-      effectiveFlameColor = this.currentPnl >= 8 ? '#FFD21E' : '#00E89A';
+      flame = this.currentPnl >= 8 ? ROCKET.hyperFlame : ROCKET.profitFlame;
     } else if (this.currentPnl < 0) {
-      // Sputtering loss flame
+      // Sputtering loss flame, in one stable amber
       const lossPenalty = Math.min(10, Math.abs(this.currentPnl) * 1.2);
-      const sputter = (Math.random() - 0.5) * 6;
+      const sputter = this.reduced ? 0 : (Math.random() - 0.5) * 6;
       baseFlameLen = Math.max(8, 14 - lossPenalty + sputter);
-      effectiveFlameColor = Math.random() > 0.3 ? '#FF3B6B' : '#FF4400';
+      flame = ROCKET.lossFlame;
     }
 
     // The throttle answers the climb too: pulling up lights the afterburner,
@@ -590,23 +570,23 @@ export class RocketAvatar {
     // 1. Rocket Glow halo & Supersonic Plasma Jet Exhaust
     if (this.engineActive && !this.isDrifting) {
       const glowGrad = ctx.createRadialGradient(-12, 0, 2, -12, 0, 28);
-      glowGrad.addColorStop(0, effectiveFlameColor + 'bb');
-      glowGrad.addColorStop(1, 'transparent');
+      glowGrad.addColorStop(0, flame.a(0.73));
+      glowGrad.addColorStop(1, CLEAR);
       ctx.fillStyle = glowGrad;
       ctx.beginPath();
       ctx.arc(-12, 0, 28, 0, Math.PI * 2);
       ctx.fill();
 
       // Dynamic Flame Plume Geometry
-      const flicker = Math.sin(this.time * 28) * 3;
+      const flicker = this.reduced ? 0 : Math.sin(this.time * 28) * 3;
       const flameLen = Math.max(10, baseFlameLen + flicker);
-      const flameHalfWidth = 4.5 * (1 + Math.sin(this.time * 22) * 0.12);
+      const flameHalfWidth = 4.5 * (1 + (this.reduced ? 0 : Math.sin(this.time * 22) * 0.12));
 
       // A. Outer Plasma Flame Plume
       const flameGrad = ctx.createLinearGradient(-18, 0, -18 - flameLen, 0);
-      flameGrad.addColorStop(0, effectiveFlameColor);
-      flameGrad.addColorStop(0.55, `${effectiveFlameColor}88`);
-      flameGrad.addColorStop(1, 'transparent');
+      flameGrad.addColorStop(0, flame.hex);
+      flameGrad.addColorStop(0.55, flame.a(0.53));
+      flameGrad.addColorStop(1, CLEAR);
 
       ctx.fillStyle = flameGrad;
       ctx.beginPath();
@@ -619,9 +599,9 @@ export class RocketAvatar {
       // B. Inner Hot Core Torch (White-Hot Supersonic Core)
       const coreLen = flameLen * 0.52;
       const coreGrad = ctx.createLinearGradient(-18, 0, -18 - coreLen, 0);
-      coreGrad.addColorStop(0, '#FFFFFF');
-      coreGrad.addColorStop(0.6, effectiveFlameColor);
-      coreGrad.addColorStop(1, 'transparent');
+      coreGrad.addColorStop(0, ROCKET.flameCore);
+      coreGrad.addColorStop(0.6, flame.hex);
+      coreGrad.addColorStop(1, CLEAR);
 
       ctx.fillStyle = coreGrad;
       ctx.beginPath();
@@ -635,8 +615,8 @@ export class RocketAvatar {
       const diamondCount = this.currentPnl >= 4 ? 4 : this.boostIntensity > 1.2 ? 3 : 2;
       for (let d = 1; d <= diamondCount; d++) {
         const dX = -18 - d * (flameLen / (diamondCount + 1.2));
-        const dPulse = 1 + Math.sin(this.time * 32 + d) * 0.22;
-        ctx.fillStyle = '#FFFFFF';
+        const dPulse = this.reduced ? 1 : 1 + Math.sin(this.time * 32 + d) * 0.22;
+        ctx.fillStyle = ROCKET.flameCore;
         ctx.beginPath();
         ctx.moveTo(dX - 2 * dPulse, 0);
         ctx.lineTo(dX, -1.6 * dPulse);
@@ -649,22 +629,22 @@ export class RocketAvatar {
 
     // Hyperdrive Plasma Energy Shield Bubble (>= $10.00 Profit)
     if (this.currentPnl >= 10 && !this.isDrifting) {
-      const shieldPulse = 1 + Math.sin(this.time * 16) * 0.08;
+      const shieldPulse = this.reduced ? 1 : 1 + Math.sin(this.time * 16) * 0.08;
       ctx.save();
       const shieldGrad = ctx.createRadialGradient(2, 0, 8, 2, 0, 32 * shieldPulse);
-      shieldGrad.addColorStop(0, 'rgba(0, 255, 163, 0.12)');
-      shieldGrad.addColorStop(0.7, 'rgba(0, 240, 255, 0.28)');
-      shieldGrad.addColorStop(1, 'rgba(240, 185, 11, 0.55)');
+      shieldGrad.addColorStop(0, ROCKET.shieldCore);
+      shieldGrad.addColorStop(0.7, ROCKET.shieldMid);
+      shieldGrad.addColorStop(1, ROCKET.shieldRim);
       ctx.fillStyle = shieldGrad;
       ctx.beginPath();
       ctx.ellipse(2, 0, 30 * shieldPulse, 19 * shieldPulse, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.strokeStyle = '#00E89A';
+      ctx.strokeStyle = ROCKET.shieldStroke;
       ctx.lineWidth = 1.5;
       ctx.setLineDash([8, 4]);
       ctx.beginPath();
-      ctx.ellipse(2, 0, 30 * shieldPulse, 19 * shieldPulse, this.time * 4, 0, Math.PI * 2);
+      ctx.ellipse(2, 0, 30 * shieldPulse, 19 * shieldPulse, this.reduced ? 0 : this.time * 4, 0, Math.PI * 2);
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.restore();
@@ -681,7 +661,7 @@ export class RocketAvatar {
 
     const charge = Math.max(0, this.chargeLevel);
     const scorch = this.scorch;
-    const col = this.tierRGB();
+    const col = this.tierTone();
     const comp = this.strokeComp();
     // Quantised so a smoothly moving charge does not blow the gradient cache.
     const gk = `${this.tier}|${(charge * 16) | 0}|${(scorch * 16) | 0}`;
@@ -690,17 +670,17 @@ export class RocketAvatar {
     // with the electrical arcs below (they need pnl <= -6, this needs ~+6.6).
     if (charge > 0.55 && !this.isDrifting) {
       ctx.save();
-      ctx.shadowColor = rgba(col, 0.9);
+      ctx.shadowColor = col.a(0.9);
       ctx.shadowBlur = 8 + charge * 12;
-      ctx.strokeStyle = rgba(col, 0.22 * charge);
+      ctx.strokeStyle = col.a(0.22 * charge);
       ctx.lineWidth = 1.2;
       ctx.stroke(this.fuselage);
       ctx.restore();
     }
 
     // Tail Fins
-    ctx.fillStyle = '#192348';
-    ctx.strokeStyle = '#253366';
+    ctx.fillStyle = ROCKET.finFill;
+    ctx.strokeStyle = ROCKET.finEdge;
     ctx.lineWidth = 1.5;
 
     // Top fin
@@ -725,17 +705,23 @@ export class RocketAvatar {
     // fill, stroke and clip rather than re-specified four times per frame.
     ctx.fillStyle = this.grad('hull', () => {
       const g = ctx.createLinearGradient(0, -9, 0, 9);
-      g.addColorStop(0, '#FFFFFF');
-      g.addColorStop(0.5, '#E2E8F0');
-      g.addColorStop(1, '#94A3B8');
+      g.addColorStop(0, ROCKET.hullLight);
+      g.addColorStop(0.5, ROCKET.hullMid);
+      g.addColorStop(1, ROCKET.hullDark);
       return g;
     });
     ctx.fill(this.fuselage);
 
-    ctx.strokeStyle = rgba(
-      mixRGB(mixRGB([100, 116, 139], col, charge * 0.7), [58, 20, 20], scorch * 0.8),
-      1
-    );
+    const edgeKey = col.id * 1024 + ((charge * 16) | 0) * 32 + ((scorch * 16) | 0);
+    if (edgeKey !== this.edgeKey) {
+      this.edgeKey = edgeKey;
+      this.edgeColor = mix(
+        mix(ROCKET.hullEdge, col.hex, charge * 0.7),
+        ROCKET.hullSoot,
+        scorch * SOOT_STROKE_SHARE
+      );
+    }
+    ctx.strokeStyle = this.edgeColor;
     ctx.lineWidth = 1.5;
     ctx.stroke(this.fuselage);
 
@@ -747,15 +733,15 @@ export class RocketAvatar {
     // a. Energy conduits under the plating
     const veinLife = (1 - this.veinBrownout * 0.85) * Math.max(charge, scorch * 0.5);
     if (veinLife > 0.02) {
-      const vc = this.tier < 0 ? DAMAGE_LADDER[1] : col;
+      const vc = this.tier < 0 ? damageTone(1) : col;
       // Two wide low-alpha strokes fake a bloom for a fraction of what one
       // shadowBlur costs, and they clip cleanly to the hull.
       ctx.setLineDash([]);
-      ctx.strokeStyle = rgba(vc, 0.1 + veinLife * 0.16);
+      ctx.strokeStyle = vc.a(0.1 + veinLife * 0.16);
       ctx.lineWidth = 3.4 * comp;
       ctx.stroke(this.veins);
 
-      ctx.strokeStyle = rgba(vc, 0.3 + veinLife * 0.55);
+      ctx.strokeStyle = vc.a(0.3 + veinLife * 0.55);
       ctx.lineWidth = 1.1 * comp;
       ctx.setLineDash([5, 9]);
       // Dash phase follows arc length along the real curve — a moving gradient
@@ -764,7 +750,7 @@ export class RocketAvatar {
       ctx.stroke(this.veins);
 
       if (!this.reduced && veinLife > 0.25) {
-        ctx.strokeStyle = `rgba(255,255,255,${0.45 * veinLife})`;
+        ctx.strokeStyle = TONE.ink.a(0.45 * veinLife);
         ctx.lineWidth = 1.7 * comp;
         ctx.setLineDash([3, 41]);
         ctx.lineDashOffset = -(this.time * 26) % 44;
@@ -774,7 +760,7 @@ export class RocketAvatar {
     }
 
     // b. BNB Gold Stripe Accent — inside the clip, so soot browns it out too
-    ctx.fillStyle = '#F0B90B';
+    ctx.fillStyle = ROCKET.stripe;
     ctx.beginPath();
     ctx.moveTo(3, -7.5);
     ctx.lineTo(8, -6.5);
@@ -790,9 +776,9 @@ export class RocketAvatar {
       ctx.globalCompositeOperation = 'overlay';
       ctx.fillStyle = this.grad(`tint|${gk}`, () => {
         const g = ctx.createLinearGradient(-15, 0, 22, 0);
-        g.addColorStop(0, rgba(col, 0.1 * charge));
-        g.addColorStop(0.55, rgba(col, 0.42 * charge));
-        g.addColorStop(1, rgba(mixRGB(col, [255, 255, 255], 0.5), 0.3 * charge));
+        g.addColorStop(0, col.a(0.1 * charge));
+        g.addColorStop(0.55, col.a(0.42 * charge));
+        g.addColorStop(1, col.lift.a(0.3 * charge));
         return g;
       });
       ctx.fillRect(-22, -12, 48, 24);
@@ -805,9 +791,9 @@ export class RocketAvatar {
       ctx.globalCompositeOperation = 'multiply';
       ctx.fillStyle = this.grad(`scorch|${gk}`, () => {
         const g = ctx.createLinearGradient(-15, 0, 14, 0);
-        g.addColorStop(0, `rgba(48,30,32,${0.2 + scorch * 0.75})`);
-        g.addColorStop(0.45, `rgba(96,66,64,${0.15 + scorch * 0.55})`);
-        g.addColorStop(1, 'rgba(255,255,255,0)');
+        g.addColorStop(0, ROCKET.sootDark.a(0.2 + scorch * 0.75));
+        g.addColorStop(0.45, ROCKET.sootMid.a(0.15 + scorch * 0.55));
+        g.addColorStop(1, TONE.ink.a(0));
         return g;
       });
       ctx.fillRect(-22, -12, 48, 24);
@@ -821,8 +807,8 @@ export class RocketAvatar {
       for (const [sx, sy, sr] of soot) {
         ctx.fillStyle = this.grad(`soot|${sx}|${(scorch * 12) | 0}`, () => {
           const g = ctx.createRadialGradient(sx, sy, 0.5, sx, sy, sr);
-          g.addColorStop(0, `rgba(24,16,18,${0.7 * scorch})`);
-          g.addColorStop(1, 'rgba(255,255,255,0)');
+          g.addColorStop(0, ROCKET.sootDark.a(0.7 * scorch));
+          g.addColorStop(1, TONE.ink.a(0));
           return g;
         });
         ctx.fillRect(sx - sr, sy - sr, sr * 2, sr * 2);
@@ -831,23 +817,22 @@ export class RocketAvatar {
     }
 
     // e. Travelling wavefront. Direction is the whole tell: a tier gained runs
-    //    tail -> nose, a tier lost runs nose -> tail in red.
+    //    tail -> nose, a tier lost runs nose -> tail in amber.
     if (this.chargePulse > 0.01 && this.pulseT < 1) {
       const t = this.pulseDir === 1 ? this.pulseT : 1 - this.pulseT;
       const px = -17 + t * 41;
       const a = this.chargePulse * Math.sin(this.pulseT * Math.PI);
-      const bandCol =
-        this.pulseDir === 1 ? mixRGB(col, [255, 255, 255], 0.65) : DAMAGE_LADDER[2];
+      const bandCol = this.pulseDir === 1 ? col.lift : damageTone(2);
 
       ctx.globalCompositeOperation = 'lighter';
       const band = ctx.createLinearGradient(px - 7, 0, px + 7, 0);
-      band.addColorStop(0, rgba(bandCol, 0));
-      band.addColorStop(0.5, rgba(bandCol, 0.55 * a));
-      band.addColorStop(1, rgba(bandCol, 0));
+      band.addColorStop(0, bandCol.a(0));
+      band.addColorStop(0.5, bandCol.a(0.55 * a));
+      band.addColorStop(1, bandCol.a(0));
       ctx.fillStyle = band;
       ctx.fillRect(px - 7, -12, 14, 24);
 
-      ctx.strokeStyle = `rgba(255,255,255,${0.5 * a})`;
+      ctx.strokeStyle = TONE.ink.a(0.5 * a);
       ctx.lineWidth = 1.2 * comp;
       ctx.beginPath();
       ctx.moveTo(px + this.pulseDir * 2.5, -9);
@@ -859,9 +844,10 @@ export class RocketAvatar {
     // f. Hazard lamps at the fin roots
     const dmg = Math.max(0, Math.min(1, -this.currentPnl / 9));
     if (dmg > 0.08) {
-      // 0.9Hz at first blood to 3.5Hz at -$9. pow(.,8) gives a short sharp
-      // blink with a long dark gap; the 0.12 floor keeps the lamp present.
-      const hz = 0.9 + dmg * 2.6;
+      // 0.9Hz at first blood, capped at 2.5Hz to stay clear of flash limits.
+      // pow(.,8) gives a short sharp blink with a long dark gap; the 0.12
+      // floor keeps the lamp present.
+      const hz = Math.min(LAMP_MAX_HZ, 0.9 + dmg * 2.6);
       const raw = Math.max(0, Math.sin(this.time * RocketAvatar.HZ * hz));
       const strobe = this.reduced ? 0.55 : 0.12 + Math.pow(raw, 8) * 0.88;
 
@@ -871,9 +857,9 @@ export class RocketAvatar {
           `lamp|${ly}|${(strobe * 10) | 0}|${(dmg * 8) | 0}`,
           () => {
             const g = ctx.createRadialGradient(-6, ly, 0.4, -6, ly, 5.2);
-            g.addColorStop(0, `rgba(255,255,255,${0.75 * strobe * dmg})`);
-            g.addColorStop(0.35, `rgba(255,0,85,${0.7 * strobe * dmg})`);
-            g.addColorStop(1, 'rgba(255,0,85,0)');
+            g.addColorStop(0, TONE.ink.a(0.75 * strobe * dmg));
+            g.addColorStop(0.35, ROCKET.hazard.a(0.7 * strobe * dmg));
+            g.addColorStop(1, ROCKET.hazard.a(0));
             return g;
           }
         );
@@ -881,7 +867,7 @@ export class RocketAvatar {
       }
       ctx.globalCompositeOperation = 'source-over';
 
-      ctx.fillStyle = `rgba(255,${60 - 60 * strobe},90,${0.5 + 0.5 * strobe})`;
+      ctx.fillStyle = ROCKET.hazard.a(0.5 + 0.5 * strobe);
       ctx.beginPath();
       ctx.arc(-6, -4.6, 1.6, 0, Math.PI * 2);
       ctx.fill();
@@ -895,7 +881,7 @@ export class RocketAvatar {
     if (this.hullHits.length) {
       ctx.globalCompositeOperation = 'lighter';
       for (const h of this.hullHits) {
-        ctx.fillStyle = `rgba(255,${180 * h.life + 60},120,${0.85 * h.life})`;
+        ctx.fillStyle = ROCKET.hit.a(0.85 * h.life);
         ctx.beginPath();
         ctx.arc(h.x, h.y, 0.8 + (1 - h.life) * 2.2, 0, Math.PI * 2);
         ctx.fill();
@@ -907,11 +893,11 @@ export class RocketAvatar {
     if (this.impactFlash > 0.01) {
       const f = this.impactFlash;
       ctx.globalCompositeOperation = 'lighter';
-      ctx.fillStyle = `rgba(255,${40 + 120 * (1 - f)},${70 + 60 * (1 - f)},${0.55 * f})`;
+      ctx.fillStyle = ROCKET.hit.a(0.55 * f);
       ctx.fillRect(-22, -12, 48, 24);
       ctx.globalCompositeOperation = 'source-over';
       if (f > 0.6) {
-        ctx.strokeStyle = `rgba(255,255,255,${(f - 0.6) * 1.8})`;
+        ctx.strokeStyle = TONE.ink.a((f - 0.6) * 1.8);
         ctx.lineWidth = 3 * comp;
         ctx.stroke(this.fuselage);
       }
@@ -923,10 +909,10 @@ export class RocketAvatar {
     const rimA = Math.min(1, 0.16 + charge * 0.62 + this.rimFlare * 0.5);
     ctx.strokeStyle = this.grad(`rim|${gk}|${(this.rimFlare * 8) | 0}`, () => {
       const g = ctx.createLinearGradient(0, -9, 0, 9);
-      g.addColorStop(0, rgba(col, rimA));
-      g.addColorStop(0.3, rgba(mixRGB(col, [255, 255, 255], 0.55), rimA * 0.9));
-      g.addColorStop(0.72, rgba(col, rimA * 0.35));
-      g.addColorStop(1, rgba(col, rimA * 0.7));
+      g.addColorStop(0, col.a(rimA));
+      g.addColorStop(0.3, col.lift.a(rimA * 0.9));
+      g.addColorStop(0.72, col.a(rimA * 0.35));
+      g.addColorStop(1, col.a(rimA * 0.7));
       return g;
     });
     ctx.lineWidth = (2.6 + charge * 2.4 + this.rimFlare * 2.0) * comp;
@@ -934,8 +920,8 @@ export class RocketAvatar {
 
     ctx.restore();
 
-    // Cockpit Visor / Glass Dome. Loss desaturates rather than reddens — red
-    // is already the hull's job, and a browning-out screen reads as systems
+    // Cockpit Visor / Glass Dome. Loss desaturates rather than tints — the
+    // hull already carries the amber, and a dimming screen reads as systems
     // failing rather than as anger.
     const visorHot = Math.min(1, charge * 1.15);
     const flick =
@@ -947,16 +933,12 @@ export class RocketAvatar {
       const g = ctx.createLinearGradient(4, -4, 12, 4);
       if (scorch > 0.15) {
         const k = scorch;
-        g.addColorStop(0, `rgb(${43 * k},${240 - 166 * k},${255 - 168 * k})`);
-        g.addColorStop(1, `rgb(${22 * k},${136 - 86 * k},${204 - 142 * k})`);
+        g.addColorStop(0, mix(ROCKET.visorScorchLight, ROCKET.visorScorchSink, k));
+        g.addColorStop(1, mix(ROCKET.visorScorchDark, ROCKET.visorScorchFloor, k));
       } else {
-        // Cockpit glass base is a cool neutral (--text-2), not cyan — the
-        // palette's "white/gray for neutral UI" rule applies to the hull too.
-        g.addColorStop(
-          0,
-          rgba(mixRGB([154, 168, 189], mixRGB(col, [255, 255, 255], 0.55), visorHot), 1)
-        );
-        g.addColorStop(1, rgba(mixRGB([101, 117, 140], col, visorHot * 0.7), 1));
+        // Cockpit glass base is a cool neutral, tinted by the charge tier.
+        g.addColorStop(0, mix(ROCKET.visorBase, col.lift.hex, visorHot));
+        g.addColorStop(1, mix(ROCKET.visorDeep, col.hex, visorHot * 0.7));
       }
       return g;
     });
@@ -966,16 +948,14 @@ export class RocketAvatar {
     ctx.restore();
 
     ctx.strokeStyle =
-      scorch > 0.3
-        ? `rgba(200,210,220,${0.5 + 0.3 * flick})`
-        : `rgba(255,255,255,${0.7 + visorHot * 0.3})`;
+      scorch > 0.3 ? ROCKET.glass.a(0.5 + 0.3 * flick) : TONE.ink.a(0.7 + visorHot * 0.3);
     ctx.lineWidth = 1 + visorHot * 0.6;
     ctx.stroke(this.visorArc);
 
     if (this.currentPnl <= -6.0) {
       ctx.save();
       ctx.clip(this.visorArc);
-      ctx.strokeStyle = `rgba(230,240,255,${0.35 + 0.35 * flick})`;
+      ctx.strokeStyle = ROCKET.glass.a(0.35 + 0.35 * flick);
       ctx.lineWidth = 0.7;
       ctx.beginPath();
       ctx.moveTo(6.2, -4.2);
@@ -991,7 +971,7 @@ export class RocketAvatar {
 
     // Cockpit specular reflection glint
     const gr = 1.2 + visorHot * 1.1;
-    ctx.fillStyle = `rgba(255,255,255,${0.85 + visorHot * 0.15})`;
+    ctx.fillStyle = TONE.ink.a(0.85 + visorHot * 0.15);
     ctx.beginPath();
     ctx.arc(
       7 + (this.reduced ? 0 : Math.sin(this.time * 1.7) * 0.25),
@@ -1006,7 +986,7 @@ export class RocketAvatar {
     // signal there is, and far cheaper than a second shadowBlur.
     if (visorHot > 0.55) {
       const fl = (visorHot - 0.55) / 0.45;
-      ctx.strokeStyle = `rgba(255,255,255,${0.55 * fl})`;
+      ctx.strokeStyle = TONE.ink.a(0.55 * fl);
       ctx.lineWidth = 0.8;
       ctx.beginPath();
       ctx.moveTo(7 - 5 * fl, -1.8);
@@ -1017,7 +997,7 @@ export class RocketAvatar {
     }
 
     // Thruster Nozzle
-    ctx.fillStyle = '#334155';
+    ctx.fillStyle = ROCKET.nozzle;
     ctx.beginPath();
     ctx.roundRect(-18, -4, 4, 8, 2);
     ctx.fill();
@@ -1030,13 +1010,13 @@ export class RocketAvatar {
         : Math.min(0.65, ((this.targetProgressPct - 80) / 20) * 0.65);
 
       ctx.save();
-      ctx.strokeStyle = `rgba(255, 255, 255, ${coneAlpha})`;
+      ctx.strokeStyle = ROCKET.cone.a(coneAlpha);
       ctx.lineWidth = 1.6;
       ctx.beginPath();
       ctx.arc(22, 0, 10, -Math.PI * 0.42, Math.PI * 0.42);
       ctx.stroke();
 
-      ctx.strokeStyle = `rgba(0, 240, 255, ${coneAlpha * 0.75})`;
+      ctx.strokeStyle = ROCKET.coneOuter.a(coneAlpha * 0.75);
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(20, 0, 14, -Math.PI * 0.48, Math.PI * 0.48);
@@ -1048,9 +1028,9 @@ export class RocketAvatar {
     if (climbSignal > 0.30 && !this.isDrifting && !this.reduced) {
       const bloom = Math.min(1, (climbSignal - 0.30) / 0.7);
       const noseGrad = ctx.createRadialGradient(20, 0, 1, 20, 0, 16 + bloom * 12);
-      noseGrad.addColorStop(0, `rgba(255, 255, 255, ${0.35 * bloom})`);
-      noseGrad.addColorStop(0.5, `rgba(0, 240, 255, ${0.22 * bloom})`);
-      noseGrad.addColorStop(1, 'transparent');
+      noseGrad.addColorStop(0, ROCKET.cone.a(0.35 * bloom));
+      noseGrad.addColorStop(0.5, ROCKET.coneOuter.a(0.22 * bloom));
+      noseGrad.addColorStop(1, CLEAR);
       ctx.fillStyle = noseGrad;
       ctx.beginPath();
       ctx.arc(20, 0, 16 + bloom * 12, 0, Math.PI * 2);
@@ -1058,11 +1038,11 @@ export class RocketAvatar {
     }
 
     // Critical Overload High-Voltage Electrical Arcs (<= -$6.00 Loss)
-    if (this.currentPnl <= -6.0 && !this.isDrifting) {
+    if (this.currentPnl <= -6.0 && !this.isDrifting && !this.reduced) {
       ctx.save();
-      ctx.strokeStyle = Math.random() > 0.5 ? '#FF3B6B' : '#FFD21E';
+      ctx.strokeStyle = ROCKET.arc;
       ctx.lineWidth = 1.4;
-      ctx.shadowColor = '#FF3B6B';
+      ctx.shadowColor = ROCKET.arc;
       ctx.shadowBlur = 8;
       ctx.beginPath();
       ctx.moveTo(-16 + (Math.random() - 0.5) * 4, -4);

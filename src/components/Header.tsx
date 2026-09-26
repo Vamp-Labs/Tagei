@@ -1,5 +1,7 @@
-import { Menu as MenuIcon } from 'lucide-react';
 import { WalletState } from '../services/web3Service';
+import { buttonClass } from '../ui/lucky/Button';
+import { Icon } from '../ui/lucky/Icon';
+import { cn } from '../ui/cn';
 
 interface HeaderProps {
   wallet: WalletState;
@@ -7,27 +9,26 @@ interface HeaderProps {
 }
 
 /**
- * The top bar per docs/UI_UX_SPEC.md's `BNB PLAY   ◉  ☰` mock — constant
+ * The top bar per docs/UI_UX_SPEC.md's `BNB PLAY   status   menu` mock — constant
  * across every screen. Asset name, price and 24h change are NOT header
  * content in the new spec: they're their own tappable block on Home
  * (`HomeHeroOverlay`), since the header stays identical on Active Trade too.
  */
 export const Header: React.FC<HeaderProps> = ({ wallet, onOpenMenu }) => {
   return (
-    <header className="relative z-30 flex items-center justify-between px-4 pb-3 pad-safe-top select-none">
-      <span className="text-sm font-black tracking-widest text-[color:var(--color-bnb-yellow)] uppercase">
-        BNB PLAY
+    <header className="relative z-30 flex items-center justify-between px-6 pb-3 pad-safe-top select-none">
+      <span className="flex items-center gap-1.5 text-label font-extrabold tracking-[0.06em] text-ink uppercase">
+        <span>BNB</span>
+        <span className="lg-disc size-4 bg-gold" aria-hidden="true" />
+        <span>PLAY</span>
       </span>
 
-      <div className="flex items-center gap-2">
-        {/* Wallet status dot — the docs mock's "◉". Green when connected. */}
+      <div className="flex items-center gap-3">
         <span
-          className="w-2.5 h-2.5 rounded-full shrink-0"
-          style={{
-            backgroundColor: wallet.isConnected
-              ? 'var(--color-long)'
-              : 'var(--color-text-3)',
-          }}
+          className={cn(
+            'w-2.5 h-2.5 rounded-full shrink-0',
+            wallet.isConnected ? 'bg-lucky ring-4 ring-lucky-tint' : 'bg-control-ring'
+          )}
           aria-label={wallet.isConnected ? 'Wallet connected' : 'Wallet not connected'}
           role="img"
         />
@@ -35,9 +36,9 @@ export const Header: React.FC<HeaderProps> = ({ wallet, onOpenMenu }) => {
         <button
           onClick={onOpenMenu}
           aria-label="Open menu"
-          className="w-[var(--tap-min)] h-[var(--tap-min)] -mr-2 rounded-[var(--radius-sm)] flex items-center justify-center text-[color:var(--color-text-1)] hover:bg-white/5 active:scale-95 transition-all cursor-pointer"
+          className={cn(buttonClass('icon', 'md'), '-mr-1 active:scale-95 transition-transform')}
         >
-          <MenuIcon className="w-5 h-5" />
+          <Icon name="grid" />
         </button>
       </div>
     </header>

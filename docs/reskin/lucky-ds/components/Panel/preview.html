@@ -1,0 +1,12 @@
+<!-- @dsCard group="Layout" height=130 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Panel — preview</title></head>
+<body>
+<div id="root" class="lg-stage-col"></div>
+<script>
+  var L = window.LuckyGames, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(h(L.Panel, { title: 'Wallets' }, h('p', { className: 'caption', style: { margin: 0, textAlign: 'center', color: 'var(--ink-muted)' } }, 'Rows, tiles or a progress bar go here.')));
+</script>
+</body>
+</html>

@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Target, Sparkles, CheckCircle2 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import { soundEngine } from '../services/audioHaptics';
-import { STANDARD } from '../ui/motion';
+import { MICRO, STANDARD, useMotionPref } from '../ui/motion';
+import { Badge, formatXp } from '../ui/lucky';
+import { OutcomeArt } from './outcome/OutcomeArt';
 
 interface MissionToastProps {
   isOpen: boolean;
@@ -13,6 +13,12 @@ interface MissionToastProps {
   onDismiss: () => void;
 }
 
+const AUTO_DISMISS_MS = 3200;
+const SWIPE_DISMISS_PX = 48;
+const SWIPE_DISMISS_VELOCITY = 500;
+const CHECK_POP_DELAY_SECONDS = 0.15;
+const GIFT_PX = 44;
+
 export const MissionToast: React.FC<MissionToastProps> = ({
   isOpen,
   roundsPlayed,
@@ -20,6 +26,7 @@ export const MissionToast: React.FC<MissionToastProps> = ({
   xpBonus = 50,
   onDismiss,
 }) => {
+  const reduced = useMotionPref();
   const onDismissRef = useRef(onDismiss);
   onDismissRef.current = onDismiss;
 
@@ -31,23 +38,14 @@ export const MissionToast: React.FC<MissionToastProps> = ({
       return;
     }
 
-    // Only fire confetti and sound once when opened
     if (!hasFiredRef.current) {
       hasFiredRef.current = true;
       soundEngine.playLevelUp();
-
-      // Mini gold coin & emerald spark confetti burst (strictly once)
-      confetti({
-        particleCount: 30,
-        spread: 60,
-        origin: { y: 0.15 },
-        colors: ['#F0B90B', '#00FFA3', '#FFFFFF'],
-      });
     }
 
     const timer = setTimeout(() => {
       onDismissRef.current();
-    }, 3200);
+    }, AUTO_DISMISS_MS);
 
     return () => clearTimeout(timer);
   }, [isOpen]);
@@ -57,6 +55,7 @@ export const MissionToast: React.FC<MissionToastProps> = ({
       {isOpen && (
         <motion.div
           key="mission-toast"
+          role="status"
           initial={{ opacity: 0, x: '-50%', y: -28, scale: 0.95 }}
           animate={{ opacity: 1, x: '-50%', y: 0, scale: 1 }}
           exit={{ opacity: 0, x: '-50%', y: -28, scale: 0.95 }}
@@ -66,35 +65,30 @@ export const MissionToast: React.FC<MissionToastProps> = ({
           dragElastic={0.2}
           dragConstraints={{ top: 0, bottom: 0 }}
           onDragEnd={(_, info) => {
-            if (info.offset.y < -48 || info.velocity.y < -500) onDismiss();
+            if (info.offset.y < -SWIPE_DISMISS_PX || info.velocity.y < -SWIPE_DISMISS_VELOCITY) onDismiss();
           }}
           className="fixed left-1/2 z-50 pointer-events-auto max-w-sm w-[92%] cursor-grab active:cursor-grabbing"
-          style={{ top: 'calc(var(--sa-top) + 4.75rem)' }}
+          style={{ top: 'calc(var(--sa-top) + 0.5rem)' }}
         >
-      <div className="px-4 py-3 rounded-2xl bg-[#070b19]/90 border border-[#F0B90B]/50 backdrop-blur-xl shadow-[0_0_25px_rgba(240,185,11,0.35)] flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#F0B90B] to-[#FFD700] flex items-center justify-center text-black shadow-md flex-shrink-0">
-            <Target className="w-4 h-4 stroke-[2.5]" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-black tracking-wider text-[#F0B90B] uppercase font-mono">
-                MISSION COMPLETE!
-              </span>
-              <Sparkles className="w-3 h-3 text-[#00FFA3] animate-pulse" />
+          <div className="lg-card rounded-lg flex items-center gap-3 p-3 pr-4">
+            <OutcomeArt name="reward-gift" height={GIFT_PX} />
+            <div className="min-w-0 flex-1">
+              <p className="text-micro font-bold uppercase tracking-[0.08em] text-lucky">DAILY MISSION</p>
+              <p className="text-label font-bold text-ink">Mission Complete</p>
+              <p className="text-micro tabular-nums text-ink-muted">
+                {roundsPlayed}/{roundsGoal} rounds ·{' '}
+                <span className="font-bold text-lucky">{formatXp(xpBonus, { sign: 'always' })} bonus</span>
+              </p>
             </div>
-            <div className="text-[11px] font-bold text-gray-300">
-              Completed {roundsPlayed}/{roundsGoal} Rounds •{' '}
-              <span className="text-[#00FFA3]">+{xpBonus} XP Bonus</span>
-            </div>
+            <motion.span
+              initial={reduced ? undefined : { scale: 0, opacity: 0 }}
+              animate={reduced ? undefined : { scale: 1, opacity: 1 }}
+              transition={{ ...MICRO, delay: CHECK_POP_DELAY_SECONDS }}
+              className="shrink-0 inline-flex"
+            >
+              <Badge tone="check" label="Mission complete" className="w-7 h-7" />
+            </motion.span>
           </div>
-        </div>
-
-        <div className="flex items-center gap-1 text-[#00FFA3] text-xs font-mono font-bold flex-shrink-0">
-          <CheckCircle2 className="w-4 h-4" />
-          <span>DONE</span>
-        </div>
-      </div>
         </motion.div>
       )}
     </AnimatePresence>

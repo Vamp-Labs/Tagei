@@ -5,13 +5,14 @@ import {
   motion,
   useMotionValue,
   useMotionValueEvent,
-  useReducedMotion,
   useTransform,
 } from 'motion/react';
 import type { AnimationPlaybackControls } from 'motion/react';
 import { soundEngine } from '../services/audioHaptics';
-import { MICRO } from './motion';
+import { MICRO, POP_EASE, useMotionPref } from './motion';
 import { cn } from './cn';
+import { buttonClass } from './lucky/Button';
+import { rgba, TOKENS } from './lucky/palette';
 
 interface HoldButtonProps {
   onCommit: () => void;
@@ -24,10 +25,15 @@ interface HoldButtonProps {
   /** Tailwind text-* class; the progress ring is drawn in currentColor. */
   ringClassName?: string;
   ariaLabel?: string;
+  /** 'bare' (default) renders exactly as before; 'hot' is the Lucky hot CTA. */
+  variant?: 'bare' | 'hot';
 }
 
 /** Distance the pointer may wander before the hold is treated as a cancel. */
 const SLIP_TOLERANCE = 24;
+const HINT_MS = 1400;
+const BURST_MS = 320;
+const HOLD_HINT_LABEL = 'HOLD TO CONFIRM';
 
 const roundedRectPerimeter = (w: number, h: number, r: number) =>
   2 * (w - 2 * r) + 2 * (h - 2 * r) + 2 * Math.PI * r;
@@ -46,13 +52,15 @@ export const HoldButton: React.FC<HoldButtonProps> = ({
   className,
   ringClassName,
   ariaLabel,
+  variant = 'bare',
 }) => {
   const ref = useRef<HTMLButtonElement>(null);
   const progress = useMotionValue(0);
   const playbackRef = useRef<AnimationPlaybackControls | null>(null);
   const originRef = useRef<{ x: number; y: number } | null>(null);
   const milestoneRef = useRef(0);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useMotionPref();
+  const isHot = variant === 'hot';
 
   const [box, setBox] = useState({ w: 0, h: 0, r: 16 });
   const [isHolding, setIsHolding] = useState(false);
@@ -87,10 +95,15 @@ export const HoldButton: React.FC<HoldButtonProps> = ({
   // shadow, not energy building.
   const ringGlow = useTransform(
     progress,
-    (value) => `drop-shadow(0 0 ${2 + value * 10}px rgba(255,255,255,${0.15 + value * 0.55}))`
+    (value) => `drop-shadow(0 0 ${2 + value * 10}px ${rgba(TOKENS.ink, 0.15 + value * 0.55)})`
   );
   // A faint scale creep on the whole button, same read.
   const pressScale = useTransform(progress, [0, 1], [1, 1.015]);
+  const ringOpacity = useMotionValue(0);
+
+  useEffect(() => {
+    ringOpacity.set(isHolding ? 1 : 0);
+  }, [isHolding, ringOpacity]);
 
   // Audio/haptic ramp: reel clicks at each quarter, then a rising tone just
   // before the action fires so the commit is never a surprise.
@@ -122,7 +135,7 @@ export const HoldButton: React.FC<HoldButtonProps> = ({
     // say so rather than failing silently.
     if (progress.get() > 0.02 && progress.get() < 1) {
       setShowHint(true);
-      window.setTimeout(() => setShowHint(false), 1400);
+      window.setTimeout(() => setShowHint(false), HINT_MS);
     }
     animate(progress, 0, { ...MICRO, duration: 0.15 });
   }, [progress, stopHold]);
@@ -141,7 +154,7 @@ export const HoldButton: React.FC<HoldButtonProps> = ({
     // only confirmation that the press landed.
     const id = ++burstIdRef.current;
     setBurst(id);
-    window.setTimeout(() => setBurst((b) => (b === id ? 0 : b)), 320);
+    window.setTimeout(() => setBurst((b) => (b === id ? 0 : b)), BURST_MS);
     onCommit();
   }, [onCommit, progress, stopHold]);
 
@@ -205,21 +218,32 @@ export const HoldButton: React.FC<HoldButtonProps> = ({
       onLostPointerCapture={cancelHold}
       onKeyDown={handleKeyDown}
       style={{ scale: reduceMotion ? 1 : pressScale }}
-      className={cn('relative overflow-hidden touch-none select-none', className)}
+      className={cn(
+        isHot && buttonClass('hot', 'lg', true),
+        'relative overflow-hidden touch-none select-none',
+        className
+      )}
     >
       <span className="relative z-10 flex items-center justify-center gap-2">
-        {isHolding && holdingLabel ? holdingLabel : children}
+        {isHot && showHint ? HOLD_HINT_LABEL : isHolding && holdingLabel ? holdingLabel : children}
       </span>
 
-      {showHint && (
-        <span className="absolute inset-x-0 bottom-1 z-10 text-[9px] font-mono font-bold tracking-widest uppercase opacity-70">
+      {showHint && !isHot && (
+        <span
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-1 z-10 text-micro font-semibold tracking-widest uppercase opacity-70"
+        >
           hold to confirm
         </span>
       )}
 
+      <span className="sr-only" aria-live="polite">
+        {showHint ? 'Hold to confirm' : ''}
+      </span>
+
       {!reduceMotion && box.w > 0 && (
         <svg
-          className={cn('absolute inset-0 pointer-events-none', ringClassName)}
+          className={cn('absolute inset-0 pointer-events-none', isHot && 'text-on-hot', ringClassName)}
           width={box.w}
           height={box.h}
           aria-hidden="true"
@@ -235,7 +259,7 @@ export const HoldButton: React.FC<HoldButtonProps> = ({
             strokeWidth={3}
             strokeLinecap="round"
             strokeDasharray={perimeter}
-            style={{ strokeDashoffset: dashOffset, opacity: isHolding ? 1 : 0, filter: ringGlow }}
+            style={{ strokeDashoffset: dashOffset, opacity: ringOpacity, filter: ringGlow }}
           />
         </svg>
       )}
@@ -251,12 +275,12 @@ export const HoldButton: React.FC<HoldButtonProps> = ({
             initial={{ opacity: 0.6, scale: 0.7 }}
             animate={{ opacity: 0, scale: 1.4 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.32, ease: [0.34, 1.56, 0.64, 1] }}
+            transition={{ duration: BURST_MS / 1000, ease: POP_EASE }}
             className="absolute inset-0 pointer-events-none"
             // White, not currentColor/ringClassName — that's a dark
             // *contrast* color for the stroke against a bright button, and
             // a dark flash there would read as a press-down, not a release.
-            style={{ borderRadius: 'inherit', backgroundColor: '#FFFFFF' }}
+            style={{ borderRadius: 'inherit', backgroundColor: TOKENS.ink.css }}
           />
         )}
       </AnimatePresence>

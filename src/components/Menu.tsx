@@ -1,6 +1,9 @@
-import { ChevronRight, Flame, HelpCircle, LogOut, Settings2, UserRound } from 'lucide-react';
+import React from 'react';
 import { Sheet } from '../ui/Sheet';
+import { cn } from '../ui/cn';
+import { ART, Badge, Button, Icon, Panel, Pill, formatXp } from '../ui/lucky';
 import { UserProgression } from '../types/game';
+import { AvatarDisc } from './account/AvatarDisc';
 
 interface MenuProps {
   progression: UserProgression;
@@ -11,32 +14,38 @@ interface MenuProps {
   onDisconnect: () => void;
 }
 
-const Row: React.FC<{
+interface RowProps {
   label: string;
-  badge?: string;
+  badge?: number;
   onClick?: () => void;
   disabled?: boolean;
   icon?: React.ReactNode;
-}> = ({ label, badge, onClick, disabled, icon }) => (
+}
+
+const STREAK_BONUS_XP = 50;
+
+const Row: React.FC<RowProps> = ({ label, badge, onClick, disabled, icon }) => (
   <button
-    onClick={onClick}
-    disabled={disabled}
-    className={`w-full flex items-center justify-between gap-2 px-5 h-14 text-left transition-colors ${
-      disabled ? 'opacity-40 cursor-default' : 'hover:bg-white/[0.03] active:bg-white/[0.05] cursor-pointer'
-    }`}
+    type="button"
+    onClick={disabled ? undefined : onClick}
+    aria-disabled={disabled || undefined}
+    className={cn(
+      'flex min-h-14 w-full items-center gap-3 rounded-md bg-well px-4 text-left transition-colors',
+      disabled ? 'cursor-default text-ink-muted' : 'cursor-pointer text-ink hover:bg-control active:bg-control'
+    )}
   >
-    <div className="flex items-center gap-2.5">
-      {icon}
-      <span className="text-[length:var(--text-body)] font-semibold text-[color:var(--color-text-1)]">
-        {label}
-      </span>
-    </div>
-    <div className="flex items-center gap-2">
-      {badge && (
-        <span className="text-[length:var(--text-metadata)] text-[color:var(--color-text-3)]">{badge}</span>
-      )}
-      {!disabled && <ChevronRight className="w-4 h-4 text-[color:var(--color-text-3)]" />}
-    </div>
+    {icon}
+    <span className="flex-1 text-label">{label}</span>
+    {badge != null && badge > 0 && (
+      <Badge tone="count" label={`${badge} open`} className="h-7 min-w-7 px-2 text-body leading-none font-extrabold">
+        {badge}
+      </Badge>
+    )}
+    {disabled ? (
+      <Pill size="sm">soon</Pill>
+    ) : (
+      <Icon name="chevron-right" size={20} className="text-ink-muted" />
+    )}
   </button>
 );
 
@@ -55,51 +64,55 @@ export const Menu: React.FC<MenuProps> = ({
   onOpenSettings,
   onDisconnect,
 }) => {
+  const streakDays = progression.streakDays ?? 0;
+  const rows: RowProps[] = [
+    { label: 'Positions', badge: 0, disabled: true },
+    { label: 'History', disabled: true },
+    { label: 'Profile', onClick: onOpenProfile },
+    { label: 'Settings', onClick: onOpenSettings },
+    { label: 'Help & Support', disabled: true },
+  ];
+
   return (
     <Sheet onClose={onClose}>
-      <div className="flex items-center gap-3 px-5 pt-1 pb-4">
-        <div className="w-12 h-12 rounded-full bg-[color:var(--color-bnb-yellow)]/15 border border-[color:var(--color-bnb-yellow)]/40 flex items-center justify-center">
-          <UserRound className="w-6 h-6 text-[color:var(--color-bnb-yellow)]" />
-        </div>
-        <div>
-          <div className="text-[length:var(--text-body)] font-black text-[color:var(--color-text-1)]">
-            TraderFox
-          </div>
-          <div className="text-[length:var(--text-metadata)] text-[color:var(--color-text-2)] font-mono">
-            Level {progression.level} · {progression.currentXp.toLocaleString()} XP
+      <div className="flex items-center gap-3 px-6 pb-4 pt-1">
+        <AvatarDisc />
+        <div className="min-w-0">
+          <div className="text-section font-extrabold text-ink">TraderFox</div>
+          <div className="text-caption tabular-nums text-ink-soft">
+            <span className="font-bold text-lucky">Level {progression.level}</span> ·{' '}
+            {formatXp(progression.currentXp)}
           </div>
         </div>
       </div>
 
-      <div className="border-t border-[color:var(--color-line)]">
-        <Row label="Positions" badge="0" disabled icon={<span className="w-4" />} />
-        <Row label="History" disabled icon={<span className="w-4" />} />
-        <Row label="Profile" onClick={onOpenProfile} icon={<UserRound className="w-4 h-4 text-[color:var(--color-text-2)]" />} />
-        <Row label="Settings" onClick={onOpenSettings} icon={<Settings2 className="w-4 h-4 text-[color:var(--color-text-2)]" />} />
-        <Row label="Help & Support" disabled icon={<HelpCircle className="w-4 h-4 text-[color:var(--color-text-2)]" />} />
-      </div>
+      <div className="flex flex-col gap-3 px-6 pb-2">
+        <Panel as="div" className="flex flex-col gap-2 p-3">
+          <nav aria-label="Menu" className="flex flex-col gap-2">
+            {rows.map((row) => (
+              <Row key={row.label} {...row} />
+            ))}
+          </nav>
+        </Panel>
 
-      <div className="mx-5 my-4 px-4 py-3 rounded-[var(--radius-md)] bg-[color:var(--color-panel-soft)] border border-[color:var(--color-line)] flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Flame className="w-4 h-4 text-[color:var(--color-bnb-yellow)]" />
-          <span className="text-[length:var(--text-metadata)] font-bold text-[color:var(--color-text-1)]">
-            Daily Streak · {progression.streakDays ?? 0} days
+        <div className="flex min-h-14 items-center gap-3 rounded-md bg-well py-2 pl-2 pr-4">
+          <span className="grid size-10 flex-none place-items-center rounded-sm bg-tile">
+            <img src={ART['reward-gift'].src} alt="" width={36} height={33} />
+          </span>
+          <span className="flex-1 text-caption font-semibold text-ink">
+            Daily streak · {streakDays} {streakDays === 1 ? 'day' : 'days'}
+          </span>
+          <span className="text-caption font-bold tabular-nums text-lucky">
+            {formatXp(STREAK_BONUS_XP, { sign: 'always' })}
           </span>
         </div>
-        <span className="text-[length:var(--text-micro)] font-bold text-[color:var(--color-long)]">+50 XP</span>
-      </div>
 
-      {isWalletConnected && (
-        <div className="px-5 pb-5">
-          <button
-            onClick={onDisconnect}
-            className="w-full flex items-center justify-center gap-2 h-[var(--tap-min)] rounded-[var(--radius-md)] border border-[color:var(--color-line)] text-[color:var(--color-short)] font-semibold text-[length:var(--text-metadata)] cursor-pointer"
-          >
-            <LogOut className="w-4 h-4" />
-            Disconnect Wallet
-          </button>
-        </div>
-      )}
+        {isWalletConnected && (
+          <Button variant="secondary" size="md" block onClick={onDisconnect}>
+            Disconnect wallet
+          </Button>
+        )}
+      </div>
     </Sheet>
   );
 };

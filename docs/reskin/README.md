@@ -47,13 +47,13 @@ This re-skin rebuilds every BNB PLAY screen in the **Lucky Games** design system
 |---|---|---|---|---|---|
 | E0a Foundation: look | [E0a-foundation-look.md](E0a-foundation-look.md) | `feat/lucky-reskin` | `reskin-integrate` | 5180 | done (G0 passed) |
 | E0b Foundation: tooling | [E0b-foundation-tooling.md](E0b-foundation-tooling.md) | `reskin/e0b-tooling` | `reskin-e0b` | 5188 | done (G0 passed) |
-| E1 Home & Landing | [E1-home.md](E1-home.md) | `reskin/e1-home` | `reskin-e1` | 5181 | todo |
-| E2 Trade flow | [E2-trade.md](E2-trade.md) | `reskin/e2-trade` | `reskin-e2` | 5182 | todo |
-| E3 Outcome, settlement, result | [E3-outcome.md](E3-outcome.md) | `reskin/e3-outcome` | `reskin-e3` | 5183 | todo |
-| E4 Menu, profile, settings | [E4-account.md](E4-account.md) | `reskin/e4-account` | `reskin-e4` | 5184 | todo |
-| E5 PIX | [E5-pix.md](E5-pix.md) | `reskin/e5-pix` | `reskin-e5` | 5185 | todo |
-| E6 Canvas world | [E6-canvas.md](E6-canvas.md) | `reskin/e6-canvas` | `reskin-e6` | 5186 | todo |
-| Integration + QA | this file, `INTEGRATION_LOG.md`, `QA.md` | `feat/lucky-reskin` | `reskin-integrate` | 5187 | todo |
+| E1 Home & Landing | [E1-home.md](E1-home.md) | `reskin/e1-home` | `reskin-e1` | 5181 | done (merged) |
+| E2 Trade flow | [E2-trade.md](E2-trade.md) | `reskin/e2-trade` | `reskin-e2` | 5182 | done (merged) |
+| E3 Outcome, settlement, result | [E3-outcome.md](E3-outcome.md) | `reskin/e3-outcome` | `reskin-e3` | 5183 | done (merged) |
+| E4 Menu, profile, settings | [E4-account.md](E4-account.md) | `reskin/e4-account` | `reskin-e4` | 5184 | done (merged) |
+| E5 PIX | [E5-pix.md](E5-pix.md) | `reskin/e5-pix` | `reskin-e5` | 5185 | done (merged) |
+| E6 Canvas world | [E6-canvas.md](E6-canvas.md) | `reskin/e6-canvas` | `reskin-e6` | 5186 | done (merged) |
+| Integration + QA | this file, `INTEGRATION_LOG.md`, `QA.md` | `feat/lucky-reskin` | `reskin-integrate` | 5187 | done (QA 2 rounds) |
 
 File ownership and the rules for working side by side are in [OWNERSHIP.md](OWNERSHIP.md). Read it before touching anything.
 

@@ -27,5 +27,6 @@ export const MAX_RANGE_SECONDS = 256;
 
 export const NONCE_KEY = { open: 0n, withdraw: 1n, session: 2n } as const;
 
-// open allows a wallet prompt; the price is fixed at block.timestamp + ENTRY_DELAY, so a longer deadline gives nobody a price choice.
-export const INTENT_TTL_SEC = { open: 15, cashOut: 6, withdraw: 60 } as const;
+// Short TTLs bound how long a relayer can hold an intent and pick its submit moment (G1 M2).
+// External wallets sign at launch time, so the prompt latency is outside this window.
+export const INTENT_TTL_SEC = { open: 6, cashOut: 4, withdraw: 60 } as const;

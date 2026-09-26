@@ -53,6 +53,7 @@ export const TOKENS = {
   onHot: swatch('on-hot', '#ffffff'),
   info: swatch('info', '#2dbdf1'),
   amber: swatch('amber', '#f08204'),
+  red: swatch('red', '#ff3b30'),
   focus: swatch('focus', '#1ef66d'),
   coinUsd: swatch('coin-usd', '#feb300'),
   coinEur: swatch('coin-eur', '#1d47b9'),
@@ -71,7 +72,7 @@ export const ROLE = {
   dirLong: role('dir-long', TOKENS.lucky),
   dirShort: role('dir-short', TOKENS.info),
   profit: role('profit', TOKENS.lucky),
-  loss: role('loss', TOKENS.amber),
+  loss: role('loss', TOKENS.red),
 } as const satisfies Record<string, Swatch>;
 
 export const CANVAS = {
@@ -86,7 +87,7 @@ export const CANVAS = {
   entryRing: TOKENS.controlRing,
   target: TOKENS.lucky,
   targetZone: TOKENS.luckyTint,
-  stop: TOKENS.amber,
+  stop: TOKENS.red,
   labelBg: TOKENS.tile,
   labelText: TOKENS.ink,
   labelMuted: TOKENS.inkMuted,
@@ -95,12 +96,12 @@ export const CANVAS = {
   flame: [TOKENS.ink, TOKENS.goldBright, TOKENS.gold],
   tiers: [TOKENS.gold, TOKENS.lucky, TOKENS.goldBright, TOKENS.ink],
   charge: [TOKENS.luckyBar, TOKENS.lucky, TOKENS.ink],
-  damage: [TOKENS.amber, TOKENS.goldDeep, TOKENS.inkMuted],
+  damage: [TOKENS.red, TOKENS.goldDeep, TOKENS.inkMuted],
   coin: TOKENS.gold,
   coinRim: TOKENS.goldDeep,
   coinShine: TOKENS.goldBright,
   boomWin: TOKENS.lucky,
-  boomLoss: TOKENS.amber,
+  boomLoss: TOKENS.red,
 } as const satisfies Record<string, Swatch | readonly Swatch[]>;
 
 export type ConfettiKind = 'connect' | 'win' | 'levelUp' | 'mission';

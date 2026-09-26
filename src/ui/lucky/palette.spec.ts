@@ -30,7 +30,7 @@ describe('palette.ts stays in sync with src/index.css', () => {
 
   it('maps roles onto the documented tokens', () => {
     expect(ROLE.dirShort.hex).toBe('#2dbdf1');
-    expect(ROLE.loss.hex).toBe(TOKENS.amber.hex);
+    expect(ROLE.loss.hex).toBe(TOKENS.red.hex);
     expect(ROLE.cta.css).toBe('var(--color-cta)');
     for (const role of ['cta', 'brand', 'premium', 'dir-long', 'dir-short', 'profit', 'loss']) {
       expect(css).toMatch(new RegExp(`--color-${role}:\\s*var\\(--color-`));

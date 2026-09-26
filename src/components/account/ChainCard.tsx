@@ -1,8 +1,7 @@
 import React from 'react';
-import { AssetDisc, Button, Panel, Pill, WalletRow, formatHash } from '../../ui/lucky';
+import { CHAIN_ID } from '@bnbplay/shared/constants';
+import { AssetDisc, Button, Panel, Pill, WalletRow, formatAmount, formatHash } from '../../ui/lucky';
 import type { WalletState } from '../../services/web3Service';
-
-const TESTNET_CHAIN_ID = 97;
 
 interface ChainCardProps {
   wallet: WalletState;
@@ -11,27 +10,28 @@ interface ChainCardProps {
 
 export const ChainCard: React.FC<ChainCardProps> = ({ wallet, onConnectWallet }) => {
   const connected = wallet.isConnected;
+  const credits = wallet.creditsUsd ?? null;
   return (
     <Panel className="flex flex-col gap-3 p-3">
       <WalletRow
         mode="static"
         compact
         icon={<AssetDisc symbol="BNB" />}
-        title="BNB Chain"
+        title={wallet.kind === 'guest' ? 'Guest · BNB Chain' : 'BNB Chain'}
         amount={
           connected ? (
-            `${wallet.balanceBNB} tBNB`
+            credits !== null ? (
+              formatAmount(credits, 'USDT', { sign: 'never' })
+            ) : (
+              `${wallet.balanceBNB} tBNB`
+            )
           ) : (
             <span className="block whitespace-nowrap text-caption font-semibold text-ink-soft">Not connected</span>
           )
         }
-        bonus={
-          connected && wallet.address ? (
-            <span className="tabular-nums">{wallet.isDemoWallet ? wallet.address : formatHash(wallet.address)}</span>
-          ) : undefined
-        }
+        bonus={connected && wallet.address ? <span className="tabular-nums">{formatHash(wallet.address)}</span> : undefined}
         bonusTone="muted"
-        trailing={<Pill size="sm">testnet · {TESTNET_CHAIN_ID}</Pill>}
+        trailing={<Pill size="sm">testnet · {CHAIN_ID}</Pill>}
         className="pr-4"
       />
       {!connected && (

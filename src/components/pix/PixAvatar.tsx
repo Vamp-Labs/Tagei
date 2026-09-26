@@ -17,7 +17,7 @@ const BLINK_TIMES = [0, 0.93, 0.965, 1];
 const RING_CLASS: Record<PixMood, string> = {
   happy: 'ring-lucky',
   neutral: 'ring-line',
-  concerned: 'ring-amber',
+  concerned: 'ring-loss',
 };
 
 const MOUTH_PATH: Record<PixMood, string> = {

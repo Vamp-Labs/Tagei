@@ -47,6 +47,7 @@
   --color-on-hot: #ffffff;
   --color-info: #2dbdf1;
   --color-amber: #f08204;
+  --color-red: #ff3b30;
   --color-focus: #1ef66d;
   --color-coin-usd: #feb300;
   --color-coin-eur: #1d47b9;
@@ -61,7 +62,7 @@
   --color-dir-long: var(--color-lucky);
   --color-dir-short: var(--color-info);
   --color-profit: var(--color-lucky);
-  --color-loss: var(--color-amber);
+  --color-loss: var(--color-red);
 
 
   --font-sans: "Figtree", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;

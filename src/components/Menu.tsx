@@ -3,11 +3,14 @@ import { Sheet } from '../ui/Sheet';
 import { cn } from '../ui/cn';
 import { ART, Badge, Button, Icon, Panel, Pill, formatXp } from '../ui/lucky';
 import { UserProgression } from '../types/game';
+import { streakBonusXp } from './game/progression';
 import { AvatarDisc } from './account/AvatarDisc';
 
 interface MenuProps {
   progression: UserProgression;
   isWalletConnected: boolean;
+  displayName: string;
+  openPositions: number;
   onClose: () => void;
   onOpenProfile: () => void;
   onOpenSettings: () => void;
@@ -21,8 +24,6 @@ interface RowProps {
   disabled?: boolean;
   icon?: React.ReactNode;
 }
-
-const STREAK_BONUS_XP = 50;
 
 const Row: React.FC<RowProps> = ({ label, badge, onClick, disabled, icon }) => (
   <button
@@ -49,16 +50,11 @@ const Row: React.FC<RowProps> = ({ label, badge, onClick, disabled, icon }) => (
   </button>
 );
 
-/**
- * docs/UI_UX_SPEC.md §11. Profile/Settings/Streak/Disconnect route to real,
- * already-working state and components (PilotProfileDrawer, SettingsModal,
- * UserProgression, web3Service). Positions and History are honest stubs —
- * this app has no position-history persistence and holds one active round
- * at a time, so there's nothing real to list yet.
- */
 export const Menu: React.FC<MenuProps> = ({
   progression,
   isWalletConnected,
+  displayName,
+  openPositions,
   onClose,
   onOpenProfile,
   onOpenSettings,
@@ -66,7 +62,7 @@ export const Menu: React.FC<MenuProps> = ({
 }) => {
   const streakDays = progression.streakDays ?? 0;
   const rows: RowProps[] = [
-    { label: 'Positions', badge: 0, disabled: true },
+    { label: 'Positions', badge: openPositions, disabled: true },
     { label: 'History', disabled: true },
     { label: 'Profile', onClick: onOpenProfile },
     { label: 'Settings', onClick: onOpenSettings },
@@ -78,7 +74,7 @@ export const Menu: React.FC<MenuProps> = ({
       <div className="flex items-center gap-3 px-6 pb-4 pt-1">
         <AvatarDisc />
         <div className="min-w-0">
-          <div className="text-section font-extrabold text-ink">TraderFox</div>
+          <div className="truncate text-section font-extrabold text-ink">{displayName}</div>
           <div className="text-caption tabular-nums text-ink-soft">
             <span className="font-bold text-lucky">Level {progression.level}</span> ·{' '}
             {formatXp(progression.currentXp)}
@@ -103,7 +99,7 @@ export const Menu: React.FC<MenuProps> = ({
             Daily streak · {streakDays} {streakDays === 1 ? 'day' : 'days'}
           </span>
           <span className="text-caption font-bold tabular-nums text-lucky">
-            {formatXp(STREAK_BONUS_XP, { sign: 'always' })}
+            {formatXp(streakBonusXp(streakDays), { sign: 'always' })}
           </span>
         </div>
 

@@ -5,11 +5,11 @@ import { UserProgression } from '../types/game';
 import { AssetSymbol, PriceTick } from '../types/market';
 import { MICRO, STANDARD, useMotionPref } from '../ui/motion';
 import { cn } from '../ui/cn';
-import { Icon, ProgressBar, buttonClass, formatPct, formatPrice, signOf, useConfetti } from '../ui/lucky';
+import { Icon, ProgressBar, buttonClass, formatPct, formatPrice, signOf } from '../ui/lucky';
 
 interface HomeHeroOverlayProps {
   isWalletConnected: boolean;
-  onConnectWallet: () => Promise<void>;
+  onConnectWallet: () => void;
   onOpenTradeSheet: () => void;
   onOpenAssetSelector: () => void;
   currentAsset: AssetSymbol;
@@ -35,19 +35,10 @@ export const HomeHeroOverlay: React.FC<HomeHeroOverlayProps> = ({
   progression,
 }) => {
   const reduced = useMotionPref();
-  const { burst } = useConfetti();
-  const [connecting, setConnecting] = useState(false);
 
-  const handleConnectClick = async () => {
+  const handleConnectClick = () => {
     soundEngine.playClick();
-    setConnecting(true);
-    try {
-      await onConnectWallet();
-      soundEngine.playChipSelect();
-      burst('connect');
-    } finally {
-      setConnecting(false);
-    }
+    onConnectWallet();
   };
 
   const change = latestTick ? latestTick.change24h : 0;
@@ -110,12 +101,10 @@ export const HomeHeroOverlay: React.FC<HomeHeroOverlayProps> = ({
         <motion.button
           type="button"
           onClick={handleConnectClick}
-          disabled={connecting}
-          aria-busy={connecting}
           {...pressProps}
           className={cn(buttonClass('hot', 'lg', true), 'mt-4', !reduced && 'lg-pulse-hot')}
         >
-          {connecting ? 'CONNECTING…' : 'CONNECT WALLET!'}
+          CONNECT WALLET!
         </motion.button>
 
         <button type="button" onClick={onOpenTradeSheet} className={buttonClass('ghost', 'md')}>

@@ -2,7 +2,6 @@ import type { SegmentedTabsItem } from '../../ui/lucky';
 import type { Hand } from '../../ui/useHandedness';
 import type { UserSettings } from '../../types/game';
 
-// Required boolean settings only (optional ones such as practiceMode are wired by A6).
 export type BooleanSettingKey = {
   [K in keyof UserSettings]-?: undefined extends UserSettings[K] ? never : UserSettings[K] extends boolean ? K : never;
 }[keyof UserSettings];
@@ -27,4 +26,17 @@ export const THUMB_SIDE_COPY = {
 export const HAND_ITEMS: readonly SegmentedTabsItem<Hand>[] = [
   { value: 'left', label: 'Left' },
   { value: 'right', label: 'Right' },
+];
+
+export function practiceToggleCopy(modeLocked: boolean, liveAvailable: boolean): string {
+  if (modeLocked) return 'Finish the current round to switch';
+  if (!liveAvailable) return 'Live play needs the BNB PLAY backend';
+  return 'Mock market, not on-chain, earns no XP';
+}
+
+export type PlayMode = 'practice' | 'live';
+
+export const MODE_ITEMS: readonly SegmentedTabsItem<PlayMode>[] = [
+  { value: 'practice', label: 'Practice' },
+  { value: 'live', label: 'Live' },
 ];

@@ -11,6 +11,7 @@ import {
   boomStep,
   type TrackScheme,
 } from './theme';
+import { priceSpan } from './trackMath';
 
 interface Star {
   x: number;
@@ -33,6 +34,7 @@ const TAG_PAD_X = 8;
 const TAG_RADIUS = 6;
 const ZONE_TRI = 5;
 const ZONE_LABEL_X = 20;
+const ZONE_LABEL_MIN_BAND = TAG_HEIGHT * 2;
 const BACKGROUND_TIME_PER_SECOND = 0.96;
 const DEFAULT_FRAME_SECONDS = 1 / 60;
 const DEFAULT_BOTTOM_PAD_FRAC = 0.36;
@@ -207,7 +209,7 @@ export class MarketTrackRenderer {
       maxPrice = Math.max(maxPrice, activeRound.stopLossPrice, activeRound.targetPrice);
     }
 
-    const span = Math.max(minPrice * 0.004, maxPrice - minPrice);
+    const span = priceSpan(minPrice, maxPrice);
     const paddedMin = minPrice - span * 0.18;
     const paddedMax = maxPrice + span * 0.18;
     const paddedSpan = paddedMax - paddedMin;
@@ -247,7 +249,7 @@ export class MarketTrackRenderer {
       maxPrice = Math.max(maxPrice, activeRound.stopLossPrice, activeRound.targetPrice);
     }
 
-    const span = Math.max(minPrice * 0.004, maxPrice - minPrice);
+    const span = priceSpan(minPrice, maxPrice);
     const paddedMin = minPrice - span * 0.18;
     const paddedMax = maxPrice + span * 0.18;
     const paddedSpan = paddedMax - paddedMin;
@@ -417,8 +419,12 @@ export class MarketTrackRenderer {
     ctx.fillStyle = lossGrad;
     ctx.fillRect(0, lossTop, width, lossHeight);
 
-    this.zoneLabel(ctx, 'PROFIT ZONE', MARKER.profitLabel, ZONE_LABEL_X, (profitTop + profitBottom) / 2 + 5, isLong);
-    this.zoneLabel(ctx, 'STOP ZONE', MARKER.stopLabel, ZONE_LABEL_X, (lossTop + lossBottom) / 2 + 5, !isLong);
+    if (profitHeight >= ZONE_LABEL_MIN_BAND) {
+      this.zoneLabel(ctx, 'PROFIT ZONE', MARKER.profitLabel, ZONE_LABEL_X, (profitTop + profitBottom) / 2 + 5, isLong);
+    }
+    if (lossHeight >= ZONE_LABEL_MIN_BAND) {
+      this.zoneLabel(ctx, 'STOP ZONE', MARKER.stopLabel, ZONE_LABEL_X, (lossTop + lossBottom) / 2 + 5, !isLong);
+    }
 
     // 2. ENTRY baseline, ring and tag
     ctx.strokeStyle = MARKER.entryLine;

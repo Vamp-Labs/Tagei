@@ -12,6 +12,7 @@ import {
     Outcome,
     Round,
     RoundTerms,
+    TuneBounds,
     VoidReason,
     WithdrawIntent
 } from "../types/ArenaTypes.sol";
@@ -55,6 +56,8 @@ interface IBnbPlayArena {
     error InvalidLimits();
     error InvalidOracle(uint256 idx);
     error TooManyIds(uint256 count, uint256 max);
+    error TuneOutOfBounds(uint32 targetPpm, uint32 stopPpm);
+    error OnlySelf();
 
     // ── Events ──────────────────────────────────────────────────────────────────
     event RoundOpened(uint256 indexed roundId, address indexed player, uint8 indexed assetId, RoundTerms terms);
@@ -78,6 +81,7 @@ interface IBnbPlayArena {
     event AssetConfigured(uint8 indexed assetId, AssetConfig config);
     event LaneConfigured(uint8 indexed assetId, uint8 indexed tier, uint32 indexed version, LaneParams params);
     event LimitsUpdated(uint16 maxUtilizationBps, uint128 maxPayoutPerRound);
+    event LaneTuneBoundsSet(uint8 indexed assetId, uint8 indexed tier, TuneBounds bounds);
     event OracleAdded(uint8 indexed idx, address oracle, bytes32 sourceId, bool trusted);
     event ActiveOracleSet(uint8 indexed idx);
 
@@ -99,7 +103,8 @@ interface IBnbPlayArena {
 
     // Permissionless, never paused.
     function settle(uint256 roundId) external returns (Outcome outcome, uint256 payout);
-    /// @notice Skips rounds that are not open or not decidable. At most 100 ids.
+    /// @notice Skips rounds that are not open, not decidable, or whose evaluation reverts (fault-isolated).
+    /// At most 100 ids.
     function settleMany(uint256[] calldata roundIds) external;
     /// @notice `oracles(oracleIdx).record(proof)` then `settleMany(roundIds)`. At most 100 ids.
     function recordAndSettle(uint8 oracleIdx, bytes calldata proof, uint256[] calldata roundIds) external;
@@ -122,6 +127,7 @@ interface IBnbPlayArena {
     function activeRoundOf(address) external view returns (uint256);
     function getAsset(uint8 assetId) external view returns (AssetConfig memory);
     function getLane(uint8 assetId, uint8 tier) external view returns (Lane memory);
+    function getLaneTuneBounds(uint8 assetId, uint8 tier) external view returns (TuneBounds memory);
     function oracles(uint256 idx) external view returns (ICheckpointOracle);
     function activeOracleIdx() external view returns (uint8);
     function houseFree() external view returns (uint256);
@@ -134,8 +140,22 @@ interface IBnbPlayArena {
     function fundHouse(uint256 amount) external;
     function withdrawHouse(address to, uint256 amount) external;
     function skim() external;
+    /// @notice CONFIG (cold). Bumps the version of every configured lane of the asset.
     function setAsset(uint8 assetId, AssetConfig calldata c) external;
+    /// @notice CONFIG (cold). Full lane config; validates and bumps the version.
     function setLane(uint8 assetId, uint8 tier, LaneParams calldata p) external;
+    /// @notice CONFIG (cold). Inclusive T/S window for `tuneLane`; all-zero (unset) blocks tuning.
+    function setLaneTuneBounds(
+        uint8 assetId,
+        uint8 tier,
+        uint32 minTargetPpm,
+        uint32 maxTargetPpm,
+        uint32 minStopPpm,
+        uint32 maxStopPpm
+    ) external;
+    /// @notice LANE_TUNER (the adaptive-lanes job): changes only T and S of an existing lane, inside the tune
+    /// bounds and the house-edge guard; M, fee, duration, stakes and `enabled` are kept. Bumps the version.
+    function tuneLane(uint8 assetId, uint8 tier, uint32 targetPpm, uint32 stopPpm) external;
     function setLimits(uint16 maxUtilizationBps, uint128 maxPayoutPerRound) external;
     function addOracle(ICheckpointOracle o) external;
     function setActiveOracle(uint8 idx) external;

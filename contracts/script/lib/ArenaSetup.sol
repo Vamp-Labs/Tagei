@@ -8,7 +8,7 @@ import {StatelessSupraVerifier} from "../../src/oracle/StatelessSupraVerifier.so
 import {ISupraSValueFeedVerifier} from "../../src/oracle/interfaces/ISupraSValueFeedVerifier.sol";
 import {TestUSD} from "../../src/token/TestUSD.sol";
 import {TestUSDFaucet} from "../../src/token/TestUSDFaucet.sol";
-import {Lane} from "../../src/types/ArenaTypes.sol";
+import {Lane, LaneParams, TuneBounds} from "../../src/types/ArenaTypes.sol";
 import {DeployConfig} from "./DeployConfig.sol";
 
 /// @notice Deployment and configuration steps shared by script/Deploy.s.sol, script/ConfigureLanes.s.sol and the
@@ -60,6 +60,9 @@ library ArenaSetup {
         for (uint256 i; i < c.configRole.length; ++i) {
             arena.grantRole(arena.CONFIG_ROLE(), c.configRole[i]);
         }
+        for (uint256 i; i < c.laneTuners.length; ++i) {
+            arena.grantRole(arena.LANE_TUNER_ROLE(), c.laneTuners[i]);
+        }
         for (uint256 i; i < c.pauserRole.length; ++i) {
             arena.grantRole(arena.PAUSER_ROLE(), c.pauserRole[i]);
         }
@@ -86,7 +89,8 @@ library ArenaSetup {
     }
 
     /// @dev Idempotent: `setAsset` only when the asset differs and `setLane` only when the lane differs, so lane
-    /// versions (which clients sign) are bumped only by real changes. Assets go first so the guard sees the new gap.
+    /// versions (which clients sign) are bumped only by real changes. Assets go first so the guard sees the new gap
+    /// (and `setAsset` itself bumps the asset's lane versions). Tune bounds are derived from each base lane.
     function applyLanes(BnbPlayArena arena, DeployConfig.Config memory c) internal returns (uint256 changed) {
         for (uint256 i; i < c.assets.length; ++i) {
             DeployConfig.AssetEntry memory a = c.assets[i];
@@ -101,8 +105,26 @@ library ArenaSetup {
                     arena.setLane(a.assetId, l.tier, l.params);
                     ++changed;
                 }
+                TuneBounds memory b = tuneBounds(l.params, c.tuneMinScalePct, c.tuneMaxScalePct);
+                if (keccak256(abi.encode(arena.getLaneTuneBounds(a.assetId, l.tier))) != keccak256(abi.encode(b))) {
+                    arena.setLaneTuneBounds(
+                        a.assetId, l.tier, b.minTargetPpm, b.maxTargetPpm, b.minStopPpm, b.maxStopPpm
+                    );
+                }
             }
         }
+    }
+
+    /// @dev [ceil(base·min/100), floor(base·max/100)] clamped to the barrier range [10, 100000] ppm.
+    function tuneBounds(LaneParams memory p, uint256 minPct, uint256 maxPct) internal pure returns (TuneBounds memory b) {
+        b.minTargetPpm = uint32(_clamp((uint256(p.targetPpm) * minPct + 99) / 100));
+        b.maxTargetPpm = uint32(_clamp((uint256(p.targetPpm) * maxPct) / 100));
+        b.minStopPpm = uint32(_clamp((uint256(p.stopPpm) * minPct + 99) / 100));
+        b.maxStopPpm = uint32(_clamp((uint256(p.stopPpm) * maxPct) / 100));
+    }
+
+    function _clamp(uint256 v) private pure returns (uint256) {
+        return v < 10 ? 10 : v > 100_000 ? 100_000 : v;
     }
 
     function _contains(address[] memory xs, address x) private pure returns (bool) {

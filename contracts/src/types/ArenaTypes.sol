@@ -28,7 +28,8 @@ enum VoidReason {
     EntryInvalid,
     TerminalInvalid,
     CheckpointGap,
-    Stalled
+    Stalled,
+    PathDisputed
 }
 
 struct AssetConfig {
@@ -52,6 +53,14 @@ struct LaneParams {
 struct Lane {
     LaneParams p;
     uint32 version;
+}
+
+/// @dev Inclusive T/S window within which LANE_TUNER_ROLE may retune a lane (set by CONFIG_ROLE).
+struct TuneBounds {
+    uint32 minTargetPpm;
+    uint32 maxTargetPpm;
+    uint32 minStopPpm;
+    uint32 maxStopPpm;
 }
 
 /// @dev Four storage slots. Every term is snapshotted at open, so later config changes never touch it.

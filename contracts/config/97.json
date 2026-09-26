@@ -1,5 +1,5 @@
 {
-  "_comment": "BNB PLAY deploy config for BSC testnet (chainId 97). Lanes: docs/spec/F1e-lanes.md (laneVersion 1); disabled tiers carry the closest research/lane-params.json candidate for reference only. Big numbers are decimal strings (18-decimal tUSD).",
+  "_comment": "BNB PLAY deploy config for BSC testnet (chainId 97). Lanes: docs/spec/F1e-lanes.md (laneVersion 1); disabled tiers carry the closest research/lane-params.json candidate for reference only. Big numbers are decimal strings (18-decimal tUSD). Roles: config = cold key only (oracles, limits, assets, lanes, tune bounds); ops gets laneTuner (tuneLane: T/S within the window) and pauser.",
   "chainId": 97,
   "supra": {
     "pull": "0x6Cd59830AAD978446e6cc7f6cc173aF7656Fb917",
@@ -42,8 +42,7 @@
   "roles": {
     "admin": "0xcA5391C789fdabf872BdB447d73D9739bBF006f3",
     "config": [
-      "0xcA5391C789fdabf872BdB447d73D9739bBF006f3",
-      "0xeeC1c0a3044b8554430ad9139686b192b1DE0005"
+      "0xcA5391C789fdabf872BdB447d73D9739bBF006f3"
     ],
     "pauser": [
       "0xcA5391C789fdabf872BdB447d73D9739bBF006f3",
@@ -57,10 +56,18 @@
     ],
     "priceSigners": [
       "0xB9Bf2913bfc2C8eE30Ab7CBa539B21c500963C71"
+    ],
+    "laneTuner": [
+      "0xeeC1c0a3044b8554430ad9139686b192b1DE0005"
     ]
   },
   "signedBackup": {
     "deploy": true
+  },
+  "laneTuning": {
+    "minScalePct": 50,
+    "maxScalePct": 200,
+    "_comment": "tuneLane window per lane = [ceil(base*min/100), floor(base*max/100)] of the base T and S below, clamped to [10, 100000] ppm (F1e adaptive k in [0.5, 2])"
   },
   "assets": [
     {

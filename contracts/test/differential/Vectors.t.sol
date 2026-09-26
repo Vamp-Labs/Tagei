@@ -21,9 +21,13 @@ import {
 } from "../../src/types/ArenaTypes.sol";
 import {MockCheckpointOracle} from "../mocks/MockCheckpointOracle.sol";
 import {ArenaHarness} from "../utils/ArenaHarness.sol";
+import {RefPath} from "../utils/RefPath.sol";
 
 /// @notice Differential tests against the golden vectors generated from packages/shared (the TS reference).
 /// Every case of lane-, path- and eip712-vectors.json is asserted field by field.
+/// Path cases: until A0 mirrors G1 L1 (a disputed mid-path second voids as PathDisputed) in path.ts, the contract is
+/// asserted against RefPath (L1-aware) on every case AND against the vector on every case where L1 does not change
+/// the result; the others are logged as "L1 divergence" and must be PathDisputed voids.
 contract VectorsTest is Test {
     string internal constant VECTORS = "/../packages/shared/vectors/";
     uint32 internal constant PAIR = 99;
@@ -182,6 +186,37 @@ contract VectorsTest is Test {
     }
 
     /// @dev One parse per checkpoint: `null` (never recorded) encodes as a single zero word.
+    /// @dev Replaces the vector's expectation by the L1-aware reference when (and only when) L1 changes the result.
+    function _applyL1(PathCase memory c, uint256 i) internal {
+        RefPath.Terms memory t = RefPath.Terms({
+            direction: c.t.direction,
+            stake: c.t.stake,
+            maxPayout: c.t.maxPayout,
+            entrySec: c.t.entrySec,
+            endSec: c.t.endSec,
+            targetPpm: c.t.targetPpm,
+            stopPpm: c.t.stopPpm,
+            multiplierBps: c.t.multiplierBps,
+            feeBps: c.t.feeBps,
+            maxJumpPpm: c.t.maxJumpPpm,
+            cashOutRequested: c.t.cashOutRequested
+        });
+        RefPath.Point[] memory pts = new RefPath.Point[](c.present.length);
+        for (uint256 j; j < pts.length; ++j) {
+            pts[j] = RefPath.Point(c.present[j], c.prices[j], c.disputed[j], false);
+            for (uint256 m; m < c.permanentlyMissing.length; ++m) {
+                if (c.permanentlyMissing[m] == c.t.entrySec + j) pts[j].permanentlyMissing = true;
+            }
+        }
+        RefPath.Result memory x = RefPath.evaluate(t, pts, c.nowSec);
+        bool same = x.decidable == c.e.decidable && x.outcome == c.e.outcome && x.payout == c.e.payout
+            && x.decisionSec == c.e.decisionSec && x.voidReason == c.e.voidReason && x.missingSec == c.e.missingSec;
+        if (same) return;
+        assertEq(x.voidReason, RefPath.PATH_DISPUTED, "only L1 may change a vector result");
+        console.log("L1 divergence: path case", i);
+        c.e = PathExpected(x.decidable, x.outcome, x.payout, x.decisionSec, x.voidReason, x.missingSec);
+    }
+
     function _checkpointAt(string memory json, string memory key)
         internal
         pure
@@ -283,6 +318,7 @@ contract VectorsTest is Test {
         for (uint256 i = shard * SHARD; i < (shard + 1) * SHARD; ++i) {
             PathCase memory c = _loadCase(json, i);
             string memory tag = string.concat(" #", vm.toString(i));
+            _applyL1(c, i);
 
             // 1) End to end (open → cash-out → record → settle) whenever the lane passes the setLane guard.
             if (!_endToEnd(c, i, tag)) _populate(c);

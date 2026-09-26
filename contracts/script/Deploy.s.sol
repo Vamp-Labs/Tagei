@@ -50,6 +50,7 @@ contract Deploy is Script {
         me[0] = deployer;
         c.admin = deployer;
         c.configRole = me;
+        c.laneTuners = me;
         c.pauserRole = me;
         c.treasuryRole = me;
         c.faucetOperators = me;

@@ -9,6 +9,7 @@ import {ICheckpointOracle} from "../../src/oracle/interfaces/ICheckpointOracle.s
 import {SupraProofV2} from "../../src/oracle/libraries/SupraProofV2.sol";
 import {TestUSD} from "../../src/token/TestUSD.sol";
 import {
+    AssetConfig,
     CashOutIntent,
     Direction,
     LaneParams,
@@ -37,6 +38,7 @@ contract ArenaHandler is Test {
     MockSupraPull public pull;
     CheckpointOracle[3] public oracles; // idx 1 (signed backup) is never recorded, so never activated here
     address public admin;
+    address public tuner; // LANE_TUNER_ROLE (the ops key)
 
     address[5] public players;
     uint256[5] internal keys;
@@ -101,6 +103,10 @@ contract ArenaHandler is Test {
         for (uint256 i; i < 5; ++i) {
             archive[pairs[i]][archiveSec] = uint128(basePrice[i]);
         }
+    }
+
+    function setTuner(address t) external {
+        tuner = t;
     }
 
     function idCount() external view returns (uint256) {
@@ -331,7 +337,7 @@ contract ArenaHandler is Test {
         uint256[] memory batch = new uint256[](n);
         bool[] memory wasOpen = new bool[](n);
         for (uint256 i; i < n; ++i) {
-            batch[i] = ids[(seed + i * 7) % ids.length];
+            batch[i] = ids[(seed % ids.length + i * 7) % ids.length]; // no overflow for any seed
             wasOpen[i] = arena.getRound(batch[i]).status == RoundStatus.Open;
         }
         bool useRecord = seed % 2 == 0;
@@ -429,6 +435,34 @@ contract ArenaHandler is Test {
         p.durationSec = uint16(5 + (seed >> 32) % 36);
         vm.prank(admin);
         try arena.setLane(assetId, tier, p) {} catch {}
+        _afterCall();
+    }
+
+    /// @notice The adaptive-lanes job: scale T and S by k in [0.5, 2] of the current lane (bounds + guard enforced).
+    function tunerTuneLane(uint256 seed) external {
+        ++calls["tunerTuneLane"];
+        uint8 assetId = uint8(seed % 5);
+        uint8 tier = uint8((seed >> 8) % 2);
+        LaneParams memory p = arena.getLane(assetId, tier).p;
+        uint256 k = 50 + (seed >> 16) % 151;
+        vm.prank(tuner);
+        try arena.tuneLane(assetId, tier, uint32((uint256(p.targetPpm) * k) / 100), uint32((uint256(p.stopPpm) * k) / 100)) {
+            if (arena.getLane(assetId, tier).p.enabled != p.enabled) _flag(1, "tuneLane changed enabled");
+        } catch {}
+        _afterCall();
+    }
+
+    /// @notice Cold-key asset update (jump filter), which re-versions the asset's lanes.
+    function adminSetAsset(uint256 seed) external {
+        ++calls["adminSetAsset"];
+        uint8 assetId = uint8(seed % 5);
+        AssetConfig memory a = arena.getAsset(assetId);
+        a.maxJumpPpm = uint32(5_000 + (seed >> 8) % 45_001);
+        uint32 v = arena.getLane(assetId, 0).version;
+        vm.prank(admin);
+        try arena.setAsset(assetId, a) {
+            if (arena.getLane(assetId, 0).version != v + 1) _flag(1, "setAsset did not bump lane version");
+        } catch {}
         _afterCall();
     }
 

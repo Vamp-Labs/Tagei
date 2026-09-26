@@ -28,6 +28,7 @@ import {
     Round,
     RoundStatus,
     RoundTerms,
+    TuneBounds,
     VoidReason,
     WithdrawIntent
 } from "./types/ArenaTypes.sol";
@@ -39,12 +40,15 @@ import {
 /// the interior curve. Missing data voids the round (stake refunded) only when it is provably permanent or the round
 /// stalled. Settlement, recording, cash-out and withdrawals are permissionless and never paused; admins configure new
 /// rounds only and can never touch open rounds or player balances. Every rounding favours the house.
+/// Roles: CONFIG (cold key: oracles, limits, assets, lanes, tune bounds), LANE_TUNER (hot adaptive-lanes job: T/S only,
+/// inside admin bounds), PAUSER (opens only), TREASURY (houseFree only), DEFAULT_ADMIN (roles, unpause).
 /// @dev `_evaluate` mirrors `evaluatePath` in packages/shared/src/path.ts bit for bit.
 contract BnbPlayArena is IBnbPlayArena, AccessControl, Pausable, ReentrancyGuardTransient, EIP712, NoncesKeyed {
     using SafeERC20 for IERC20;
     using SafeCast for uint256;
 
     bytes32 public constant CONFIG_ROLE = keccak256("CONFIG_ROLE");
+    bytes32 public constant LANE_TUNER_ROLE = keccak256("LANE_TUNER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant TREASURY_ROLE = keccak256("TREASURY_ROLE");
 
@@ -57,9 +61,10 @@ contract BnbPlayArena is IBnbPlayArena, AccessControl, Pausable, ReentrancyGuard
     uint192 public constant NONCE_KEY_OPEN = 0;
     uint192 public constant NONCE_KEY_WITHDRAW = 1;
     uint192 public constant NONCE_KEY_SESSION = 2;
-    /// @notice Gas `voidStale` must have before probing the oracle, so a failed probe can never be an induced
-    /// out-of-gas (an honest 121-second evaluation needs well under half of this).
-    uint256 public constant VOID_STALE_MIN_GAS = 1_000_000;
+    /// @notice Gas `voidStale` must have left before probing the oracle, so a failed probe can never be an induced
+    /// out-of-gas: the probe gets 63/64 of it (~1.48M) while the worst honest evaluation, a cold 121-second path,
+    /// needs ~0.37M (test_voidStale_gasFloorMargin): ~4x headroom.
+    uint256 public constant VOID_STALE_MIN_GAS = 1_500_000;
 
     uint256 private constant BPS = 10_000;
     uint8 private constant FLAG_RECORDED = 1;
@@ -96,6 +101,7 @@ contract BnbPlayArena is IBnbPlayArena, AccessControl, Pausable, ReentrancyGuard
     mapping(uint8 assetId => AssetConfig) private _assets;
     mapping(uint8 assetId => mapping(uint8 tier => Lane)) private _lanes;
     mapping(uint256 roundId => Round) private _rounds;
+    mapping(uint8 assetId => mapping(uint8 tier => TuneBounds)) private _tuneBounds;
     ICheckpointOracle[] private _oracles;
 
     error InsufficientGas();
@@ -173,12 +179,9 @@ contract BnbPlayArena is IBnbPlayArena, AccessControl, Pausable, ReentrancyGuard
     }
 
     function settle(uint256 roundId) external nonReentrant returns (Outcome outcome, uint256 payout) {
-        Round storage s = _rounds[roundId];
-        if (s.status != RoundStatus.Open) revert RoundNotOpen(roundId);
-        Round memory r = s;
-        Evaluation memory e = _evaluate(r);
+        if (_rounds[roundId].status != RoundStatus.Open) revert RoundNotOpen(roundId);
+        Evaluation memory e = _settleIfDecidable(roundId);
         if (!e.decidable) revert NotDecidable(roundId, e.missingSec);
-        _finalize(roundId, s, r, e);
         return (e.outcome, e.payout);
     }
 
@@ -250,6 +253,16 @@ contract BnbPlayArena is IBnbPlayArena, AccessControl, Pausable, ReentrancyGuard
         return _hashTypedDataV4(Intents.hash(w));
     }
 
+    /// @notice ERC-5267, identical output to OZ's but with constant strings (saves runtime bytecode).
+    function eip712Domain()
+        public
+        view
+        override
+        returns (bytes1, string memory, string memory, uint256, address, bytes32, uint256[] memory)
+    {
+        return (hex"0f", "BnbPlayArena", "1", block.chainid, address(this), bytes32(0), new uint256[](0));
+    }
+
     function nonces(address owner, uint192 key) public view override(IBnbPlayArena, NoncesKeyed) returns (uint256) {
         return super.nonces(owner, key);
     }
@@ -260,6 +273,10 @@ contract BnbPlayArena is IBnbPlayArena, AccessControl, Pausable, ReentrancyGuard
 
     function getLane(uint8 assetId, uint8 tier) external view returns (Lane memory) {
         return _lanes[assetId][tier];
+    }
+
+    function getLaneTuneBounds(uint8 assetId, uint8 tier) external view returns (TuneBounds memory) {
+        return _tuneBounds[assetId][tier];
     }
 
     function oracles(uint256 idx) external view returns (ICheckpointOracle) {
@@ -293,10 +310,6 @@ contract BnbPlayArena is IBnbPlayArena, AccessControl, Pausable, ReentrancyGuard
         return held > accounted ? held - accounted : 0;
     }
 
-    function DOMAIN_SEPARATOR() external view returns (bytes32) {
-        return _domainSeparatorV4();
-    }
-
     // ═════════════════════════════════════════════════════════════════════════════
     // House & config
     // ═════════════════════════════════════════════════════════════════════════════
@@ -325,32 +338,64 @@ contract BnbPlayArena is IBnbPlayArena, AccessControl, Pausable, ReentrancyGuard
         emit Skimmed(amount);
     }
 
-    /// @notice Also re-checks the house-edge guard of every enabled lane of the asset against the new gap margin.
+    /// @notice Re-checks the house-edge guard of every enabled lane of the asset against the new gap margin and bumps
+    /// the version of every configured lane, so intents signed against the old pair / jump filter cannot open.
     function setAsset(uint8 assetId, AssetConfig calldata c) external onlyRole(CONFIG_ROLE) {
         if (c.maxJumpPpm == 0 || c.maxJumpPpm > LaneMath.PPM || c.gapMarginPpm > LaneMath.MAX_BARRIER_PPM) {
             revert InvalidAsset();
         }
+        _assets[assetId] = c;
+        emit AssetConfigured(assetId, c);
         for (uint8 t; t < MAX_TIERS; ++t) {
-            LaneParams storage p = _lanes[assetId][t].p;
+            Lane storage lane = _lanes[assetId][t];
+            if (lane.version == 0) continue;
+            LaneParams memory p = lane.p;
             if (p.enabled && !LaneMath.laneEdgeGuardOk(p.targetPpm, p.stopPpm, p.multiplierBps, c.gapMarginPpm)) {
                 revert HouseEdgeViolated();
             }
+            uint32 version = lane.version + 1;
+            lane.version = version;
+            emit LaneConfigured(assetId, t, version, p);
         }
-        _assets[assetId] = c;
-        emit AssetConfigured(assetId, c);
     }
 
     /// @notice Validates the lane (F1a §5-6) and bumps its version; open rounds keep their snapshot.
     function setLane(uint8 assetId, uint8 tier, LaneParams calldata p) external onlyRole(CONFIG_ROLE) {
-        if (tier >= MAX_TIERS) revert InvalidLane();
-        uint8 status = LaneMath.checkLane(p, _assets[assetId].gapMarginPpm);
-        if (status == LaneMath.LANE_INVALID) revert InvalidLane();
-        if (status == LaneMath.LANE_HOUSE_EDGE) revert HouseEdgeViolated();
+        _writeLane(assetId, tier, p);
+    }
+
+    function setLaneTuneBounds(
+        uint8 assetId,
+        uint8 tier,
+        uint32 minTargetPpm,
+        uint32 maxTargetPpm,
+        uint32 minStopPpm,
+        uint32 maxStopPpm
+    ) external onlyRole(CONFIG_ROLE) {
+        // No range checks needed: every tuned lane still goes through checkLane (ranges + house-edge guard), so a
+        // malformed window can only make tuning impossible.
+        TuneBounds memory b = TuneBounds(minTargetPpm, maxTargetPpm, minStopPpm, maxStopPpm);
+        _tuneBounds[assetId][tier] = b;
+        emit LaneTuneBoundsSet(assetId, tier, b);
+    }
+
+    /// @notice The adaptive-lanes job: T and S only, within the tune bounds and the house-edge guard. Unset bounds
+    /// (all zero) reject every call; `enabled`, M, fee, duration and stakes are never touched.
+    function tuneLane(uint8 assetId, uint8 tier, uint32 targetPpm, uint32 stopPpm)
+        external
+        onlyRole(LANE_TUNER_ROLE)
+    {
+        TuneBounds memory b = _tuneBounds[assetId][tier];
+        if (
+            targetPpm < b.minTargetPpm || targetPpm > b.maxTargetPpm || stopPpm < b.minStopPpm
+                || stopPpm > b.maxStopPpm
+        ) revert TuneOutOfBounds(targetPpm, stopPpm);
         Lane storage lane = _lanes[assetId][tier];
-        uint32 version = lane.version + 1;
-        lane.p = p;
-        lane.version = version;
-        emit LaneConfigured(assetId, tier, version, p);
+        if (lane.version == 0) revert InvalidLane();
+        LaneParams memory p = lane.p;
+        p.targetPpm = targetPpm;
+        p.stopPpm = stopPpm;
+        _writeLane(assetId, tier, p);
     }
 
     function setLimits(uint16 maxUtilizationBps_, uint128 maxPayoutPerRound_) external onlyRole(CONFIG_ROLE) {
@@ -473,6 +518,18 @@ contract BnbPlayArena is IBnbPlayArena, AccessControl, Pausable, ReentrancyGuard
         t.maxJumpPpm = r.maxJumpPpm;
     }
 
+    function _writeLane(uint8 assetId, uint8 tier, LaneParams memory p) private {
+        if (tier >= MAX_TIERS) revert InvalidLane();
+        uint8 status = LaneMath.checkLane(p, _assets[assetId].gapMarginPpm);
+        if (status == LaneMath.LANE_INVALID) revert InvalidLane();
+        if (status == LaneMath.LANE_HOUSE_EDGE) revert HouseEdgeViolated();
+        Lane storage lane = _lanes[assetId][tier];
+        uint32 version = lane.version + 1;
+        lane.p = p;
+        lane.version = version;
+        emit LaneConfigured(assetId, tier, version, p);
+    }
+
     function _checkTerms(uint8 assetId, uint8 tier, uint128 stake, uint32 laneVersion, uint8 oracleIdx)
         private
         view
@@ -541,17 +598,30 @@ contract BnbPlayArena is IBnbPlayArena, AccessControl, Pausable, ReentrancyGuard
     // Internals — settlement (mirror of path.ts `evaluatePath`)
     // ═════════════════════════════════════════════════════════════════════════════
 
+    /// @dev Fault-isolated: each round settles in its own self-call, so one reverting round (e.g. an unreadable
+    /// oracle) is skipped instead of reverting the batch or the preceding `record`.
     function _settleMany(uint256[] calldata roundIds) private {
         uint256 n = roundIds.length;
         if (n > MAX_IDS) revert TooManyIds(n, MAX_IDS);
         for (uint256 i; i < n; ++i) {
             uint256 roundId = roundIds[i];
-            Round storage s = _rounds[roundId];
-            if (s.status != RoundStatus.Open) continue;
-            Round memory r = s;
-            Evaluation memory e = _evaluate(r);
-            if (e.decidable) _finalize(roundId, s, r, e);
+            if (_rounds[roundId].status != RoundStatus.Open) continue;
+            try this.settleFromBatch(roundId) {} catch {}
         }
+    }
+
+    /// @notice Internal step of settleMany / recordAndSettle; callable only by the Arena itself (inside their
+    /// reentrancy lock). Settles `roundId` if it is decidable.
+    function settleFromBatch(uint256 roundId) external {
+        if (msg.sender != address(this)) revert OnlySelf();
+        if (_rounds[roundId].status == RoundStatus.Open) _settleIfDecidable(roundId);
+    }
+
+    function _settleIfDecidable(uint256 roundId) private returns (Evaluation memory e) {
+        Round storage s = _rounds[roundId];
+        Round memory r = s;
+        e = _evaluate(r);
+        if (e.decidable) _finalize(roundId, s, r, e);
     }
 
     function _evaluate(Round memory r) internal view returns (Evaluation memory) {
@@ -570,8 +640,13 @@ contract BnbPlayArena is IBnbPlayArena, AccessControl, Pausable, ReentrancyGuard
             uint40 sec = r.entrySec + uint40(k);
             if (cp.flags & FLAG_RECORDED == 0) return _onMissing(r, oracle, sec, p0);
 
-            bool valid = cp.flags & FLAG_DISPUTED == 0 && LaneMath.jumpOk(prev, cp.price18, r.maxJumpPpm);
-            prev = cp.price18; // always advances, even past an invalid checkpoint
+            // A DISPUTED second (two conflicting verified prices) voids the round: which price "happened" is unknowable,
+            // so neither side may win on it (G1 L1). The terminal second keeps its original reason.
+            if (cp.flags & FLAG_DISPUTED != 0) {
+                return _voided(k == last ? VoidReason.TerminalInvalid : VoidReason.PathDisputed, r.stake, sec, p0);
+            }
+            bool valid = LaneMath.jumpOk(prev, cp.price18, r.maxJumpPpm);
+            prev = cp.price18; // always advances, even past an invalid (jump) checkpoint
             if (!valid) {
                 if (k == last) return _voided(VoidReason.TerminalInvalid, r.stake, sec, p0);
                 continue;

@@ -45,6 +45,8 @@ const EnvSchema = z.object({
   ORACLE_ROUND_RETENTION_D: z.coerce.number().int().default(3),
 
   INDEXER_POLL_MS: z.coerce.number().int().default(1000),
+  ADAPTIVE_LANES_ENABLED: bool(true),
+  ADAPTIVE_LANES_INTERVAL_MIN: z.coerce.number().int().default(10),
   BINANCE_DATA_URL: z.string().default('https://data-api.binance.vision'),
 
   JWT_SECRET: z.string().default('dev-only-change-me'),

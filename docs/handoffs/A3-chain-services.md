@@ -68,5 +68,5 @@
 - **Polling.** 5 Hz, phase-aligned between round+150 ms and round+950 ms (rounds appear +0.2–0.65 s after the round start). Reject non-canonical feeds with `isCanonicalRound`.
 - **Chain I/O.** Track heads over **WSS** (`wss://bsc-testnet-rpc.publicnode.com`); HTTP "latest" from the bnbchain.org RPCs is ≈ 1.9 s stale. Send txs through two RPCs. Use publicnode for archive reads and forks.
 - **Redundancy.** Build the proof archiver so that a second instance (`ROLE=archiver`, P1) can run on another network. Both upsert into the same `oracle_proofs` table.
-- **Adaptive lanes (ops, pending the user's G0 decision).** A job that recomputes σ₁ₛ from the hub every 5–15 min and calls `setLane` when the calibrated T/S drift by more than 20 %, bounded within [0.5×, 2×] of `research/lane-params.json`. Keep it behind a flag.
+- **Adaptive lanes (decided at G0; P0).** Implement exactly `docs/spec/F1e-lanes.md` §Adaptive lanes in `ops/`, behind `ADAPTIVE_LANES_ENABLED`, and audit changes to `lane_changes` (your `rounds.ts`/`chain.ts` schema).
 - **Supra monitoring.** Watch `Upgraded` on the Supra proxies and committee key changes (owner `0xaF90…4B7A`), and alert.

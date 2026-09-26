@@ -57,3 +57,13 @@ Enforced by `.githooks/pre-commit` → `tools/check-ownership.ts` (`git config c
 ## Change requests to frozen interfaces
 
 Agents never edit A0 paths. Put the request in your final report as: file, the change, and why. A0 updates, regenerates vectors if needed, bumps `packages/shared` version, and tells every affected agent.
+
+## Shared dev infrastructure (set up by A0)
+
+| Resource | Value |
+|---|---|
+| Postgres | container `bnbplay-pg`, `postgres://postgres:postgres@127.0.0.1:55432/<db>`. One DB per agent: `bnbplay_a1`, `bnbplay_a3`, `bnbplay_a4`, plus `bnbplay_dev` for A0 integration. Never use port 5432 (another project's Postgres runs there) |
+| Ports per agent N | web 3000+N, server 8787+N, anvil 8545+N |
+| Forks of chain 97 | `https://bsc-testnet-rpc.publicnode.com` (archive state) |
+| Testnet hot wallets | `~/.config/bnbplay/testnet.env` (chmod 600, outside the repo). **A0 only.** M1 runs entirely on anvil; agents never read, print or commit these keys |
+| Public addresses (for docs and config) | deployer `0xcA5391C789fdabf872BdB447d73D9739bBF006f3` · relayer `0x18E82917289AF4E518AC7dd705008033870d6410` · recorder `0xB9Bf2913bfc2C8eE30Ab7CBa539B21c500963C71` · ops `0xeeC1c0a3044b8554430ad9139686b192b1DE0005` |

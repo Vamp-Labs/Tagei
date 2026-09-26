@@ -18,6 +18,7 @@ import {
 } from "../../src/types/ArenaTypes.sol";
 import {ArenaSetup} from "../../script/lib/ArenaSetup.sol";
 import {DeployConfig} from "../../script/lib/DeployConfig.sol";
+import {MockCheckpointOracle} from "../mocks/MockCheckpointOracle.sol";
 import {MockSupraCommitteeVerifier} from "../mocks/MockSupraCommitteeVerifier.sol";
 import {SupraProofBuilder} from "./SupraProofBuilder.sol";
 
@@ -136,7 +137,7 @@ abstract contract ArenaTestBase is Test {
             laneVersion: _version(assetId, tier),
             oracleIdx: arena.activeOracleIdx(),
             nonce: arena.nonces(player, 0),
-            deadline: uint48(block.timestamp + 5)
+            deadline: uint48(vm.getBlockTimestamp() + 5)
         });
     }
 
@@ -169,6 +170,15 @@ abstract contract ArenaTestBase is Test {
 
     // ── oracle ──────────────────────────────────────────────────────────────────
 
+    /// @dev Registers a scriptable oracle and makes it active for new rounds.
+    function _useMock(bool late) internal returns (MockCheckpointOracle m) {
+        m = new MockCheckpointOracle(late);
+        vm.startPrank(deployer);
+        arena.addOracle(m);
+        arena.setActiveOracle(uint8(arena.oracleCount() - 1));
+        vm.stopPrank();
+    }
+
     function _proof(uint32 pair, uint40 sec, uint256 price) internal returns (bytes memory) {
         return SupraProofBuilder.single(committee, pair, uint128(price), sec);
     }
@@ -181,7 +191,7 @@ abstract contract ArenaTestBase is Test {
     /// @dev Records prices[k] at second fromSec + k (null entries = 0 are skipped). Warps forward if needed.
     function _recordPath(uint32 pair, uint40 fromSec, uint256[] memory prices) internal {
         uint256 lastSec = uint256(fromSec) + prices.length - 1;
-        if (block.timestamp + 3 < lastSec) vm.warp(lastSec - 3);
+        if (vm.getBlockTimestamp() + 3 < lastSec) vm.warp(lastSec - 3);
         for (uint256 k; k < prices.length; ++k) {
             if (prices[k] != 0) _record(pair, fromSec + uint40(k), prices[k]);
         }

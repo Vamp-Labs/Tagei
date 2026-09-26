@@ -2,8 +2,9 @@ import type { SegmentedTabsItem } from '../../ui/lucky';
 import type { Hand } from '../../ui/useHandedness';
 import type { UserSettings } from '../../types/game';
 
+// Required boolean settings only (optional ones such as practiceMode are wired by A6).
 export type BooleanSettingKey = {
-  [K in keyof UserSettings]: UserSettings[K] extends boolean ? K : never;
+  [K in keyof UserSettings]-?: undefined extends UserSettings[K] ? never : UserSettings[K] extends boolean ? K : never;
 }[keyof UserSettings];
 
 export interface SettingToggle {

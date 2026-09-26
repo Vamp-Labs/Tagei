@@ -1,3 +1,4 @@
+import { INTENT_TTL_SEC } from '@bnbplay/shared/constants';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import type { RoundApi } from '../src/api/client';
@@ -297,7 +298,7 @@ describe('RoundService edge cases', () => {
     reference.dispose();
   });
 
-  it('signs the OpenRound intent with the packed nonce and a 5 s deadline', async () => {
+  it('signs the OpenRound intent with the packed nonce and the INTENT_TTL_SEC.open deadline', async () => {
     const signer = createAccountSigner(privateKeyToAccount(generatePrivateKey()));
     let captured: Parameters<RoundApi['openRound']>[0] | null = null;
     const { service } = await makeService(
@@ -320,7 +321,7 @@ describe('RoundService edge cases', () => {
         laneVersion: 1,
         oracleIdx: 0,
         nonce: '0',
-        deadline: Math.floor(START / 1000) + 5,
+        deadline: Math.floor(START / 1000) + INTENT_TTL_SEC.open,
       },
     });
   });

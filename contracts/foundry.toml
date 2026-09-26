@@ -1,0 +1,45 @@
+[profile.default]
+src = "src"
+test = "test"
+script = "script"
+out = "out"
+libs = ["dependencies"]
+solc_version = "0.8.30"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 1000
+# BnbPlayArena is 29.8 kB with the legacy pipeline; via-IR brings it to ~23.4 kB (< EIP-170 24,576 B).
+via_ir = true
+remappings = [
+  "@openzeppelin/contracts/=dependencies/@openzeppelin-contracts-5.7.0/",
+  "forge-std/=dependencies/forge-std-1.16.2/src/",
+]
+fs_permissions = [
+  { access = "read", path = "./test/fixtures" },
+  { access = "read", path = "./config" },
+  { access = "read", path = "../packages/shared/vectors" },
+  { access = "read", path = "../research/fixtures" },
+  { access = "read-write", path = "./deployments" },
+]
+
+[fuzz]
+runs = 1024
+
+[invariant]
+runs = 256
+depth = 128
+fail_on_revert = false
+
+[rpc_endpoints]
+bsc_testnet = "${BSC_TESTNET_RPC_URL}"
+
+[etherscan]
+bsc_testnet = { key = "${ETHERSCAN_API_KEY}", chain = 97 }
+
+[soldeer]
+remappings_generate = false
+remappings_regenerate = false
+
+[dependencies]
+forge-std = "1"
+"@openzeppelin-contracts" = "5.7.0"

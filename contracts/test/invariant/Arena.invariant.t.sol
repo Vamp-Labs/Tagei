@@ -36,7 +36,8 @@ contract ArenaInvariantTest is ArenaTestBase {
             arena, token, committee, pull, oracle, stateful, deployer, ps, [aliceKey, bobKey, carolKey, daveKey, erinKey]
         );
 
-        bytes4[] memory sel = new bytes4[](24);
+        handler.setTuner(ops);
+        bytes4[] memory sel = new bytes4[](26);
         sel[0] = ArenaHandler.record.selector;
         sel[1] = ArenaHandler.record.selector;
         sel[2] = ArenaHandler.record.selector;
@@ -61,6 +62,8 @@ contract ArenaInvariantTest is ArenaTestBase {
         sel[21] = ArenaHandler.adminPause.selector;
         sel[22] = ArenaHandler.adminHouse.selector;
         sel[23] = ArenaHandler.cashOut.selector;
+        sel[24] = ArenaHandler.tunerTuneLane.selector;
+        sel[25] = ArenaHandler.adminSetAsset.selector;
         targetSelector(FuzzSelector({addr: address(handler), selectors: sel}));
         targetContract(address(handler));
     }
@@ -198,6 +201,18 @@ contract ArenaInvariantTest is ArenaTestBase {
         assertEq(uint8(r.voidReason), 3); // CheckpointGap
         assertEq(r.payout, r.stake);
         assertFalse(handler.mismatch(), handler.why());
+    }
+
+    /// 12. liveness: a round past its stall window is always settleable (a void at worst) and never stuck
+    function invariant_12_liveness() public view {
+        uint256 n = handler.idCount();
+        for (uint256 i; i < n; ++i) {
+            uint256 id = handler.ids(i);
+            Round memory r = arena.getRound(id);
+            if (r.status != RoundStatus.Open || block.timestamp <= uint256(r.endSec) + 60) continue;
+            (bool decidable,,,,) = arena.previewSettle(id);
+            assertTrue(decidable, "open round past the stall window is not settleable");
+        }
     }
 
     function afterInvariant() external view {

@@ -1,6 +1,6 @@
 # BNB PLAY contracts
 
-Foundry project: solc 0.8.30, EVM cancun, optimizer 1000 runs, **via-IR** (the Arena exceeds EIP-170 without it).
+Foundry project: solc 0.8.30, EVM cancun, **via-IR**, optimizer **800** runs (F1a says 1000; at 1000 the Arena is 24.8 kB, over EIP-170; at 800 it is 23.4 kB).
 Dependencies come from Soldeer (`forge-std` 1.16.2, `@openzeppelin-contracts` 5.7.0), with no git submodules.
 The spec is `docs/spec/F1a-contracts.md` (v2) and the lane table is `docs/spec/F1e-lanes.md` (`config/97.json`).
 
@@ -35,12 +35,16 @@ Other scripts:
 ## Trust model
 
 1. Prices come only from Supra DORA-2 proofs. `StatelessSupraVerifier` checks each committee's BLS signature (Supra's `requireHashVerified_V2`) and the little-endian leaf multiproof, then records one immutable price per (pair, second) in `CheckpointOracle`.
-2. Recording is permissionless and late records are valid, so nobody can censor a second or force a gap. A conflicting verified price only raises a DISPUTED flag.
+2. Recording is permissionless and late records are valid, so nobody can censor a second or force a gap. A conflicting verified price raises a DISPUTED flag, and a round that reaches a disputed second voids (`PathDisputed`, or `TerminalInvalid` at the last second).
 3. A player commits without knowing the price. The entry is the checkpoint at `block.timestamp + 3`, and a cash-out exits at a second not yet recorded.
 4. Settlement replays the full recorded path, and the first barrier touched wins. It mirrors `packages/shared/src/path.ts` bit for bit, and every division rounds in favour of the house.
 5. The operator is trusted for liveness only. If data is missing, the round voids and the stake is refunded, after `STALL_AFTER_SEC` = 60 s or once a gap is provably permanent. `voidStale` also refunds when an oracle becomes unreadable.
-6. There is no relayer or keeper role. Settle, record, cash-out, withdraw and void are permissionless and never paused. Pause blocks new opens only.
-7. Admin roles are CONFIG, PAUSER and TREASURY. They configure new rounds only: each round snapshots its terms, so admins can never move player balances or touch open rounds. Treasury withdrawals are capped at `houseFree`.
+6. There is no relayer or keeper role. Settle, record, cash-out, withdraw and void are permissionless and never paused. Pause blocks new opens only. Batch settlement is fault-isolated: a reverting round is skipped.
+7. Admin roles:
+   - CONFIG is a **cold** key: oracles, limits, assets, lanes and tune bounds. `setAsset` re-versions the asset's lanes.
+   - LANE_TUNER is the hot ops key for the adaptive-lanes job. `tuneLane` changes only T and S, inside the per-lane bounds set by CONFIG (0.5x to 2x of the base lane) and the house-edge guard, and never enables a lane.
+   - PAUSER stops opens only. TREASURY can withdraw up to `houseFree`.
+   - Every round snapshots its terms, so no role can touch open rounds or player balances.
 8. Oracles are append-only. Rotating Supra's verifier or keys means deploying a new verifier and oracle, then calling `addOracle` and `setActiveOracle`, which affects new rounds only.
 9. `SignedPriceVerifier` (a backend key) is a labelled backup: its `isTrusted()` returns true. `SupraPriceVerifier` is the stateful P1 fallback, where the F1 guard is enforced and gaps can become permanent.
 10. The ledger is conserved: `token.balanceOf(arena) == players + houseFree + houseReserved + stakesLocked + surplus`. This is asserted by the invariant suite.

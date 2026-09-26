@@ -4,7 +4,7 @@ pragma solidity ^0.8.30;
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 /// @notice Independent test-side port of packages/shared/src/path.ts `evaluatePath` (and the lane.ts arithmetic it
-/// needs). Deliberately written without the production libraries so the invariant and fuzz suites compare two
+/// needs), including the G1 L1 change (a disputed mid-path second voids as PathDisputed) that path.ts does not have yet. Deliberately written without the production libraries so the invariant and fuzz suites compare two
 /// implementations. `path[k]` is the checkpoint of second `entrySec + k`.
 library RefPath {
     uint256 internal constant PPM = 1e6;
@@ -21,6 +21,7 @@ library RefPath {
     uint8 internal constant TERMINAL_INVALID = 2;
     uint8 internal constant CHECKPOINT_GAP = 3;
     uint8 internal constant STALLED = 4;
+    uint8 internal constant PATH_DISPUTED = 5;
 
     struct Terms {
         uint8 direction; // 0 long, 1 short
@@ -64,8 +65,10 @@ library RefPath {
         for (uint256 sec = t.entrySec + 1; sec <= t.endSec; ++sec) {
             Point memory cp = path[sec - t.entrySec];
             if (!cp.recorded) return _missing(t, cp, sec, nowSec, p0);
+            // G1 L1: a disputed second voids the round (terminal keeps TerminalInvalid)
+            if (cp.disputed) return _void(sec == t.endSec ? TERMINAL_INVALID : PATH_DISPUTED, t.stake, sec, p0);
             uint256 jump = cp.price18 >= prev ? cp.price18 - prev : prev - cp.price18;
-            bool valid = !cp.disputed && jump * PPM <= t.maxJumpPpm * prev;
+            bool valid = jump * PPM <= t.maxJumpPpm * prev;
             prev = cp.price18;
             bool terminal = sec == t.endSec;
             if (!valid) {

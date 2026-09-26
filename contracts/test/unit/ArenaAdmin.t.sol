@@ -61,7 +61,9 @@ contract ArenaAdminTest is ArenaTestBase {
         assertEq(houseSeed, 1_000_000e18);
 
         assertTrue(arena.hasRole(arena.DEFAULT_ADMIN_ROLE(), deployer));
-        assertTrue(arena.hasRole(arena.CONFIG_ROLE(), ops));
+        assertFalse(arena.hasRole(arena.CONFIG_ROLE(), ops), "G1 H1: CONFIG is cold");
+        assertTrue(arena.hasRole(arena.CONFIG_ROLE(), deployer));
+        assertTrue(arena.hasRole(arena.LANE_TUNER_ROLE(), ops));
         assertTrue(arena.hasRole(arena.PAUSER_ROLE(), ops));
         assertTrue(arena.hasRole(arena.TREASURY_ROLE(), deployer));
         assertFalse(arena.hasRole(arena.TREASURY_ROLE(), ops));

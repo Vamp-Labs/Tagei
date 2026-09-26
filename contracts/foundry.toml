@@ -7,8 +7,10 @@ libs = ["dependencies"]
 solc_version = "0.8.30"
 evm_version = "cancun"
 optimizer = true
-optimizer_runs = 1000
-# BnbPlayArena is 29.8 kB with the legacy pipeline; via-IR brings it to ~23.4 kB (< EIP-170 24,576 B).
+# F1a asks for 1000; after the G1 fixes (tuneLane, fault-isolated batches) the Arena is 24.8 kB at 1000 runs and
+# 23.4 kB at 800 (via-IR inlining threshold). 800 keeps >1 kB of EIP-170 headroom at a negligible gas cost.
+optimizer_runs = 800
+# BnbPlayArena is ~30 kB with the legacy pipeline; via-IR is required to stay under EIP-170 (24,576 B).
 via_ir = true
 remappings = [
   "@openzeppelin/contracts/=dependencies/@openzeppelin-contracts-5.7.0/",

@@ -41,6 +41,9 @@ library DeployConfig {
         address ops;
         address admin;
         address[] configRole;
+        address[] laneTuners;
+        uint256 tuneMinScalePct;
+        uint256 tuneMaxScalePct;
         address[] pauserRole;
         address[] treasuryRole;
         address[] faucetOperators;
@@ -79,6 +82,9 @@ library DeployConfig {
         c.ops = vm.parseJsonAddress(json, ".addresses.ops");
         c.admin = vm.parseJsonAddress(json, ".roles.admin");
         c.configRole = vm.parseJsonAddressArray(json, ".roles.config");
+        c.laneTuners = vm.parseJsonAddressArray(json, ".roles.laneTuner");
+        c.tuneMinScalePct = vm.parseJsonUint(json, ".laneTuning.minScalePct");
+        c.tuneMaxScalePct = vm.parseJsonUint(json, ".laneTuning.maxScalePct");
         c.pauserRole = vm.parseJsonAddressArray(json, ".roles.pauser");
         c.treasuryRole = vm.parseJsonAddressArray(json, ".roles.treasury");
         c.faucetOperators = vm.parseJsonAddressArray(json, ".roles.faucetOperator");

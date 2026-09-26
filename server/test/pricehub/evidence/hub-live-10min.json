@@ -1,0 +1,81 @@
+{
+  "startedAt": "2026-09-26T12:12:51.101Z",
+  "durationSec": 600,
+  "window": {
+    "startSec": 1790424773,
+    "endSec": 1790425369
+  },
+  "requests": {
+    "polls": 2991,
+    "ok": 2991,
+    "http429": 0,
+    "httpErrors": 0,
+    "netErrors": 0,
+    "decodeErrors": 0,
+    "newProofs": 600,
+    "duplicateProofs": 2391
+  },
+  "nonCanonical": 0,
+  "regressions": 0,
+  "hubMissingByPair": {
+    "0": 0,
+    "1": 0,
+    "3": 0,
+    "10": 0,
+    "49": 0
+  },
+  "lagMs": {
+    "p50": 422,
+    "p95": 628,
+    "p99": 634,
+    "max": 726,
+    "n": 3000
+  },
+  "perPair": {
+    "BNB": {
+      "pairId": 49,
+      "secondsWindow": 597,
+      "secondsSeen": 597,
+      "missing": 0,
+      "missingSecs": [],
+      "sigma1sBipowerPpm": 18.19441753568634,
+      "kVsBase": 0.5
+    },
+    "BTC": {
+      "pairId": 0,
+      "secondsWindow": 597,
+      "secondsSeen": 597,
+      "missing": 0,
+      "missingSecs": [],
+      "sigma1sBipowerPpm": 11.320753293550213,
+      "kVsBase": 0.5
+    },
+    "ETH": {
+      "pairId": 1,
+      "secondsWindow": 597,
+      "secondsSeen": 597,
+      "missing": 0,
+      "missingSecs": [],
+      "sigma1sBipowerPpm": 7.77005199950674,
+      "kVsBase": 0.5
+    },
+    "SOL": {
+      "pairId": 10,
+      "secondsWindow": 597,
+      "secondsSeen": 597,
+      "missing": 0,
+      "missingSecs": [],
+      "sigma1sBipowerPpm": 49.57667076295521,
+      "kVsBase": 0.5
+    },
+    "DOGE": {
+      "pairId": 3,
+      "secondsWindow": 597,
+      "secondsSeen": 597,
+      "missing": 0,
+      "missingSecs": [],
+      "sigma1sBipowerPpm": 59.18185096727918,
+      "kVsBase": 0.5
+    }
+  }
+}

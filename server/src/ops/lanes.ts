@@ -2,7 +2,7 @@
 // Every ADAPTIVE_LANES_INTERVAL_MIN (clamped to 5–15) per asset:
 //   σ_recent = bipower σ₁ₛ of the last 30 min of Supra rounds from the hub
 //   k = clamp(σ_recent / σ_base, 0.5, 2.0);  T' = round(T·k), S' = round(S·k), gap' = ceil(0.58·σ_recent)
-//   setLane only if |k − k_current| / k_current > 20 %, the lane passes validateLane and S' ≥ 10 ppm.
+//   tuneLane (ops holds LANE_TUNER_ROLE only) if |k − k_current| / k_current > 20 %, the lane passes validateLane and S' ≥ 10 ppm.
 // k_current is implied by the on-chain lane (T_current / T_base). Tiers disabled in the base table,
 // or disabled on chain, are never touched (so never enabled). Every change goes to lane_changes.
 
@@ -201,13 +201,22 @@ export class AdaptiveLanes {
 
   private async apply(assetId: number, tier: number, lane: { p: LaneParams; version: number }, d: Extract<LaneDecision, { action: 'update' }>, sigma: number, sigmaBase: number, samples: number): Promise<void> {
     const key = `${assetId}:${tier}`;
+    // G1 H1: the ops key holds only LANE_TUNER_ROLE — it may retune T/S inside the admin-set
+    // bounds via tuneLane; M, fee, stakes and `enabled` stay as configured on chain.
+    const bounds = await this.o.chain.read.readContract({ address: this.o.arena, abi: arenaAbi, functionName: 'getLaneTuneBounds', args: [assetId, tier] });
+    if (bounds.maxTargetPpm === 0 || bounds.maxStopPpm === 0) return; // tuning not enabled for this lane
+    const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+    const targetPpm = clamp(d.params.targetPpm, bounds.minTargetPpm, bounds.maxTargetPpm);
+    const stopPpm = clamp(d.params.stopPpm, bounds.minStopPpm, bounds.maxStopPpm);
+    if (targetPpm === lane.p.targetPpm && stopPpm === lane.p.stopPpm) return; // already at the bound
+    d = { ...d, params: { ...d.params, targetPpm, stopPpm } };
     const id = randomUUID();
     const now = Date.now();
     const h = this.o.sender.enqueue({
       key: 'ops',
       kind: 'admin',
       to: this.o.arena,
-      data: encodeFunctionData({ abi: arenaAbi, functionName: 'setLane', args: [assetId, tier, d.params] }),
+      data: encodeFunctionData({ abi: arenaAbi, functionName: 'tuneLane', args: [assetId, tier, targetPpm, stopPpm] }),
       priority: 10,
     });
     this.inflight.add(key);

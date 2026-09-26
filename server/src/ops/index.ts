@@ -23,7 +23,7 @@ export type OpsConfig = Pick<Config, 'ARENA_ADDRESS' | 'FAUCET_ADDRESS' | 'FAUCE
 export interface OpsDeps {
   config: OpsConfig;
   chain: ChainIo;
-  /** The ops-key sender (faucet, voidStale, setLane). */
+  /** The ops-key sender (faucet, voidStale, tuneLane). */
   sender: ChainTxSender;
   roundBook: ChainRoundBook;
   hub: SigmaSource & { latest(pairId: number): { sec: number } | undefined; proofForSecond(sec: number): { proof: Hex } | undefined };

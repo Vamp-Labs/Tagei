@@ -9,12 +9,12 @@ export type RoundStatus = (typeof RoundStatus)[keyof typeof RoundStatus];
 export const Outcome = { None: 0, TargetHit: 1, StopHit: 2, Timeout: 3, CashedOut: 4, Voided: 5 } as const;
 export type Outcome = (typeof Outcome)[keyof typeof Outcome];
 
-export const VoidReason = { None: 0, EntryInvalid: 1, TerminalInvalid: 2, CheckpointGap: 3, Stalled: 4 } as const;
+export const VoidReason = { None: 0, EntryInvalid: 1, TerminalInvalid: 2, CheckpointGap: 3, Stalled: 4, PathDisputed: 5 } as const;
 export type VoidReason = (typeof VoidReason)[keyof typeof VoidReason];
 
 export type DirectionLabel = 'LONG' | 'SHORT';
 export type OutcomeLabel = 'win' | 'loss' | 'timeout' | 'cashed_out' | 'voided';
-export type VoidReasonLabel = 'entry_invalid' | 'terminal_invalid' | 'checkpoint_gap' | 'stalled';
+export type VoidReasonLabel = 'entry_invalid' | 'terminal_invalid' | 'checkpoint_gap' | 'stalled' | 'path_disputed';
 
 export const directionLabel = (d: Direction): DirectionLabel => (d === Direction.Long ? 'LONG' : 'SHORT');
 export const directionFromLabel = (l: DirectionLabel): Direction => (l === 'LONG' ? Direction.Long : Direction.Short);
@@ -34,6 +34,7 @@ const VOID_LABELS: Record<Exclude<VoidReason, 0>, VoidReasonLabel> = {
   [VoidReason.TerminalInvalid]: 'terminal_invalid',
   [VoidReason.CheckpointGap]: 'checkpoint_gap',
   [VoidReason.Stalled]: 'stalled',
+  [VoidReason.PathDisputed]: 'path_disputed',
 };
 
 export const voidReasonLabel = (r: VoidReason): VoidReasonLabel | null => (r === VoidReason.None ? null : VOID_LABELS[r]);

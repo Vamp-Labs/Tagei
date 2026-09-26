@@ -68,6 +68,7 @@ contract StubArena {
     struct AssetConfig { uint32 pairId; uint32 maxJumpPpm; uint32 gapMarginPpm; bool enabled; }
     struct LaneParams { uint32 targetPpm; uint32 stopPpm; uint32 multiplierBps; uint16 feeBps; uint16 durationSec; bool enabled; uint128 minStake; uint128 maxStake; }
     struct Lane { LaneParams p; uint32 version; }
+    struct TuneBounds { uint32 minTargetPpm; uint32 maxTargetPpm; uint32 minStopPpm; uint32 maxStopPpm; }
     struct Round {
         address player; uint8 assetId; uint8 tier; uint8 direction; uint8 status; uint8 outcome; bool cashOutRequested; uint8 oracleIdx;
         uint40 entrySec; uint128 stake; uint128 maxPayout; uint32 targetPpm; uint32 stopPpm; uint32 multiplierBps; uint16 feeBps;
@@ -111,6 +112,7 @@ contract StubArena {
     uint8 public activeOracleIdx;
     mapping(uint8 => AssetConfig) internal assets;
     mapping(uint8 => mapping(uint8 => Lane)) internal lanes;
+    mapping(uint8 => mapping(uint8 => TuneBounds)) internal tuneBounds;
     mapping(uint256 => Round) internal rounds;
     uint256 public nextRoundId = 1;
     mapping(address => uint256) public balanceOf;
@@ -126,7 +128,17 @@ contract StubArena {
     function setLane(uint8 assetId, uint8 tier, LaneParams calldata p) external {
         Lane storage l = lanes[assetId][tier];
         l.p = p; l.version += 1;
+        // Mirrors config/97.json laneTuning: bounds are 50 %–200 % of the configured T/S.
+        tuneBounds[assetId][tier] = TuneBounds(p.targetPpm / 2, p.targetPpm * 2, p.stopPpm / 2, p.stopPpm * 2);
         emit LaneConfigured(assetId, tier, l.version, p);
+    }
+    function getLaneTuneBounds(uint8 assetId, uint8 tier) external view returns (TuneBounds memory) { return tuneBounds[assetId][tier]; }
+    function tuneLane(uint8 assetId, uint8 tier, uint32 targetPpm, uint32 stopPpm) external {
+        TuneBounds memory b = tuneBounds[assetId][tier];
+        require(targetPpm >= b.minTargetPpm && targetPpm <= b.maxTargetPpm && stopPpm >= b.minStopPpm && stopPpm <= b.maxStopPpm, "TuneOutOfBounds");
+        Lane storage l = lanes[assetId][tier];
+        l.p.targetPpm = targetPpm; l.p.stopPpm = stopPpm; l.version += 1;
+        emit LaneConfigured(assetId, tier, l.version, l.p);
     }
     function getLane(uint8 assetId, uint8 tier) external view returns (Lane memory) { return lanes[assetId][tier]; }
     function deposit(uint256 amount) external { balanceOf[msg.sender] += amount; emit Deposited(msg.sender, msg.sender, amount); }

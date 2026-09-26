@@ -71,7 +71,10 @@ export function evaluatePath(terms: RoundTerms, src: PathSource, nowSec: number)
 
     if (!valid) {
       if (terminal) return voided(VoidReason.TerminalInvalid, terms.stake, sec, p0);
-      continue;
+      // G1 L1: a conflicting signed price inside the path voids the round instead of being
+      // skipped (skipping let a late dispute flip an already-decided outcome).
+      if (cp.disputed) return voided(VoidReason.PathDisputed, terms.stake, sec, p0);
+      continue; // price jump beyond maxJumpPpm: skip the second, no barrier evaluated
     }
 
     const { fav, mag } = directional(terms.direction, p0, cp.price18);

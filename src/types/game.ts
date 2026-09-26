@@ -16,7 +16,8 @@ export type RoundMode = 'practice' | 'live';
 
 export type TierLabel = 'CRUISE' | 'BOOST' | 'HYPER' | 'WARP';
 
-export type VoidReasonLabel = 'entry_invalid' | 'terminal_invalid' | 'checkpoint_gap' | 'stalled';
+// Mirrors @bnbplay/shared VoidReasonLabel (kept local so components don't import shared directly).
+export type VoidReasonLabel = import('@bnbplay/shared/enums').VoidReasonLabel;
 
 export interface ActiveTradeRound {
   id: string;

@@ -97,6 +97,21 @@ describe('evaluatePath', () => {
     expect(evaluatePath(terms(), source(prices), 1_021)).toMatchObject({ outcome: Outcome.Voided, voidReason: VoidReason.EntryInvalid });
   });
 
+  it('voids a round when a checkpoint inside the path is disputed (G1 L1)', () => {
+    const prices = { ...flatPath(1_000, 1_020), 1_005: { price18: target, disputed: true } };
+    expect(evaluatePath(terms(), source(prices), 1_021)).toMatchObject({
+      outcome: Outcome.Voided,
+      voidReason: VoidReason.PathDisputed,
+      payout: stake,
+      decisionSec: 1_005,
+    });
+  });
+
+  it('ignores a dispute after the deciding second', () => {
+    const prices = { ...flatPath(1_000, 1_020), 1_003: target, 1_006: { price18: p0, disputed: true } };
+    expect(evaluatePath(terms(), source(prices), 1_021)).toMatchObject({ outcome: Outcome.TargetHit, decisionSec: 1_003 });
+  });
+
   it('skips a jump checkpoint mid-round but voids an invalid terminal', () => {
     const spike = p0 + p0 / 50n; // +2%, above maxJumpPpm
     const mid = { ...flatPath(1_000, 1_020), 1_010: spike };

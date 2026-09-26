@@ -11,7 +11,7 @@ export const Hash32 = z.string().regex(/^0x[0-9a-fA-F]{64}$/, '32-byte hash');
 export const AssetSymbolSchema = z.enum(['BNB', 'BTC', 'ETH', 'SOL', 'DOGE']);
 export const DirectionLabelSchema = z.enum(['LONG', 'SHORT']);
 export const OutcomeLabelSchema = z.enum(['win', 'loss', 'timeout', 'cashed_out', 'voided']);
-export const VoidReasonLabelSchema = z.enum(['entry_invalid', 'terminal_invalid', 'checkpoint_gap', 'stalled']);
+export const VoidReasonLabelSchema = z.enum(['entry_invalid', 'terminal_invalid', 'checkpoint_gap', 'stalled', 'path_disputed']);
 
 export const ErrorCode = z.enum([
   'VALIDATION',

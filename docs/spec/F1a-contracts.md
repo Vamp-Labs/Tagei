@@ -307,3 +307,21 @@ Admin can never touch open rounds or player balances.
    using `[etherscan] bsc_testnet = { key = "${ETHERSCAN_API_KEY}", chain = 97 }`. The script writes `deployments/97.json` (addresses, start block, git commit).
 3. Run `script/Smoke.s.sol`: faucet → open → record ×21 → settle.
 4. A0 runs `abi:sync` to export the ABIs and addresses into `packages/shared/src/chain/` (F2).
+
+## v2.1 — G1 security fixes (merged 1514ea0; see docs/security/G1-contracts-review.md)
+
+- **Roles (H1).**
+  - `CONFIG_ROLE` (`setAsset`, `setLane`, `setLimits`, `addOracle`, `setActiveOracle`, `setLaneTuneBounds`) is held by the **cold admin key only**.
+  - The ops hot key holds `LANE_TUNER_ROLE` + `PAUSER_ROLE` + faucet `OPERATOR`.
+  - `tuneLane(assetId, tier, targetPpm, stopPpm)` changes T/S only:
+    - it must stay within `getLaneTuneBounds` (config: 50–200 % of the base lane) and pass the house-edge guard;
+    - it bumps `laneVersion`;
+    - it never changes M, fee, duration, stakes or `enabled`.
+  - The adaptive-lanes job (server `ops/lanes.ts`) calls `tuneLane`, clamped to the bounds. Changing a gap margin needs the cold key.
+- **L1:** a DISPUTED checkpoint strictly inside the path voids the round with `VoidReason.PathDisputed = 5`. A disputed entry second is still `EntryInvalid`, a disputed terminal second is still `TerminalInvalid`, and a dispute after the deciding second has no effect. Mirrored in `packages/shared/src/path.ts`; vectors regenerated (42 cases changed, identical on both sides).
+- **L2:** `setAsset` bumps the `laneVersion` of every lane of that asset.
+- **L3:** `settleMany` / `recordAndSettle` skip a reverting round (via `settleFromBatch`, which is self-call only) instead of reverting the batch.
+- `VOID_STALE_MIN_GAS` = 1.5M.
+- Optimizer runs are 800 (Arena 23,404 B, EIP-170 margin 1,172 B).
+- `DOMAIN_SEPARATOR()` is removed; `eip712Domain()` is unchanged.
+- Client intent TTLs: open 6 s, cash-out 4 s (G1 M2).

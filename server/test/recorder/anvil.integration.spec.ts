@@ -334,7 +334,7 @@ describe.skipIf(!anvilAvailable())('chain services on anvil', () => {
     }
   }, 60_000);
 
-  it('adaptive lanes halve BNB CRUISE when σ drops, through setLane on the ops key', async () => {
+  it('adaptive lanes halve BNB CRUISE when σ drops, through tuneLane on the ops key', async () => {
     const store = new MemoryLaneChangeStore();
     const lanes = new AdaptiveLanes({ arena: stubs.arena, hub: { sigmaBipower: () => ({ sigmaPpm: 25, samples: 1800 }) }, sender: senders.ops as ChainTxSender, chain, store, enabled: () => true, intervalMin: 10 });
     const out = await lanes.runOnce();
@@ -342,7 +342,7 @@ describe.skipIf(!anvilAvailable())('chain services on anvil', () => {
     const bnb = await until(async () => {
       const l = await pc.readContract({ address: stubs.arena, abi: arenaAbi, functionName: 'getLane', args: [0, 0] });
       return l.version === 2 ? l : undefined;
-    }, 20_000, 'setLane mined');
+    }, 20_000, 'tuneLane mined');
     expect(bnb.p).toMatchObject({ targetPpm: 113, stopPpm: 217, multiplierBps: 15_000, durationSec: TEST_DURATION_SEC, enabled: true });
     await until(() => [...store.rows.values()].some((r) => r.assetId === 0 && r.status === 'confirmed' && r.toVersion === 2), 10_000, 'lane_changes row');
     expect((await lanes.runOnce()).find((a) => a.assetId === 0)?.tiers[0].action).toBe('keep');

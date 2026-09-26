@@ -14,21 +14,28 @@ import {
   staggerVariants,
   useMotionPref,
 } from '../ui/motion';
-import { buttonClass, Button } from '../ui/lucky/Button';
-import { Scrim } from '../ui/lucky/Scrim';
-import { SignedAmount } from '../ui/lucky/SignedAmount';
-import { StatTable, type StatRow } from '../ui/lucky/StatTable';
-import { Panel } from '../ui/lucky/Panel';
-import { ProgressBar } from '../ui/lucky/ProgressBar';
-import { Pill } from '../ui/lucky/Pill';
-import { Icon } from '../ui/lucky/Icon';
-import { DirectionChip } from '../ui/lucky/DirectionChip';
-import { useConfetti } from '../ui/lucky/Confetti';
-import { formatAmount, formatPrice, formatXp, signOf } from '../ui/lucky/format';
+import {
+  buttonClass,
+  Button,
+  Scrim,
+  SignedAmount,
+  StatTable,
+  type StatRow,
+  Panel,
+  ProgressBar,
+  Pill,
+  Icon,
+  DirectionChip,
+  useConfetti,
+  formatAmount,
+  formatPrice,
+  formatXp,
+  signOf,
+} from '../ui/lucky';
 import { cn } from '../ui/cn';
 import { OutcomeArt } from './outcome/OutcomeArt';
 import { useResultCounters } from './outcome/useResultCounters';
-import { GLYPH_STROKE, POP } from './outcome/tokens';
+import { GLYPH_STROKE, POP, POP_SECONDS } from './outcome/tokens';
 
 interface ResultPanelProps {
   result: TradeResult;
@@ -55,6 +62,8 @@ const OUTCOME = {
 const MISSION_BONUS_XP = 50;
 const XP_PILL_DELAY_SECONDS = 0.15;
 const LEVEL_COIN_PX = 32;
+const HERO_ART_PX = 60;
+const LEVEL_GLOW_REST_OPACITY = 0.6;
 const FOOTER_GLYPH_PX = 22;
 
 export const ResultPanel: React.FC<ResultPanelProps> = ({
@@ -124,12 +133,13 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({
 
   const remaining = Math.max(0, progression.dailyRoundsGoal - progression.dailyRoundsPlayed);
   // Never references money — PRD §22 bans anything that reads as loss-chasing.
-  const missionCopy =
-    remaining === 0
+  const missionCopy = !isProfit
+    ? `${progression.dailyRoundsPlayed}/${progression.dailyRoundsGoal} rounds today`
+    : remaining === 0
       ? 'Daily goal done'
       : `${remaining} more ${remaining === 1 ? 'round' : 'rounds'} · +${MISSION_BONUS_XP} XP`;
 
-  const art = result.outcome === 'win' ? 'reward-crown' : result.outcome === 'cashed_out' && isProfit ? 'coin' : null;
+  const art = result.outcome === 'win' ? 'reward-crown' : result.outcome === 'cashed_out' && isProfit ? 'reward-clover' : null;
   const childVariants = reduced ? undefined : staggerChildVariants;
   const nextLevel = progression.level + 1;
 
@@ -182,7 +192,7 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({
           className="px-5 pb-2 flex flex-col items-center"
         >
           <motion.div variants={childVariants} className="flex flex-col items-center gap-2">
-            {art && <OutcomeArt name={art} height={art === 'coin' ? 60 : undefined} />}
+            {art && <OutcomeArt name={art} height={HERO_ART_PX} />}
             {/* §35 bans colour-only encoding, so one text label always stays. */}
             <h2 className={cn('text-label font-extrabold uppercase tracking-[0.08em]', outcome.accent)}>
               {outcome.label}
@@ -211,7 +221,16 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({
                     transition={POP}
                     className="flex items-center gap-2 shrink-0"
                   >
-                    <OutcomeArt name="coin" height={LEVEL_COIN_PX} className="rounded-full shadow-glow-gold" />
+                    <span className="relative inline-grid shrink-0 rounded-full">
+                      <motion.span
+                        aria-hidden="true"
+                        initial={reduced ? false : { opacity: 0 }}
+                        animate={{ opacity: reduced ? LEVEL_GLOW_REST_OPACITY : [0, 1, LEVEL_GLOW_REST_OPACITY] }}
+                        transition={reduced ? { duration: 0 } : { duration: POP_SECONDS, times: [0, 0.5, 1], ease: 'easeOut' }}
+                        className="absolute inset-0 rounded-full shadow-glow-gold"
+                      />
+                      <OutcomeArt name="coin" height={LEVEL_COIN_PX} className="relative rounded-full" />
+                    </span>
                     <span className="text-label font-extrabold uppercase tracking-[0.08em] text-gold">LEVEL UP</span>
                   </motion.div>
                 ) : null}
@@ -235,7 +254,7 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({
               <ProgressBar
                 className="mt-2"
                 size="sm"
-                tone={justLeveledUp ? 'gold' : 'lucky'}
+                tone={showLevelUp ? 'gold' : 'lucky'}
                 value={xpDisplay}
                 max={progression.nextLevelXp}
                 label={`XP toward level ${nextLevel}`}
@@ -295,7 +314,7 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({
               rel="noopener noreferrer"
               aria-label="View settlement on BscScan"
               title="Settled on BNB Chain — view on BscScan"
-              className={cn(buttonClass('icon', 'md'), 'text-info')}
+              className={cn(buttonClass('icon', 'md'), 'text-ink-secondary')}
             >
               <ShieldCheck size={FOOTER_GLYPH_PX} strokeWidth={GLYPH_STROKE} aria-hidden="true" />
             </a>

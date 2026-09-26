@@ -45,6 +45,17 @@ const ICONS: IconName[] = [
   'chevron-down',
   'tri-up',
   'tri-down',
+  'arrow-right',
+  'send',
+  'search',
+  'home',
+  'external',
+  'shield-check',
+  'bolt',
+  'key',
+  'broadcast',
+  'clock',
+  'rocket',
 ];
 
 const TYPE_SCALE = [
@@ -263,7 +274,7 @@ export const Gallery: React.FC = () => {
           <Panel title="Wallets">
             <div role="radiogroup" aria-label="Wallet" className="flex flex-col gap-2">
               <WalletRow
-                icon={CURRENCY.usdt.src}
+                iconSrc={CURRENCY.usdt.src}
                 amount="612.34"
                 currency="USDT"
                 bonus="demo balance"
@@ -271,7 +282,7 @@ export const Gallery: React.FC = () => {
                 onSelect={() => setWallet('usdt')}
               />
               <WalletRow
-                icon={CURRENCY.btc.src}
+                iconSrc={CURRENCY.btc.src}
                 amount="0.989220"
                 currency="BTC"
                 bonus="dp.bonus 20 fs"

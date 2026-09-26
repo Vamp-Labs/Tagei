@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { marketFeed } from '../services/marketFeed';
-import { MarketTrackRenderer, PNL_TRACKER_LIFT, type MarkerLabels } from './renderer';
+import { MarketTrackRenderer, type MarkerLabels } from './renderer';
 import { RocketAvatar } from './rocket';
 import { ParticleSystem } from './particles';
 import { ActiveTradeRound, GameStage, LastRoundSummary, PositionDirection } from '../types/game';
@@ -8,7 +8,15 @@ import { AssetSymbol } from '../types/market';
 import { soundEngine } from '../services/audioHaptics';
 import { DEFAULT_CONFIG } from '../services/settlementEngine';
 import { formatAmount, formatPrice } from '../ui/lucky/format';
-import { CLEAR, FX, TEXT_HALO, TRACK, TextMemo, font } from './theme';
+import { CLEAR, FX, TRACK } from './theme';
+
+const MAX_FRAME_SECONDS = 0.05;
+const DEFAULT_FRAME_SECONDS = 1 / 60;
+const HOME_ACTIVE_BOTTOM_INSET_PX = 380;
+const LOSS_BEAT_BASE_HZ = 1.1;
+const LOSS_BEAT_RANGE_HZ = 2.2;
+const LOSS_BEAT_MAX_HZ = 2.5;
+const OUTCOME_STAGES: ReadonlySet<GameStage> = new Set<GameStage>(['TARGET_HIT', 'LOSS_HIT', 'SETTLING', 'RESULT']);
 
 interface MarketTrackCanvasProps {
   gameStage: GameStage;
@@ -103,20 +111,11 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
   // stay in sync instead of drifting apart).
   const punchRef = useRef<number>(0);
   const boomRef = useRef<number>(0);
-  // Rocket-following live P&L number — a small persistent label redrawn
-  // every frame at the rocket's position (see render loop, after
-  // rocket.render). alphaRef fades it in/out with LIVE_TRADE the same
-  // lerp idiom the rocket's own movement uses; popRef spikes and decays
-  // on a meaningful P&L tick, same idiom as punchRef/boomRef above.
-  const pnlTrackerAlphaRef = useRef<number>(0);
-  const pnlTrackerPopRef = useRef<number>(0);
-  const prevTrackerPnlRef = useRef<number>(0);
   const lastPnlTierRef = useRef<number>(0);
   const lastDangerAlertRef = useRef<number>(0);
   const lastSurgeCueRef = useRef<number>(0);
   const lastHandledStageRef = useRef<GameStage | null>(null);
   const dprRef = useRef<number>(1);
-  const trackerTextRef = useRef(new TextMemo((v) => formatAmount(v)));
 
   const [, setTickCount] = useState<number>(0);
 
@@ -217,9 +216,6 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
         // Scorch ratchets and heals slowly by design, so it has to be cleared
         // explicitly or last round's damage carries into the next one.
         rocket.resetHull();
-        // Otherwise the next round's first frame would diff against the
-        // previous round's final P&L and fire a spurious pop.
-        prevTrackerPnlRef.current = 0;
       }
     }
   }, [gameStage, activeRound, reducedMotion]);
@@ -236,6 +232,7 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
     const particles = particlesRef.current;
 
     let animationFrameId: number;
+    let lastFrameAt: number | null = null;
 
     // A sharp move should be felt, not just seen. The rocket detects the
     // surge on a rising edge; the scene answers with a camera kick and — far
@@ -270,7 +267,12 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
       }
     };
 
-    const render = () => {
+    const render = (now: number) => {
+      const dtSeconds =
+        lastFrameAt === null
+          ? DEFAULT_FRAME_SECONDS
+          : Math.min(MAX_FRAME_SECONDS, Math.max(0, (now - lastFrameAt) / 1000));
+      lastFrameAt = now;
       const {
         gameStage,
         activeRound,
@@ -321,7 +323,13 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
 
       // 1. Render Background & Clean Cosmic Void
       const activeAsset = activeRound ? activeRound.asset : currentAsset;
-      renderer.renderBackground(ctx, width, height, reducedMotion, activeAsset, boomRef.current);
+      renderer.setBottomInset(
+        gameStage === 'HOME' && activeRound ? HOME_ACTIVE_BOTTOM_INSET_PX : 0,
+        height,
+        reducedMotion,
+        dtSeconds
+      );
+      renderer.renderBackground(ctx, width, height, reducedMotion, activeAsset, boomRef.current, dtSeconds);
 
       // 2. Calculate Screen Points
       const currentHistory = marketFeed.getHistory();
@@ -370,7 +378,6 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
 
         // Deep Loss Emergency Radar Pulse (< -$6.00)
         if (activeRound.currentPnl <= -6.0) {
-          const now = performance.now();
           if (now - lastDangerAlertRef.current > 2200) {
             soundEngine.playDangerWarningPulse();
             lastDangerAlertRef.current = now;
@@ -411,7 +418,8 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
           rocket.y,
           activeRound.direction,
           activeRound.currentPnl,
-          labels ?? undefined
+          labels ?? undefined,
+          !OUTCOME_STAGES.has(gameStage)
         );
       }
 
@@ -425,53 +433,8 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
       particles.update();
       particles.render(ctx);
 
-      rocket.update(particles, reducedMotion);
+      rocket.update(particles, reducedMotion, dtSeconds);
       rocket.render(ctx);
-
-      // 8b. Rocket-Following Live P&L Number — a small persistent label
-      // drawn every frame at the rocket's live position, redrawn like
-      // everything else in this loop rather than spawned once as a
-      // particle. Complements the fixed P&L readout in LiveTradeOverlay's
-      // HUD with direct spatial feedback right where the action is
-      // happening. Same font/shadow technique particles.ts's 'text' shape
-      // already uses, and the same manual lerp/decay idiom as
-      // punchRef/boomRef above.
-      {
-        const wantsTracker = gameStage === 'LIVE_TRADE' && !!activeRound;
-        pnlTrackerAlphaRef.current += ((wantsTracker ? 1 : 0) - pnlTrackerAlphaRef.current) * 0.15;
-
-        if (activeRound) {
-          const trackerDelta = activeRound.currentPnl - prevTrackerPnlRef.current;
-          prevTrackerPnlRef.current = activeRound.currentPnl;
-          if (Math.abs(trackerDelta) >= 0.05) {
-            pnlTrackerPopRef.current = 1;
-          }
-        }
-        pnlTrackerPopRef.current *= 0.85;
-
-        if (activeRound && pnlTrackerAlphaRef.current > 0.01) {
-          const trackerPnl = activeRound.currentPnl;
-          const trackerColor = trackerPnl >= 0 ? TRACK.profit.stroke : TRACK.loss.stroke;
-          // Reduced motion keeps the number legible but drops the pop kick.
-          const pop = reducedMotion ? 0 : pnlTrackerPopRef.current;
-          const trackerFont = font(15 + pop * 5);
-
-          ctx.save();
-          ctx.globalAlpha = pnlTrackerAlphaRef.current;
-          const tracker = trackerTextRef.current.update(ctx, trackerPnl, trackerFont);
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'middle';
-          const trackerX = rocket.x - tracker.width / 2;
-          const trackerY = rocket.y + rocket.hoverOffset - PNL_TRACKER_LIFT;
-          ctx.lineWidth = 3;
-          ctx.lineJoin = 'round';
-          ctx.strokeStyle = TEXT_HALO;
-          ctx.strokeText(tracker.text, trackerX, trackerY);
-          ctx.fillStyle = trackerColor;
-          ctx.fillText(tracker.text, trackerX, trackerY);
-          ctx.restore();
-        }
-      }
 
       // 9. Tiered Dynamic PnL Edge Atmosphere (Plus & Minus Escalation)
       if (gameStage === 'LIVE_TRADE' && activeRound && !reducedMotion) {
@@ -481,7 +444,7 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
           // --- PLUS ESCALATION ---
           const pnlIntensity = Math.min(1, activeRound.currentPnl / 12);
           const auraAlpha = 0.08 + pnlIntensity * 0.28;
-          const pulse = 1 + Math.sin(performance.now() * 0.008) * 0.18;
+          const pulse = 1 + Math.sin(now * 0.008) * 0.18;
 
           ctx.strokeStyle = FX.winEdge.a(auraAlpha * pulse);
           ctx.lineWidth = 10 + pnlIntensity * 12;
@@ -504,9 +467,9 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
         } else if (activeRound.currentPnl < 0) {
           // --- MINUS ESCALATION ---
           const lossIntensity = Math.min(1, Math.abs(activeRound.currentPnl) / 9);
-          // Heartbeat tempo: accelerates with deeper loss
-          const beatSpeed = 0.007 + lossIntensity * 0.014;
-          const heartbeat = Math.pow(Math.max(0, Math.sin(performance.now() * beatSpeed)), 4);
+          // Heartbeat tempo: accelerates with deeper loss, capped under the strobe limit
+          const beatHz = Math.min(LOSS_BEAT_MAX_HZ, LOSS_BEAT_BASE_HZ + lossIntensity * LOSS_BEAT_RANGE_HZ);
+          const heartbeat = Math.pow(Math.max(0, Math.sin(now * ((2 * Math.PI) / 1000) * beatHz)), 4);
           const alertAlpha = 0.1 + lossIntensity * 0.38 * heartbeat;
 
           ctx.strokeStyle = FX.lossEdge.a(alertAlpha);

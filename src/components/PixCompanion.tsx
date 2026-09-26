@@ -73,7 +73,7 @@ export const PixCompanion: React.FC<PixCompanionProps> = ({
   const bubbleHidden = reduced ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.94 };
 
   return (
-    <div className="absolute inset-x-0 top-16 z-20 flex flex-col items-center gap-2 pointer-events-none select-none">
+    <div className="absolute inset-x-0 top-16 z-20 flex justify-center pointer-events-none select-none">
       <button
         type="button"
         onClick={onTap}
@@ -83,7 +83,7 @@ export const PixCompanion: React.FC<PixCompanionProps> = ({
         <PixAvatar mood={pixMoodFor(currentPnl)} />
       </button>
 
-      <div role="status" aria-live="polite" className="flex justify-center px-6">
+      <div role="status" aria-live="polite" className="absolute top-0 left-[calc(50%+32px)] right-6 flex min-h-12 items-center">
         <AnimatePresence mode="wait">
           {speech && (
             <motion.p
@@ -93,9 +93,9 @@ export const PixCompanion: React.FC<PixCompanionProps> = ({
               exit={bubbleHidden}
               transition={MICRO}
               onClick={onTap}
-              className="pointer-events-auto cursor-pointer max-w-[220px] px-3 py-2 rounded-md bg-panel border border-line text-caption text-ink-soft text-center line-clamp-2"
+              className="relative origin-left pointer-events-auto cursor-pointer max-w-full px-3 py-1.5 rounded-md bg-panel border border-line text-micro text-ink-soft before:absolute before:-left-[5px] before:top-1/2 before:size-2 before:-translate-y-1/2 before:rotate-45 before:border-b before:border-l before:border-line before:bg-panel"
             >
-              {speech}
+              <span className="line-clamp-3">{speech}</span>
             </motion.p>
           )}
         </AnimatePresence>

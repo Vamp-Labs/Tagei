@@ -2,8 +2,7 @@ import React from 'react';
 import { AnimatePresence, motion, type Variants } from 'motion/react';
 import { GameStage } from '../types/game';
 import { HERO, MICRO, useMotionPref } from '../ui/motion';
-import { SignedAmount } from '../ui/lucky/SignedAmount';
-import { formatMultiplier } from '../ui/lucky/format';
+import { SignedAmount, formatMultiplier } from '../ui/lucky';
 import { OutcomeArt } from './outcome/OutcomeArt';
 import { POP, REDUCED_FADE } from './outcome/tokens';
 
@@ -32,7 +31,7 @@ const winChildVariants: Variants = {
   visible: { opacity: 1, y: 0, scale: 1, transition: POP },
 };
 
-const CARD_CLASS = 'lg-card relative flex flex-col items-center bg-sheet/92 px-8 py-6 text-center';
+const CARD_CLASS = 'lg-card relative flex flex-col items-center bg-sheet shadow-lift px-8 py-6 text-center';
 
 export const OutcomeBannerOverlay: React.FC<OutcomeBannerOverlayProps> = ({
   gameStage,

@@ -24,7 +24,6 @@ export const Header: React.FC<HeaderProps> = ({ wallet, onOpenMenu }) => {
       </span>
 
       <div className="flex items-center gap-3">
-        {/* Wallet status dot. Lucky with a tint ring when connected. */}
         <span
           className={cn(
             'w-2.5 h-2.5 rounded-full shrink-0',

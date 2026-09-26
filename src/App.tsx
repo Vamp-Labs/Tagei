@@ -531,10 +531,7 @@ export const App: React.FC = () => {
                   aria-live="polite"
                   className="flex items-center justify-center gap-2 h-16 text-micro font-semibold uppercase tracking-[0.08em] text-ink-muted"
                 >
-                  <span
-                    aria-hidden="true"
-                    className={`w-2 h-2 rounded-full bg-lucky ${reduced ? '' : 'animate-pulse'}`}
-                  />
+                  <span aria-hidden="true" className="w-2 h-2 rounded-full bg-ink-muted" />
                   <span>Resolving round</span>
                 </div>
               )}

@@ -24,6 +24,7 @@ const QUICK_PROMPTS = [
 
 interface Message {
   from: 'pix' | 'user';
+  title?: string;
   text: string;
 }
 
@@ -46,7 +47,7 @@ export const PixChat: React.FC<PixChatProps> = ({ currentAsset, change24h, onClo
     setMessages((prev) => [
       ...prev,
       { from: 'user', text: prompt },
-      { from: 'pix', text: `${insight.headline}. ${insight.summary}` },
+      { from: 'pix', title: insight.headline, text: insight.summary },
     ]);
   };
 
@@ -83,7 +84,8 @@ export const PixChat: React.FC<PixChatProps> = ({ currentAsset, change24h, onClo
                     : 'self-start bg-panel border border-line text-ink-soft',
                 )}
               >
-                {m.text}
+                {m.title && <p className="font-semibold text-ink">{m.title}</p>}
+                <p>{m.text}</p>
               </motion.div>
             ))
           )}

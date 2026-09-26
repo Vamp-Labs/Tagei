@@ -9,7 +9,7 @@ import {
 } from 'motion/react';
 import type { AnimationPlaybackControls } from 'motion/react';
 import { soundEngine } from '../services/audioHaptics';
-import { MICRO, useMotionPref } from './motion';
+import { MICRO, POP_EASE, useMotionPref } from './motion';
 import { cn } from './cn';
 import { buttonClass } from './lucky/Button';
 import { rgba, TOKENS } from './lucky/palette';
@@ -99,6 +99,11 @@ export const HoldButton: React.FC<HoldButtonProps> = ({
   );
   // A faint scale creep on the whole button, same read.
   const pressScale = useTransform(progress, [0, 1], [1, 1.015]);
+  const ringOpacity = useMotionValue(0);
+
+  useEffect(() => {
+    ringOpacity.set(isHolding ? 1 : 0);
+  }, [isHolding, ringOpacity]);
 
   // Audio/haptic ramp: reel clicks at each quarter, then a rising tone just
   // before the action fires so the commit is never a surprise.
@@ -254,7 +259,7 @@ export const HoldButton: React.FC<HoldButtonProps> = ({
             strokeWidth={3}
             strokeLinecap="round"
             strokeDasharray={perimeter}
-            style={{ strokeDashoffset: dashOffset, opacity: isHolding ? 1 : 0, filter: ringGlow }}
+            style={{ strokeDashoffset: dashOffset, opacity: ringOpacity, filter: ringGlow }}
           />
         </svg>
       )}
@@ -270,7 +275,7 @@ export const HoldButton: React.FC<HoldButtonProps> = ({
             initial={{ opacity: 0.6, scale: 0.7 }}
             animate={{ opacity: 0, scale: 1.4 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: BURST_MS / 1000, ease: [0.34, 1.56, 0.64, 1] }}
+            transition={{ duration: BURST_MS / 1000, ease: POP_EASE }}
             className="absolute inset-0 pointer-events-none"
             // White, not currentColor/ringClassName — that's a dark
             // *contrast* color for the stroke against a bright button, and

@@ -13,7 +13,18 @@ export type IconName =
   | 'chevron-up'
   | 'chevron-down'
   | 'tri-up'
-  | 'tri-down';
+  | 'tri-down'
+  | 'arrow-right'
+  | 'send'
+  | 'search'
+  | 'home'
+  | 'external'
+  | 'shield-check'
+  | 'bolt'
+  | 'key'
+  | 'broadcast'
+  | 'clock'
+  | 'rocket';
 
 export interface IconProps {
   name: IconName;
@@ -33,6 +44,19 @@ const STROKE_PATHS: Record<Exclude<IconName, 'grid' | 'tri-up' | 'tri-down'>, st
   'chevron-right': 'M9.5 6l6 6-6 6',
   'chevron-up': 'M6 14.5 12 8.5l6 6',
   'chevron-down': 'M6 9.5l6 6 6-6',
+  'arrow-right': 'M5 12h14m-6-6 6 6-6 6',
+  send: 'M21 3 3 10.5l7 3 3 7.5L21 3zM10 13.5 21 3',
+  search: 'M11 4.5a6.5 6.5 0 1 1 0 13 6.5 6.5 0 0 1 0-13zM20 20l-4.4-4.4',
+  home: 'M4 11l8-7 8 7M6 9.5V20h12V9.5M10 20v-5h4v5',
+  external: 'M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5',
+  'shield-check': 'M12 3 5 6v5.5c0 4.2 3 7.8 7 9.5 4-1.7 7-5.3 7-9.5V6l-7-3zM9 12l2.2 2.2L15.5 10',
+  bolt: 'M13 3 5 13.5h6L10 21l8-10.5h-6L13 3z',
+  key: 'M8 11a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM10.8 12.2 19 4M16 7l2.5 2.5M14 9l2 2',
+  broadcast:
+    'M12 11a1 1 0 1 1 0 2 1 1 0 0 1 0-2zM8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8',
+  clock: 'M12 3.5a8.5 8.5 0 1 1 0 17 8.5 8.5 0 0 1 0-17zM12 7.5V12l3 2',
+  rocket:
+    'M12 3c3 2 4.5 5.5 4.5 9.5L14.5 16h-5l-2-3.5C7.5 8.5 9 5 12 3zM12 8.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM8 13l-3 3 3.5.5M16 13l3 3-3.5.5M10.5 18.5 12 21l1.5-2.5',
 };
 
 const TRIANGLES = {

@@ -36,6 +36,12 @@ export const HERO: Transition = { type: 'spring', stiffness: 180, damping: 22, m
 /** Matches the cubic-bezier already used by the hand-written keyframes. */
 export const EASE_OUT = [0.16, 1, 0.3, 1] as const;
 
+export const POP_EASE = [0.34, 1.56, 0.64, 1] as const;
+
+const POP_SECONDS = 0.32;
+
+export const POP: Transition = { duration: POP_SECONDS, ease: POP_EASE };
+
 export const scrimVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1 },

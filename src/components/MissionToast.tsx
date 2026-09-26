@@ -2,8 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { soundEngine } from '../services/audioHaptics';
 import { MICRO, STANDARD, useMotionPref } from '../ui/motion';
-import { Badge } from '../ui/lucky/Badge';
-import { formatXp } from '../ui/lucky/format';
+import { Badge, formatXp } from '../ui/lucky';
 import { OutcomeArt } from './outcome/OutcomeArt';
 
 interface MissionToastProps {
@@ -69,7 +68,7 @@ export const MissionToast: React.FC<MissionToastProps> = ({
             if (info.offset.y < -SWIPE_DISMISS_PX || info.velocity.y < -SWIPE_DISMISS_VELOCITY) onDismiss();
           }}
           className="fixed left-1/2 z-50 pointer-events-auto max-w-sm w-[92%] cursor-grab active:cursor-grabbing"
-          style={{ top: 'calc(var(--sa-top) + 4.75rem)' }}
+          style={{ top: 'calc(var(--sa-top) + 0.5rem)' }}
         >
           <div className="lg-card rounded-lg flex items-center gap-3 p-3 pr-4">
             <OutcomeArt name="reward-gift" height={GIFT_PX} />

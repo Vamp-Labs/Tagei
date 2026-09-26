@@ -17,13 +17,12 @@ export const ActivePositionBanner: React.FC<ActivePositionBannerProps> = ({ roun
     transition={STANDARD}
     onClick={onTap}
     aria-label={`1 active position, ${round.asset} ${round.direction}, ${formatAmount(round.currentPnl)}. Open position details`}
-    className="lg-wallet lg-wallet--compact pr-3 pointer-events-auto"
+    className="lg-wallet lg-wallet--compact min-h-14 py-2 pr-3 pointer-events-auto"
   >
-    <span className="lg-wallet-text gap-1">
-      <span className="text-micro font-semibold uppercase tracking-[0.08em] text-ink-muted">1 active position</span>
-      <span className="flex items-center gap-2">
-        <DirectionChip direction={round.direction} size="sm" />
-        <span className="text-micro font-semibold uppercase tracking-[0.08em] text-ink-soft">{round.asset}</span>
+    <span className="flex min-w-0 flex-1 items-center gap-2">
+      <DirectionChip direction={round.direction} size="sm" />
+      <span className="truncate text-micro font-semibold uppercase tracking-[0.08em] text-ink-soft">
+        {round.asset} · 1 active
       </span>
     </span>
     <SignedAmount value={round.currentPnl} className="text-label font-bold" />

@@ -4,6 +4,8 @@ import { mix } from '../ui/lucky/palette';
 import { CLEAR, ROCKET, TONE, Tone, chargeTone, damageTone } from './theme';
 
 const LAMP_MAX_HZ = 2.5;
+const TIME_UNITS_PER_SECOND = 3.0;
+const DEFAULT_FRAME_SECONDS = 1 / 60;
 const SOOT_STROKE_SHARE = 0.8;
 
 /** Surface points on the fuselage with outward normals, sampled off the bezier. */
@@ -94,8 +96,8 @@ export class RocketAvatar {
   private static readonly MAX = 6.0;
   private static readonly DENOM = Math.log1p(RocketAvatar.MAX / RocketAvatar.REF);
 
-  /** this.time advances 0.05/frame ~ 3.0/s, so sin(time * HZ * f) runs at f Hz. */
-  private static readonly HZ = (2 * Math.PI) / 3.0;
+  /** this.time advances TIME_UNITS_PER_SECOND per real second, so sin(time * HZ * f) runs at f Hz. */
+  private static readonly HZ = (2 * Math.PI) / TIME_UNITS_PER_SECOND;
 
   /** Tier colour ladder by magnitude; losses have their own colour. */
   private static readonly TIER_COLORS = ROCKET.tiers;
@@ -247,8 +249,12 @@ export class RocketAvatar {
     }
   }
 
-  public update(particles: ParticleSystem, reducedMotion: boolean = false) {
-    this.time += 0.05;
+  public update(
+    particles: ParticleSystem,
+    reducedMotion: boolean = false,
+    dtSeconds: number = DEFAULT_FRAME_SECONDS
+  ) {
+    this.time += dtSeconds * TIME_UNITS_PER_SECOND;
     // render() has no access to the flag, and the motion-reactive visuals
     // below it must honour it too (PRD §35).
     this.reduced = reducedMotion;

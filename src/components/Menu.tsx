@@ -37,7 +37,7 @@ const Row: React.FC<RowProps> = ({ label, badge, onClick, disabled, icon }) => (
     {icon}
     <span className="flex-1 text-label">{label}</span>
     {badge != null && badge > 0 && (
-      <Badge tone="count" label={`${badge} open`} className="h-7 min-w-7 px-2 text-micro font-extrabold">
+      <Badge tone="count" label={`${badge} open`} className="h-7 min-w-7 px-2 text-body leading-none font-extrabold">
         {badge}
       </Badge>
     )}

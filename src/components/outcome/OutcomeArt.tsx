@@ -1,5 +1,5 @@
 import React from 'react';
-import { ART, type ArtName } from '../../ui/lucky/assets';
+import { ART, type ArtName } from '../../ui/lucky';
 import { cn } from '../../ui/cn';
 
 export interface OutcomeArtProps {

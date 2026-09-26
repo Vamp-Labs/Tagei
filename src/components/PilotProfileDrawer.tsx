@@ -5,7 +5,6 @@ import { WalletState } from '../services/web3Service';
 import { soundEngine } from '../services/audioHaptics';
 import { useHandedness } from '../ui/useHandedness';
 import { STANDARD, useMotionPref } from '../ui/motion';
-import { cn } from '../ui/cn';
 import {
   ART,
   BalanceHeader,
@@ -186,7 +185,7 @@ export const PilotProfileDrawer: React.FC<PilotProfileDrawerProps> = ({
                   <StatTile value={plural(progression.streakDays ?? 0, 'day', 'days')} label="Streak" />
                   <StatTile
                     value={`${progression.dailyRoundsPlayed}/${progression.dailyRoundsGoal}`}
-                    label="Rounds today"
+                    label="Today"
                   />
                   <StatTile value={progression.level} label="Level" />
                 </div>
@@ -222,7 +221,7 @@ export const PilotProfileDrawer: React.FC<PilotProfileDrawerProps> = ({
                 href="https://testnet.bscscan.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={cn(buttonClass('ghost', 'md'), 'text-info')}
+                className={buttonClass('ghost', 'md')}
               >
                 Verified on BscScan
               </a>

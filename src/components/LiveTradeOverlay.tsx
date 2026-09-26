@@ -44,7 +44,6 @@ export const LiveTradeOverlay: React.FC<LiveTradeOverlayProps> = ({
   const [timeLeft, setTimeLeft] = useState<number>(round.durationSeconds);
   const [stage, setStage] = useState<HTMLElement | null>(null);
   const [pulseOnMount] = useState(() => round.currentPnl >= 0);
-  const isPnlPositive = round.currentPnl >= 0;
 
   const onTimeoutRef = useRef(onTimeout);
   onTimeoutRef.current = onTimeout;
@@ -108,7 +107,6 @@ export const LiveTradeOverlay: React.FC<LiveTradeOverlayProps> = ({
 
   // Aura intensity scales with position size — capped so a huge swing
   // doesn't overwhelm the panel, floored so a fresh 0.00 round isn't dark.
-  const auraIntensity = Math.min(1, Math.abs(round.currentPnl) / 15);
 
   // The flight HUD belongs at the top of the track, but the timer that drives
   // it lives here. A portal keeps one instance — and therefore one countdown —
@@ -159,8 +157,8 @@ export const LiveTradeOverlay: React.FC<LiveTradeOverlayProps> = ({
 
       <span role="timer" aria-label={autoResolveEnabled ? `Time left ${formatTimer(timeLeft)}` : 'No time limit'}>
         <Pill
-          className={cn('bg-panel font-extrabold', timerWarn ? 'text-loss' : 'text-ink')}
-          icon={<Clock aria-hidden="true" className={cn('w-3.5 h-3.5', timerWarn ? 'text-loss' : 'text-ink-muted')} />}
+          className={cn('bg-panel', timerWarn ? 'text-ink font-bold' : 'text-ink-soft font-semibold')}
+          icon={<Clock aria-hidden="true" className={cn('w-3.5 h-3.5', timerWarn ? 'text-ink' : 'text-ink-muted')} />}
         >
           {autoResolveEnabled ? formatTimer(timeLeft) : '∞'}
         </Pill>
@@ -175,21 +173,6 @@ export const LiveTradeOverlay: React.FC<LiveTradeOverlayProps> = ({
       <div className="w-full flex flex-col select-none pt-1 pb-3">
         <div className="flex items-center justify-between gap-3 mb-4">
           <div className="relative">
-            {/* Background aura — grows with position size, so a deep run
-                (either direction) reads at a glance, not just from the
-                digits. It only tracks the render-time value. */}
-            <div
-              aria-hidden="true"
-              className="absolute -inset-3 rounded-full pointer-events-none transition-[opacity,transform] duration-300"
-              style={{
-                background: `radial-gradient(circle, ${
-                  isPnlPositive ? ROLE.profit.css : ROLE.loss.css
-                } 0%, transparent 70%)`,
-                opacity: 0.06 + auraIntensity * 0.14,
-                transform: `scale(${0.85 + auraIntensity * 0.35})`,
-              }}
-            />
-
             <motion.div
               className="relative flex items-baseline gap-1.5 whitespace-nowrap tabular-nums"
               style={{ color: pnlColor, scale: scaleMV }}

@@ -62,7 +62,7 @@ export const LaunchCountdown: React.FC<LaunchCountdownProps> = ({
       {/* Shockwave expanding ring (PRD §15) */}
       <div className="relative flex items-center justify-center">
         {!reduced && (
-          <div className="absolute w-36 h-36 rounded-full border-2 border-lucky animate-ring-expand" />
+          <div className="absolute w-36 h-36 rounded-full border-2 border-control-ring animate-ring-expand" />
         )}
 
         <div
@@ -75,7 +75,7 @@ export const LaunchCountdown: React.FC<LaunchCountdownProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5 text-numeral tabular-nums text-ink">
-            <span className="text-info inline-flex">
+            <span className="text-ink-muted inline-flex">
               <Icon name="lock" size={18} />
             </span>
             <span>{formatPrice(entryPrice, { unit: 'USDT' })}</span>

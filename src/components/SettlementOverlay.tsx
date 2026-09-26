@@ -3,10 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { ExternalLink, Key, Radio, Zap } from 'lucide-react';
 import { STANDARD, MICRO, useMotionPref } from '../ui/motion';
 import { SettlementStep } from '../services/web3Service';
-import { Scrim } from '../ui/lucky/Scrim';
-import { Icon } from '../ui/lucky/Icon';
-import { SignedAmount } from '../ui/lucky/SignedAmount';
-import { formatHash } from '../ui/lucky/format';
+import { Scrim, Icon, SignedAmount, formatHash } from '../ui/lucky';
 import { cn } from '../ui/cn';
 import { GLYPH_STROKE } from './outcome/tokens';
 
@@ -148,7 +145,7 @@ export const SettlementOverlay: React.FC<SettlementOverlayProps> = ({ step, txHa
               <span className="text-ink-muted">Tx</span>
               <span className="tabular-nums font-semibold text-ink-secondary truncate">{formatHash(txHash)}</span>
             </span>
-            <span className="flex items-center gap-1.5 font-bold text-info shrink-0">
+            <span className="flex items-center gap-1.5 font-bold text-ink-secondary shrink-0">
               BscScan
               <ExternalLink size={16} strokeWidth={GLYPH_STROKE} aria-hidden="true" />
             </span>

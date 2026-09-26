@@ -20,6 +20,7 @@ interface Star {
   speed: number;
   twinkleSpeed: number;
   tint: string;
+  maxAlpha: number;
 }
 
 export interface MarkerLabels {
@@ -32,8 +33,14 @@ const TAG_PAD_X = 8;
 const TAG_RADIUS = 6;
 const ZONE_TRI = 5;
 const ZONE_LABEL_X = 20;
-export const PNL_TRACKER_LIFT = 34;
-const TRACKER_CLEARANCE = 26;
+const BACKGROUND_TIME_PER_SECOND = 0.96;
+const DEFAULT_FRAME_SECONDS = 1 / 60;
+const DEFAULT_BOTTOM_PAD_FRAC = 0.36;
+const TOP_PAD_FRAC = 0.14;
+const BOTTOM_INSET_EASE_PER_SECOND = 8;
+const HUD_STAR_BAND_START = 0.6;
+const HUD_STAR_BAND_FULL = 0.7;
+const HUD_STAR_MAX_ALPHA = 0.3;
 
 export class MarketTrackRenderer {
   private stars: Star[] = [];
@@ -45,8 +52,29 @@ export class MarketTrackRenderer {
   private readonly stopFallback = new TextMemo((v) => `STOP ${formatPrice(v)}`);
   private readonly lastPlayTag = new TextMemo((v) => `YOUR PLAY ${formatAmount(v)}`);
 
+  private bottomPadPx: number = -1;
+
   constructor() {
     this.initStars(140);
+  }
+
+  public setBottomInset(
+    minInsetPx: number,
+    height: number,
+    reducedMotion: boolean,
+    dtSeconds: number = DEFAULT_FRAME_SECONDS
+  ) {
+    const target = Math.max(height * DEFAULT_BOTTOM_PAD_FRAC, minInsetPx);
+    if (this.bottomPadPx < 0 || reducedMotion) {
+      this.bottomPadPx = target;
+      return;
+    }
+    const k = 1 - Math.exp(-dtSeconds * BOTTOM_INSET_EASE_PER_SECOND);
+    this.bottomPadPx += (target - this.bottomPadPx) * k;
+  }
+
+  private bottomPadFor(height: number): number {
+    return this.bottomPadPx < 0 ? height * DEFAULT_BOTTOM_PAD_FRAC : this.bottomPadPx;
   }
 
   private initStars(count: number) {
@@ -60,7 +88,14 @@ export class MarketTrackRenderer {
         speed: 0.00015 + Math.random() * 0.00045,
         twinkleSpeed: 0.02 + Math.random() * 0.06,
         tint: Math.random() < STAGE.starTintShare ? STAGE.starTint : STAGE.star,
+        maxAlpha: 1,
       });
+      const star = this.stars[i];
+      const band = Math.min(
+        1,
+        Math.max(0, (star.y - HUD_STAR_BAND_START) / (HUD_STAR_BAND_FULL - HUD_STAR_BAND_START))
+      );
+      star.maxAlpha = 1 - band * (1 - HUD_STAR_MAX_ALPHA);
     }
   }
 
@@ -77,9 +112,10 @@ export class MarketTrackRenderer {
     // 0..1, decaying — the win boom. Tints every layer below toward lucky
     // rather than drawing a shape on top, so the stage itself reads as
     // reacting instead of something being overlaid on an unchanged scene.
-    boom: number = 0
+    boom: number = 0,
+    dtSeconds: number = DEFAULT_FRAME_SECONDS
   ) {
-    this.time += 0.016;
+    this.time += dtSeconds * BACKGROUND_TIME_PER_SECOND;
     this.reduced = reducedMotion;
     const step = boomStep(boom);
 
@@ -103,7 +139,7 @@ export class MarketTrackRenderer {
       const twinkle = reducedMotion ? 1 : Math.sin(this.time * 60 * star.twinkleSpeed);
       const currentAlpha = Math.max(
         0.1,
-        Math.min(1, (star.alpha + twinkle * 0.25) * starAlphaMul)
+        Math.min(star.maxAlpha, (star.alpha + twinkle * 0.25) * starAlphaMul)
       );
 
       ctx.fillStyle = boom > 0.15 ? STAGE.star : star.tint;
@@ -176,8 +212,8 @@ export class MarketTrackRenderer {
     const paddedMax = maxPrice + span * 0.18;
     const paddedSpan = paddedMax - paddedMin;
 
-    const topPad = height * 0.14;
-    const bottomPad = height * 0.36; // Preserves space for floating cockpit HUD
+    const topPad = height * TOP_PAD_FRAC;
+    const bottomPad = this.bottomPadFor(height);
     const usableHeight = height - topPad - bottomPad;
     const usableWidth = width * 0.78; // Leave right 22% for the rocket head & target planet
 
@@ -216,8 +252,8 @@ export class MarketTrackRenderer {
     const paddedMax = maxPrice + span * 0.18;
     const paddedSpan = paddedMax - paddedMin;
 
-    const topPad = height * 0.14;
-    const bottomPad = height * 0.36; // Preserves space for floating cockpit HUD
+    const topPad = height * TOP_PAD_FRAC;
+    const bottomPad = this.bottomPadFor(height);
     const usableHeight = height - topPad - bottomPad;
 
     const normalizedY = 1 - (price - paddedMin) / paddedSpan;
@@ -342,7 +378,8 @@ export class MarketTrackRenderer {
     rocketY: number,
     direction: PositionDirection = 'LONG',
     currentPnl: number = 0,
-    labels?: MarkerLabels
+    labels?: MarkerLabels,
+    showDelta: boolean = true
   ) {
     ctx.save();
     ctx.font = LABEL_FONT;
@@ -417,7 +454,7 @@ export class MarketTrackRenderer {
 
     // 3. Live vertical delta bracket
     const deltaHeight = Math.abs(rocketY - entryY);
-    if (deltaHeight > 4) {
+    if (showDelta && deltaHeight > 4) {
       const isProfit = currentPnl >= 0;
       const deltaColor = isProfit ? MARKER.profit : MARKER.loss;
 
@@ -440,22 +477,20 @@ export class MarketTrackRenderer {
       ctx.stroke();
 
       const badgeY = (entryY + rocketY) / 2;
-      if (Math.abs(badgeY - (rocketY - PNL_TRACKER_LIFT)) >= TRACKER_CLEARANCE) {
-        const delta = this.deltaTag.update(ctx, currentPnl, LABEL_FONT);
-        const badgeW = delta.width + TAG_PAD_X * 2;
-        const badgeX = Math.min(width - badgeW - 8, rocketX + 12);
+      const delta = this.deltaTag.update(ctx, currentPnl, LABEL_FONT);
+      const badgeW = delta.width + TAG_PAD_X * 2;
+      const badgeX = Math.min(width - badgeW - 8, rocketX + 12);
 
-        ctx.fillStyle = MARKER.tagBg;
-        ctx.strokeStyle = deltaColor;
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.roundRect(badgeX, badgeY - TAG_HEIGHT / 2, badgeW, TAG_HEIGHT, TAG_RADIUS);
-        ctx.fill();
-        ctx.stroke();
+      ctx.fillStyle = MARKER.tagBg;
+      ctx.strokeStyle = deltaColor;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(badgeX, badgeY - TAG_HEIGHT / 2, badgeW, TAG_HEIGHT, TAG_RADIUS);
+      ctx.fill();
+      ctx.stroke();
 
-        ctx.fillStyle = deltaColor;
-        ctx.fillText(delta.text, badgeX + TAG_PAD_X, badgeY + 4.5);
-      }
+      ctx.fillStyle = deltaColor;
+      ctx.fillText(delta.text, badgeX + TAG_PAD_X, badgeY + 4.5);
       ctx.restore();
     }
 

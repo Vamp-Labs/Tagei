@@ -86,7 +86,7 @@ Every row reuses the timing already in the code; only colour, glow and property 
   - Mist, sparks, embers, lamps and scorch use `amber`, `gold-deep` and `ink-muted`.
   - The engine goes quiet, then drifts.
   - Per-frame random colours become a stable amber.
-- **Info:** the entry line, the entry ring, `ringExpand` and the projected SHORT path.
+- **Info:** the projected SHORT path only. The entry line and ring are neutral (`CANVAS.entry` = `ink-soft`, `CANVAS.entryRing` = `control-ring`), so blue only means SHORT.
 - **Banned:** hot, red, magenta and cyan.
 - **Strobe:** the hazard lamp is capped at 2.5 Hz or less. Today it reaches 3.5 Hz; clamp its frequency ceiling and keep its envelope.
 - **Reduced motion:**
@@ -130,7 +130,7 @@ Option A (calm-plus) is the build target. The product owner has not confirmed it
   - In components, read it with `useMotionPref()` from `src/ui/motion.ts`, never `useReducedMotion()` directly.
   - App.tsx resolves the setting (in-app toggle OR OS preference) once. It drives `<MotionConfig reducedMotion="always|never">`, the canvas `reducedMotion` prop, and `<html data-motion="reduce|full">`.
   - Both the `prefers-reduced-motion` media query and `data-motion="reduce"` apply the global CSS kill in `src/index.css`.
-- **Springs and eases.** Import `MICRO`, `STANDARD`, `HERO` and `EASE_OUT` from `src/ui/motion.ts`. `POP_EASE` is the literal `[0.34, 1.56, 0.64, 1]` already used in `HoldButton.tsx`; hoist it into `motion.ts` only through an E0a integration request.
+- **Springs and eases.** Import `MICRO`, `STANDARD`, `HERO` and `EASE_OUT` from `src/ui/motion.ts`. `POP_EASE` and `POP` (320 ms) are exported from `src/ui/motion.ts`; import them instead of redeclaring the literal.
 - **The hot pulse.** Add the `lg-pulse-hot` class once (the legacy `pulse-glow-cta` is a bridge alias that the grep gate flags), on the enable edge, and only when the screen is not reduced and not after a loss. The keyframe animates `box-shadow` in the hot tone only, never `transform`, so it no longer fights Motion's inline transforms.
 - **The live dot.** Use `<Pill dot="pulse">`. Its `::after` ripple is `transform` + `opacity` only. Under the CSS kill it ends in its final keyframe, so the dot reads solid.
 - **Confetti.** Call `useConfetti().burst('win' | 'levelUp' | 'connect' | 'mission')` and never import `canvas-confetti` directly.

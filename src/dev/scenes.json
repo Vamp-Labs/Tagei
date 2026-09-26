@@ -22,6 +22,8 @@
   { "id": "11", "name": "outcome-win", "owners": ["E3", "E6"], "settleMs": 1200 },
   { "id": "11b", "name": "outcome-loss", "owners": ["E3", "E6"], "settleMs": 1200 },
   { "id": "12", "name": "settlement", "owners": ["E3"], "settleMs": 1200 },
+  { "id": "12b", "name": "settlement-practice", "owners": ["E3"], "settleMs": 1200 },
+  { "id": "12c", "name": "settlement-failed", "owners": ["E3"], "settleMs": 1200 },
   { "id": "13", "name": "result-win", "owners": ["E3"], "settleMs": 1600 },
   { "id": "13b", "name": "result-loss", "owners": ["E3"], "settleMs": 1600 },
   { "id": "13c", "name": "result-cashout", "owners": ["E3"], "settleMs": 1600 },

@@ -71,5 +71,6 @@ export interface SceneReport {
 declare global {
   interface Window {
     __scene?: SceneReport;
+    __settleStep?: (step: SettlementStep) => void;
   }
 }

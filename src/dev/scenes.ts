@@ -6,10 +6,12 @@ import type {
   GameStage,
   LastRoundSummary,
   PositionDirection,
+  RoundMode,
   TradeResult,
   UserProgression,
 } from '../types/game';
 import type { AssetSymbol } from '../types/market';
+import type { SettlementStep } from '../services/web3Service';
 import { mulberry32, nextFrame, sceneErrors, seedRandom, sleep } from './runtime';
 import type { DevSceneContext, DevSceneParams, DevSheet, SceneEntry } from './types';
 
@@ -20,7 +22,8 @@ const DEFAULT_ASSET: AssetSymbol = 'BNB';
 const DEFAULT_SETTLE_MS = 1200;
 const FONT_TIMEOUT_MS = 5000;
 const PROMPT_TIMEOUT_MS = 2000;
-const DEFAULT_SETTLEMENT_STEP = 'submitted';
+const DEFAULT_SETTLEMENT_STEP: SettlementStep = 'submitted';
+const HASHED_STEPS: ReadonlySet<SettlementStep> = new Set(['submitted', 'confirmed', 'failed']);
 const HASH_SALT = 0x5eed;
 const HASH_LENGTH = 64;
 const XP_WIN = 50;
@@ -210,6 +213,22 @@ const result =
     ctx.setIsMissionToastOpen(extras.missionToast ?? false);
   };
 
+const settlement =
+  (defaultStep: SettlementStep, mode: RoundMode = 'live'): Recipe =>
+  (kit) => {
+    const round = flight(kit, 'SETTLING', 'LONG', TARGET_PCT);
+    const step = kit.params.step ?? defaultStep;
+    const ctx = kit.ctx();
+    const apply = (next: SettlementStep) => {
+      const current = kit.ctx();
+      current.setSettlementStep(next);
+      current.setSettlementTxHash(mode === 'live' && HASHED_STEPS.has(next) ? kit.hash : '');
+    };
+    if (mode === 'practice') ctx.setActiveRound({ ...round, mode });
+    apply(step);
+    window.__settleStep = apply;
+  };
+
 async function findPixPrompt(): Promise<HTMLElement | null> {
   const deadline = performance.now() + PROMPT_TIMEOUT_MS;
   while (performance.now() < deadline) {
@@ -264,13 +283,9 @@ const RECIPES: Record<string, Recipe> = {
   'position-details': live('LONG', favourForPnl(1.3), 'position-details'),
   'outcome-win': outcome('TARGET_HIT'),
   'outcome-loss': outcome('LOSS_HIT'),
-  settlement: (kit) => {
-    flight(kit, 'SETTLING', 'LONG', TARGET_PCT);
-    const step = kit.params.step ?? DEFAULT_SETTLEMENT_STEP;
-    const ctx = kit.ctx();
-    ctx.setSettlementStep(step);
-    ctx.setSettlementTxHash(step === 'submitted' || step === 'confirmed' ? kit.hash : '');
-  },
+  settlement: settlement(DEFAULT_SETTLEMENT_STEP),
+  'settlement-practice': settlement(DEFAULT_SETTLEMENT_STEP, 'practice'),
+  'settlement-failed': settlement('failed'),
   'result-win': result('win', TARGET_PCT),
   'result-loss': result('loss', STOP_PCT),
   'result-cashout': result('cashed_out', favourForPnl(1.25)),

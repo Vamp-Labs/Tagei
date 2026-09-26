@@ -1,7 +1,107 @@
+import { guardrailViolations, PIX_DISCLAIMER } from '@bnbplay/shared/pix';
+import type { DebriefDTO, MarketInsightDTO } from '@bnbplay/shared/dto';
 import { AssetSymbol, MarketInsight } from '../types/market';
 import { TradeResult } from '../types/game';
+import { apiClient } from '../api/runtime';
+import type { ApiClient } from '../api/client';
+import type { PixChatMessage } from '../api/schemas';
+
+export type PixSource = 'llm' | 'template';
+
+export interface PixDebrief {
+  headline: string;
+  analysis: string;
+  keyFactors: { label: string; value: string; positive?: boolean }[];
+  coachingTip: string;
+}
+
+export type PixInsightResult = MarketInsight & { source: PixSource };
+export type PixDebriefResult = PixDebrief & { source: PixSource };
+
+export type PixApi = Pick<ApiClient, 'isEnabled' | 'pixInsight' | 'pixDebrief' | 'pixChat'>;
+
+export { PIX_DISCLAIMER };
+
+const isSafe = (...texts: string[]): boolean => texts.every((text) => guardrailViolations(text).length === 0);
+
+const insightIsSafe = (insight: MarketInsightDTO): boolean =>
+  isSafe(insight.headline, insight.summary, insight.learningTip, ...insight.factors.map((factor) => `${factor.label} ${factor.value}`));
+
+const debriefIsSafe = (debrief: DebriefDTO): boolean =>
+  isSafe(debrief.headline, debrief.analysis, debrief.coachingTip, ...debrief.keyFactors.map((factor) => `${factor.label} ${factor.value}`));
 
 export class PixAIService {
+  public static async fetchInsight(
+    asset: AssetSymbol,
+    change24h: number,
+    options: { tier?: number; api?: PixApi } = {}
+  ): Promise<PixInsightResult> {
+    const api = options.api ?? apiClient;
+    if (api.isEnabled()) {
+      try {
+        const insight = await api.pixInsight(asset, options.tier);
+        if (insightIsSafe(insight)) {
+          return {
+            headline: insight.headline,
+            summary: insight.summary,
+            sentiment: insight.sentiment,
+            factors: insight.factors,
+            learningTip: insight.learningTip,
+            source: insight.source,
+          };
+        }
+      } catch {
+        return { ...PixAIService.getPreTradeInsight(asset, change24h), source: 'template' };
+      }
+    }
+    return { ...PixAIService.getPreTradeInsight(asset, change24h), source: 'template' };
+  }
+
+  public static async fetchDebrief(result: TradeResult, options: { api?: PixApi } = {}): Promise<PixDebriefResult> {
+    const api = options.api ?? apiClient;
+    if (result.mode === 'live' && result.roundId && api.isEnabled()) {
+      try {
+        const debrief = await api.pixDebrief(result.roundId);
+        if (debriefIsSafe(debrief)) return { ...debrief, source: debrief.source };
+      } catch {
+        return { ...PixAIService.getPostTradeDebrief(result), source: 'template' };
+      }
+    }
+    return { ...PixAIService.getPostTradeDebrief(result), source: 'template' };
+  }
+
+  public static async chat(
+    messages: readonly PixChatMessage[],
+    context: { asset: AssetSymbol; change24h: number },
+    onDelta: (text: string) => void,
+    options: { api?: PixApi; signal?: AbortSignal } = {}
+  ): Promise<{ text: string; source: PixSource }> {
+    const api = options.api ?? apiClient;
+    const fallback = () => {
+      const insight = PixAIService.getPreTradeInsight(context.asset, context.change24h);
+      const text = `${insight.headline}. ${insight.summary}`;
+      onDelta(text);
+      return { text, source: 'template' as const };
+    };
+    if (!api.isEnabled()) return fallback();
+    let text = '';
+    try {
+      for await (const event of api.pixChat(messages, options.signal)) {
+        if (event.type === 'pix.delta') {
+          text += event.text;
+          onDelta(event.text);
+        } else if (event.type === 'pix.error') {
+          return text ? { text, source: 'llm' } : fallback();
+        } else {
+          break;
+        }
+      }
+    } catch {
+      return text ? { text, source: 'llm' } : fallback();
+    }
+    return text ? { text, source: 'llm' } : fallback();
+  }
+
   /**
    * Generates real-time pre-trade market context without false guarantees
    * PRD Section 11

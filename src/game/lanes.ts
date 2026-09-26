@@ -143,7 +143,7 @@ export function practiceTiers(asset: AssetSymbol): TierDTO[] {
 }
 
 export function describeLane(lane: Pick<LaneParams, 'targetPpm' | 'stopPpm' | 'multiplierBps'>): string {
-  const pct = (ppm: number) => `${(ppm / 10_000).toFixed(ppm < 1_000 ? 3 : 2).replace(/0+$/, '').replace(/\.$/, '')}%`;
+  const pct = (ppm: number) => `${(ppm / 10_000).toFixed(4).replace(/0+$/, '').replace(/\.$/, '')}%`;
   const multiple = (lane.multiplierBps / 10_000).toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
   return `Target +${pct(lane.targetPpm)} · Stop −${pct(lane.stopPpm)} · ${multiple}x`;
 }

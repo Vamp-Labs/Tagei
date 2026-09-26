@@ -48,3 +48,4 @@ research/data
 # Personal agent instruction symlinks (point outside the repo)
 AGENTS.md
 GEMINI.md
+.env*

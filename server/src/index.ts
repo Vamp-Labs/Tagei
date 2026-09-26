@@ -35,13 +35,38 @@ async function waitForLeadership(sql: ReturnType<typeof createDb>['sql']): Promi
 async function main() {
   const config: Config = loadConfig();
   const bus = new Bus();
-  const checks: ReadinessCheck[] = [];
 
-  const db = config.DATABASE_URL ? createDb(config.DATABASE_URL, config.DB_POOL_MAX) : undefined;
+  // Bind the HTTP port immediately, on a liveness-only app (/healthz has no dependencies).
+  // Railway overlaps the old and new deployment during a rollout; the new one only replaces
+  // the old one once ITS healthcheck passes. If that healthcheck — or binding the port at
+  // all — waited on leadership, a single-replica service could never redeploy: the new
+  // instance can't become leader until the old one exits, and the old one is only asked to
+  // exit once the new one is healthy. `/healthz` is therefore what Railway's healthcheckPath
+  // must point at; `/readyz` stays a full operational-readiness report for humans and
+  // `demo:check`, not a rollout gate.
+  let currentApp = createApp({ version: VERSION, corsOrigins: config.CORS_ORIGINS, checks: [] });
+  const server = serve({ fetch: (req) => currentApp.fetch(req), port: config.PORT }, (info) =>
+    console.log(`listening on :${info.port} (booting)`),
+  );
+
   let leadership: Leadership | undefined;
+  let stopChain: (() => Promise<void>) | undefined;
+  let stopA4: (() => void) | undefined;
+  const db = config.DATABASE_URL ? createDb(config.DATABASE_URL, config.DB_POOL_MAX) : undefined;
+
+  registerShutdown(async () => {
+    server.close();
+    stopA4?.();
+    await stopChain?.();
+    await leadership?.release();
+    await db?.sql.end({ timeout: 5 });
+  });
+
+  const checks: ReadinessCheck[] = [];
   if (db) {
     checks.push({ name: 'db', check: async () => ((await db.sql`select 1`), { ok: true }) });
-    // Railway overlaps deployments: singleton workers (and migrations) run only on the leader.
+    // Singleton workers (and migrations) run only on the leader; this can block for as long
+    // as the previous deployment's instance is still alive and holding the lock.
     leadership = await waitForLeadership(db.sql);
     await migrate(db.db, { migrationsFolder: MIGRATIONS });
     console.log('leader acquired, migrations applied');
@@ -50,18 +75,14 @@ async function main() {
   if (config.ROLE === 'archiver') {
     if (!db) throw new Error('ROLE=archiver needs DATABASE_URL');
     const hub = await startArchiver({ config, db: db.db });
-    const app = createApp({ version: VERSION, corsOrigins: [], checks });
-    const server = serve({ fetch: app.fetch, port: config.PORT });
-    registerShutdown(async () => {
-      server.close();
-      await hub.stop();
-      await leadership?.release();
-      await db.sql.end({ timeout: 5 });
-    });
+    stopChain = () => hub.stop();
+    currentApp = createApp({ version: VERSION, corsOrigins: [], checks });
+    console.log('archiver ready');
     return;
   }
 
   const chain = await startChainServices({ config, bus, db: db?.db });
+  stopChain = chain.stop;
   const roundBook = chain.indexer?.roundBook ?? emptyRoundBook;
 
   const a4 = createA4({
@@ -74,8 +95,9 @@ async function main() {
     publicClient: chain.chain.read,
     isLeader: () => leadership?.isLeader() ?? true,
   });
+  stopA4 = a4.stop;
 
-  const app = createApp({
+  currentApp = createApp({
     version: VERSION,
     corsOrigins: config.CORS_ORIGINS,
     checks: [...checks, ...chain.checks, ...a4.checks],
@@ -83,17 +105,7 @@ async function main() {
   });
   a4.start();
 
-  const server = serve({ fetch: app.fetch, port: config.PORT }, (info) =>
-    console.log(`server listening on :${info.port} (arena ${config.ARENA_ADDRESS ?? 'not deployed'})`),
-  );
-
-  registerShutdown(async () => {
-    server.close();
-    a4.stop();
-    await chain.stop();
-    await leadership?.release();
-    await db?.sql.end({ timeout: 5 });
-  });
+  console.log(`server ready (arena ${config.ARENA_ADDRESS ?? 'not deployed'})`);
 }
 
 function registerShutdown(stop: () => Promise<void>) {

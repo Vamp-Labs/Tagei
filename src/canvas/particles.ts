@@ -1,3 +1,5 @@
+import { CLEAR, PARTICLE, TEXT_HALO, font } from './theme';
+
 export interface Particle {
   x: number;
   y: number;
@@ -49,7 +51,7 @@ export class ParticleSystem {
     x: number,
     y: number,
     angle: number,
-    color: string = '#00E89A',
+    color: string = PARTICLE.thruster,
     intensity: number = 1.0
   ) {
     const count = Math.floor(2.5 * intensity);
@@ -83,7 +85,7 @@ export class ParticleSystem {
         vx: Math.cos(sparkAngle) * (6 + Math.random() * 5) * intensity,
         vy: Math.sin(sparkAngle) * (6 + Math.random() * 5) * intensity,
         size: 1.5,
-        color: '#FFFFFF',
+        color: PARTICLE.spark,
         alpha: 1.0,
         life: 0,
         maxLife: 10 + Math.random() * 8,
@@ -93,15 +95,15 @@ export class ParticleSystem {
     }
   }
 
-  public emitTargetHitBurst(x: number, y: number, rewardText: string = '+$18.40') {
-    // 1. Multi-Ring Chromatic Shockwaves (Gold, Emerald, Cyan)
+  public emitTargetHitBurst(x: number, y: number, rewardText?: string) {
+    // 1. Multi-ring lucky shockwaves
     this.shockwaves.push(
       {
         x,
         y,
         radius: 6,
         maxRadius: 150,
-        color: '#F0B90B',
+        color: PARTICLE.ringWin,
         alpha: 1.0,
         lineWidth: 4.5,
       },
@@ -110,7 +112,7 @@ export class ParticleSystem {
         y,
         radius: 3,
         maxRadius: 105,
-        color: '#00E89A',
+        color: PARTICLE.ringWinInner,
         alpha: 0.9,
         lineWidth: 3,
       },
@@ -119,7 +121,7 @@ export class ParticleSystem {
         y,
         radius: 1,
         maxRadius: 65,
-        color: '#FFD21E',
+        color: PARTICLE.ringWin,
         alpha: 0.8,
         lineWidth: 2,
       }
@@ -136,7 +138,7 @@ export class ParticleSystem {
         vx: Math.cos(launchAngle) * launchSpeed,
         vy: Math.sin(launchAngle) * launchSpeed,
         size: 4 + Math.random() * 3.5,
-        color: '#F0B90B',
+        color: Math.random() > 0.3 ? PARTICLE.coin : PARTICLE.coinDeep,
         alpha: 1.0,
         life: 0,
         maxLife: 45 + Math.random() * 25,
@@ -152,7 +154,7 @@ export class ParticleSystem {
     for (let i = 0; i < starCount; i++) {
       const angle = (Math.PI * 2 * i) / starCount + (Math.random() - 0.5) * 0.25;
       const speed = 2.5 + Math.random() * 7;
-      const isGold = Math.random() > 0.4;
+      const isLucky = Math.random() > 0.4;
 
       this.particles.push({
         x,
@@ -160,7 +162,7 @@ export class ParticleSystem {
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
         size: 3.5 + Math.random() * 4,
-        color: isGold ? '#F0B90B' : '#00E89A',
+        color: isLucky ? PARTICLE.gem : PARTICLE.gemGold,
         alpha: 1.0,
         life: 0,
         maxLife: 35 + Math.random() * 25,
@@ -170,35 +172,37 @@ export class ParticleSystem {
       });
     }
 
-    // 4. Floating Floating Text Milestones
-    this.particles.push({
-      x,
-      y: y - 10,
-      vx: 0.4,
-      vy: -1.6,
-      size: 16,
-      color: '#00E89A',
-      alpha: 1.0,
-      life: 0,
-      maxLife: 50,
-      shape: 'text',
-      text: rewardText,
-      fontSize: 16,
-    });
+    // 4. Floating text milestones
+    if (rewardText) {
+      this.particles.push({
+        x,
+        y: y - 10,
+        vx: 0.4,
+        vy: -1.6,
+        size: 16,
+        color: PARTICLE.rewardText,
+        alpha: 1.0,
+        life: 0,
+        maxLife: 50,
+        shape: 'text',
+        text: rewardText,
+        fontSize: 16,
+      });
+    }
 
     this.particles.push({
       x: x + 15,
       y: y + 8,
       vx: -0.3,
       vy: -1.1,
-      size: 12,
-      color: '#F0B90B',
+      size: 13,
+      color: PARTICLE.headlineText,
       alpha: 0.9,
       life: 0,
       maxLife: 42,
       shape: 'text',
-      text: 'TARGET HIT!',
-      fontSize: 11,
+      text: 'TARGET HIT',
+      fontSize: 13,
     });
   }
 
@@ -215,7 +219,7 @@ export class ParticleSystem {
       y,
       radius: 4,
       maxRadius: 85,
-      color: '#00E89A',
+      color: PARTICLE.ringWin,
       alpha: 0.85,
       lineWidth: 3,
     });
@@ -230,7 +234,7 @@ export class ParticleSystem {
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
         size: 2.5 + Math.random() * 3,
-        color: Math.random() > 0.5 ? '#00E89A' : '#F0B90B',
+        color: Math.random() > 0.5 ? PARTICLE.gem : PARTICLE.gemGold,
         alpha: 1.0,
         life: 0,
         maxLife: 24 + Math.random() * 16,
@@ -250,7 +254,7 @@ export class ParticleSystem {
         vx: Math.cos(launchAngle) * launchSpeed,
         vy: Math.sin(launchAngle) * launchSpeed,
         size: 3 + Math.random() * 2.5,
-        color: '#F0B90B',
+        color: PARTICLE.coin,
         alpha: 1.0,
         life: 0,
         maxLife: 30 + Math.random() * 16,
@@ -268,7 +272,7 @@ export class ParticleSystem {
       y,
       radius: 4,
       maxRadius: 65,
-      color: '#FF3B6B',
+      color: PARTICLE.mist,
       alpha: 0.8,
       lineWidth: 2.5,
     });
@@ -282,7 +286,7 @@ export class ParticleSystem {
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
         size: 2.5 + Math.random() * 3.5,
-        color: '#FF3B6B',
+        color: Math.random() > 0.5 ? PARTICLE.mist : PARTICLE.mistSoft,
         alpha: 0.7,
         life: 0,
         maxLife: 32 + Math.random() * 18,
@@ -309,7 +313,7 @@ export class ParticleSystem {
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed + (Math.random() - 0.5) * 1.5,
         size: isCoin ? 3.5 + Math.random() * 2.5 : 2.5 + Math.random() * 3,
-        color: '#F0B90B',
+        color: isCoin ? PARTICLE.coin : PARTICLE.coinShine,
         alpha: 0.95,
         life: 0,
         maxLife: 24 + Math.random() * 16,
@@ -335,7 +339,7 @@ export class ParticleSystem {
         vx: Math.cos(angle) * speed,
         vy: (Math.random() - 0.5) * 1.5 - 0.5, // slightly drifting upward
         size: 4.5 + Math.random() * 4,
-        color: Math.random() > 0.4 ? '#192348' : '#334155',
+        color: Math.random() > 0.4 ? PARTICLE.smoke : PARTICLE.smokeDark,
         alpha: 0.8,
         life: 0,
         maxLife: 28 + Math.random() * 18,
@@ -343,7 +347,7 @@ export class ParticleSystem {
       });
     }
 
-    // Fiery red/orange friction sparks
+    // Amber friction sparks
     const sparkCount = Math.floor(1.5 * severity);
     for (let i = 0; i < sparkCount; i++) {
       const angle = Math.PI + (Math.random() - 0.5) * 0.9;
@@ -354,7 +358,7 @@ export class ParticleSystem {
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
         size: 1.8 + Math.random() * 1.5,
-        color: Math.random() > 0.4 ? '#FF3B6B' : '#FF5500',
+        color: Math.random() > 0.4 ? PARTICLE.ember : PARTICLE.emberDeep,
         alpha: 1.0,
         life: 0,
         maxLife: 14 + Math.random() * 8,
@@ -375,7 +379,7 @@ export class ParticleSystem {
     y: number,
     angle: number,
     power: number,
-    color: string = '#00E89A'
+    color: string = PARTICLE.thruster
   ) {
     const count = Math.floor(5 + power * 11);
     for (let i = 0; i < count; i++) {
@@ -388,7 +392,7 @@ export class ParticleSystem {
         vx: Math.cos(a) * speed,
         vy: Math.sin(a) * speed + 1.4 * power,
         size: (2 + Math.random() * 3.4) * (0.7 + power * 0.6),
-        color: Math.random() > 0.45 ? color : '#FFFFFF',
+        color: Math.random() > 0.45 ? color : PARTICLE.spark,
         alpha: 1,
         life: 0,
         maxLife: 14 + Math.random() * 14,
@@ -406,7 +410,7 @@ export class ParticleSystem {
         vx: Math.cos(a) * (9 + Math.random() * 7),
         vy: Math.sin(a) * (9 + Math.random() * 7),
         size: 1.6,
-        color: '#FFFFFF',
+        color: PARTICLE.spark,
         alpha: 1,
         life: 0,
         maxLife: 9 + Math.random() * 7,
@@ -425,7 +429,7 @@ export class ParticleSystem {
     x: number,
     y: number,
     power: number,
-    palette: [string, string] = ['#FF3B6B', '#FF7A00']
+    palette: [string, string] = [PARTICLE.ember, PARTICLE.emberDeep]
   ) {
     const count = Math.floor(3 + power * 6);
     for (let i = 0; i < count; i++) {
@@ -456,7 +460,7 @@ export class ParticleSystem {
         vx: -(1 + Math.random() * 1.8),
         vy: -(0.3 + Math.random() * 0.8),
         size: 4 + Math.random() * 3.5,
-        color: '#334155',
+        color: PARTICLE.smokeDark,
         alpha: 0.55,
         life: 0,
         maxLife: 26 + Math.random() * 16,
@@ -475,7 +479,7 @@ export class ParticleSystem {
     angle: number,
     side: 1 | -1,
     power: number,
-    color: string = '#FFD21E'
+    color: string = PARTICLE.thruster
   ) {
     const perp = angle + (Math.PI / 2) * side;
     const back = angle + Math.PI;
@@ -544,7 +548,7 @@ export class ParticleSystem {
         vx,
         vy,
         size: 0.9 + Math.random() * 0.9,
-        color: Math.random() > 0.35 ? '#FFC24A' : '#FF5500',
+        color: Math.random() > 0.35 ? PARTICLE.ember : PARTICLE.emberDeep,
         alpha: 1,
         life: 0,
         // Short, so they die before drifting far enough to read as exhaust.
@@ -561,7 +565,7 @@ export class ParticleSystem {
       vx: Math.cos(back) * 1.2 + nx * 1.6,
       vy: Math.sin(back) * 1.2 + ny * 1.6,
       size: 1.4,
-      color: '#FF7A00',
+      color: PARTICLE.emberDeep,
       alpha: 0.9,
       life: 0,
       maxLife: 20 + Math.random() * 12,
@@ -610,7 +614,7 @@ export class ParticleSystem {
         length: 40 + Math.random() * 120,
         speed: 16 + Math.random() * 22,
         alpha: 0.85,
-        color: '#FFD21E',
+        color: PARTICLE.warp,
       });
     }
   }
@@ -721,13 +725,13 @@ export class ParticleSystem {
         const scaleY = Math.max(0.12, Math.abs(Math.sin(rot)));
         ctx.save();
         ctx.translate(p.x, p.y);
-        ctx.fillStyle = '#F0B90B';
+        ctx.fillStyle = p.color;
         ctx.beginPath();
         ctx.ellipse(0, 0, p.size, p.size * scaleY, 0, 0, Math.PI * 2);
         ctx.fill();
 
         // Shiny inner coin rim
-        ctx.strokeStyle = '#FFFFFF';
+        ctx.strokeStyle = PARTICLE.coinShine;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.ellipse(0, 0, p.size * 0.75, p.size * 0.75 * scaleY, 0, 0, Math.PI * 2);
@@ -746,12 +750,14 @@ export class ParticleSystem {
       } else if (p.shape === 'text' && p.text) {
         // Floating Arcade Milestone Text
         ctx.save();
-        ctx.font = `900 ${p.fontSize || 14}px monospace`;
+        ctx.font = font(p.fontSize || 14);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
+        ctx.lineWidth = 3;
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = TEXT_HALO;
+        ctx.strokeText(p.text, p.x, p.y);
         ctx.fillStyle = p.color;
-        ctx.shadowColor = p.color;
-        ctx.shadowBlur = 8;
         ctx.fillText(p.text, p.x, p.y);
         ctx.restore();
       } else if (p.shape === 'smoke') {
@@ -759,7 +765,7 @@ export class ParticleSystem {
         ctx.save();
         const smokeGrad = ctx.createRadialGradient(p.x, p.y, p.size * 0.2, p.x, p.y, p.size);
         smokeGrad.addColorStop(0, p.color);
-        smokeGrad.addColorStop(1, 'transparent');
+        smokeGrad.addColorStop(1, CLEAR);
         ctx.fillStyle = smokeGrad;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);

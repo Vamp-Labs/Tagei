@@ -554,7 +554,7 @@ contract BnbPlayArena is IBnbPlayArena, AccessControl, Pausable, ReentrancyGuard
         }
     }
 
-    function _evaluate(Round memory r) private view returns (Evaluation memory) {
+    function _evaluate(Round memory r) internal view returns (Evaluation memory) {
         ICheckpointOracle oracle = _oracles[r.oracleIdx];
         ICheckpointOracle.Checkpoint[] memory cps = oracle.getRange(r.pairId, r.entrySec, r.endSec);
 

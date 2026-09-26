@@ -49,6 +49,8 @@ contract MockCheckpointOracle is ICheckpointOracle {
     mapping(uint32 pairId => mapping(uint40 sec => Checkpoint)) private _cp;
     mapping(uint32 pairId => uint40) public lastRecordedSec;
     mapping(uint32 pairId => uint40) public sourceLatestSec;
+    /// @dev Per-second override for differential tests (the vectors mark arbitrary seconds permanently missing).
+    mapping(uint32 pairId => mapping(uint40 sec => bool)) public forcedMissing;
 
     error Broken();
 
@@ -76,6 +78,10 @@ contract MockCheckpointOracle is ICheckpointOracle {
     function set(uint32 pairId, uint40 sec, uint128 price18) public {
         _cp[pairId][sec] = Checkpoint({price18: price18, tsMs: uint64(sec) * 1000 + 163, flags: FLAG_RECORDED});
         if (sec > lastRecordedSec[pairId]) lastRecordedSec[pairId] = sec;
+    }
+
+    function setForcedMissing(uint32 pairId, uint40 sec, bool missing) external {
+        forcedMissing[pairId][sec] = missing;
     }
 
     function setDisputed(uint32 pairId, uint40 sec) external {
@@ -122,6 +128,7 @@ contract MockCheckpointOracle is ICheckpointOracle {
     function isPermanentlyMissing(uint32 pairId, uint40 sec) external view returns (bool) {
         if (broken) revert Broken();
         if (_cp[pairId][sec].flags & FLAG_RECORDED != 0) return false;
+        if (forcedMissing[pairId][sec]) return true;
         if (late) return false;
         return latestKnownSec(pairId) > sec;
     }

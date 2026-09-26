@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { motion } from 'motion/react';
-import { Send } from 'lucide-react';
 import { Sheet } from '../ui/Sheet';
 import { MICRO, useMotionPref } from '../ui/motion';
 import { cn } from '../ui/cn';
-import { SheetHeader } from '../ui/lucky';
+import { Icon, SheetHeader } from '../ui/lucky';
 import { PixAvatar } from './pix/PixAvatar';
-import { PixAIService } from '../services/pixAI';
+import { PIX_DISCLAIMER, PixAIService } from '../services/pixAI';
+import type { PixChatMessage } from '../api/schemas';
 import { AssetSymbol } from '../types/market';
 
 interface PixChatProps {
@@ -15,40 +15,67 @@ interface PixChatProps {
   onClose: () => void;
 }
 
-const QUICK_PROMPTS = [
-  "What's the trend for BNB?",
+const quickPrompts = (asset: AssetSymbol) => [
+  `What's the trend for ${asset}?`,
   'Is it a good time to go long?',
   'Explain this chart',
   'Show key support levels',
 ];
 
 interface Message {
+  id: number;
   from: 'pix' | 'user';
-  title?: string;
   text: string;
+  streaming?: boolean;
 }
 
 const EMPTY_AVATAR_SIZE = 72;
 const CHIP_PRESS_SCALE = 0.97;
+const MAX_PROMPT_LENGTH = 500;
 
-/**
- * docs/UI_UX_SPEC.md §10. No real chat backend exists in this app, so this
- * stays a scripted demo of the screen's shape: quick prompts fire canned
- * replies drawn from pixAI.ts's getPreTradeInsight — a real, previously
- * orphaned service (confirmed dead code earlier this session), not fake
- * copy invented for this screen.
- */
+const toHistory = (messages: readonly Message[]): PixChatMessage[] =>
+  messages
+    .filter((message) => message.text.trim().length > 0)
+    .map((message) => ({ role: message.from === 'user' ? 'user' : 'assistant', content: message.text }));
+
 export const PixChat: React.FC<PixChatProps> = ({ currentAsset, change24h, onClose }) => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [draft, setDraft] = useState('');
+  const [busy, setBusy] = useState(false);
   const reduced = useMotionPref();
+  const abortRef = useRef<AbortController | null>(null);
+  const nextIdRef = useRef(0);
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
 
-  const ask = (prompt: string) => {
-    const insight = PixAIService.getPreTradeInsight(currentAsset, change24h);
-    setMessages((prev) => [
-      ...prev,
-      { from: 'user', text: prompt },
-      { from: 'pix', title: insight.headline, text: insight.summary },
-    ]);
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  const ask = async (prompt: string) => {
+    const text = prompt.trim().slice(0, MAX_PROMPT_LENGTH);
+    if (!text || busy) return;
+    const user: Message = { id: nextIdRef.current++, from: 'user', text };
+    const replyId = nextIdRef.current++;
+    const history = toHistory([...messagesRef.current, user]);
+    setMessages((prev) => [...prev, user, { id: replyId, from: 'pix', text: '', streaming: true }]);
+    setDraft('');
+    setBusy(true);
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const append = (delta: string) =>
+      setMessages((prev) => prev.map((message) => (message.id === replyId ? { ...message, text: message.text + delta } : message)));
+    try {
+      await PixAIService.chat(history, { asset: currentAsset, change24h }, append, { signal: controller.signal });
+    } finally {
+      if (!controller.signal.aborted) {
+        setMessages((prev) => prev.map((message) => (message.id === replyId ? { ...message, streaming: false } : message)));
+        setBusy(false);
+      }
+    }
+  };
+
+  const onSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    void ask(draft);
   };
 
   return (
@@ -71,21 +98,19 @@ export const PixChat: React.FC<PixChatProps> = ({ currentAsset, change24h, onClo
               <p className="text-caption text-ink-soft">Your AI co-pilot for smarter trades.</p>
             </div>
           ) : (
-            messages.map((m, i) => (
+            messages.map((m) => (
               <motion.div
-                key={i}
+                key={m.id}
                 initial={reduced ? { opacity: 0 } : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={MICRO}
+                aria-busy={m.streaming || undefined}
                 className={cn(
-                  'max-w-[85%] rounded-md px-4 py-3 text-caption',
-                  m.from === 'user'
-                    ? 'self-end bg-lucky-tint text-ink font-semibold'
-                    : 'self-start bg-panel border border-line text-ink-soft',
+                  'max-w-[85%] rounded-md px-4 py-3 text-caption whitespace-pre-wrap',
+                  m.from === 'user' ? 'self-end bg-lucky-tint text-ink font-semibold' : 'self-start bg-panel border border-line text-ink-soft',
                 )}
               >
-                {m.title && <p className="font-semibold text-ink">{m.title}</p>}
-                <p>{m.text}</p>
+                {m.text || (m.streaming ? <span className="text-ink-muted">thinking…</span> : null)}
               </motion.div>
             ))
           )}
@@ -93,32 +118,42 @@ export const PixChat: React.FC<PixChatProps> = ({ currentAsset, change24h, onClo
 
         <div className="flex flex-col gap-3 px-6 pt-4 pb-2">
           <div className="flex flex-wrap gap-2">
-            {QUICK_PROMPTS.map((prompt, i) => (
+            {quickPrompts(currentAsset).map((prompt, i) => (
               <motion.button
                 key={prompt}
                 type="button"
-                onClick={() => ask(prompt)}
+                onClick={() => void ask(prompt)}
+                disabled={busy}
                 whileTap={reduced ? undefined : { scale: CHIP_PRESS_SCALE }}
                 transition={MICRO}
                 data-scene-target={i === 0 ? 'pix-prompt' : undefined}
-                className="h-11 rounded-md bg-control px-4 text-caption font-semibold text-ink-secondary transition-colors hover:bg-control-hover hover:text-ink cursor-pointer"
+                className="h-11 rounded-md bg-control px-4 text-caption font-semibold text-ink-secondary transition-colors hover:bg-control-hover hover:text-ink cursor-pointer disabled:cursor-default disabled:opacity-60"
               >
                 {prompt}
               </motion.button>
             ))}
           </div>
 
-          <label className="flex h-12 items-center gap-3 rounded-md bg-well px-4 border border-line cursor-not-allowed">
+          <form onSubmit={onSubmit} className="flex h-12 items-center gap-2 rounded-md bg-well pl-4 pr-1 border border-line">
             <input
               type="text"
-              disabled
-              aria-disabled="true"
+              value={draft}
+              onChange={(event) => setDraft(event.target.value)}
+              maxLength={MAX_PROMPT_LENGTH}
               aria-label="Message PIX"
               placeholder="Ask me anything…"
-              className="min-w-0 flex-1 bg-transparent text-caption text-ink placeholder:text-ink-muted outline-none cursor-not-allowed"
+              className="min-w-0 flex-1 bg-transparent text-caption text-ink placeholder:text-ink-muted outline-none"
             />
-            <Send className="size-5 shrink-0 text-ink-muted" aria-hidden="true" />
-          </label>
+            <button
+              type="submit"
+              disabled={busy || draft.trim().length === 0}
+              aria-label="Send message"
+              className="grid size-11 shrink-0 place-items-center rounded-sm text-ink-secondary disabled:text-ink-muted cursor-pointer disabled:cursor-default"
+            >
+              <Icon name="send" size={20} />
+            </button>
+          </form>
+          <p className="text-micro text-ink-muted">{PIX_DISCLAIMER}</p>
         </div>
       </div>
     </Sheet>

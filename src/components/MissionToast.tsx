@@ -10,6 +10,7 @@ interface MissionToastProps {
   roundsPlayed: number;
   roundsGoal: number;
   xpBonus?: number;
+  title?: string;
   onDismiss: () => void;
 }
 
@@ -23,7 +24,8 @@ export const MissionToast: React.FC<MissionToastProps> = ({
   isOpen,
   roundsPlayed,
   roundsGoal,
-  xpBonus = 50,
+  xpBonus = 0,
+  title = 'Mission Complete',
   onDismiss,
 }) => {
   const reduced = useMotionPref();
@@ -74,10 +76,15 @@ export const MissionToast: React.FC<MissionToastProps> = ({
             <OutcomeArt name="reward-gift" height={GIFT_PX} />
             <div className="min-w-0 flex-1">
               <p className="text-micro font-bold uppercase tracking-[0.08em] text-lucky">DAILY MISSION</p>
-              <p className="text-label font-bold text-ink">Mission Complete</p>
+              <p className="text-label font-bold text-ink">{title}</p>
               <p className="text-micro tabular-nums text-ink-muted">
-                {roundsPlayed}/{roundsGoal} rounds ·{' '}
-                <span className="font-bold text-lucky">{formatXp(xpBonus, { sign: 'always' })} bonus</span>
+                {roundsPlayed}/{roundsGoal} complete
+                {xpBonus > 0 && (
+                  <>
+                    {' · '}
+                    <span className="font-bold text-lucky">{formatXp(xpBonus, { sign: 'always' })} bonus</span>
+                  </>
+                )}
               </p>
             </div>
             <motion.span

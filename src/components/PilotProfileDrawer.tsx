@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { bscTestnet, explorerAddressUrl } from '@bnbplay/shared/chain';
 import { AnimatePresence, motion } from 'motion/react';
 import { UserProgression, UserSettings } from '../types/game';
 import { WalletState } from '../services/web3Service';
 import { soundEngine } from '../services/audioHaptics';
 import { useHandedness } from '../ui/useHandedness';
+import { useDialogFocus } from '../ui/useDialogFocus';
 import { STANDARD, useMotionPref } from '../ui/motion';
 import {
   ART,
@@ -16,13 +18,16 @@ import {
   StatTile,
   Toggle,
   buttonClass,
+  formatHash,
   formatXp,
 } from '../ui/lucky';
 import { AvatarDisc } from './account/AvatarDisc';
 import { BadgeGrid, type ProfileBadge } from './account/BadgeGrid';
 import { ChainCard } from './account/ChainCard';
 import { ChoiceRow } from './account/ChoiceRow';
-import { HAND_ITEMS, THUMB_SIDE_COPY, settingPatch, type SettingToggle } from './account/settings';
+import { GuestKeyCard } from './account/GuestKeyCard';
+import { pilotTitle } from './game/progression';
+import { HAND_ITEMS, THUMB_SIDE_COPY, practiceToggleCopy, settingPatch, type SettingToggle } from './account/settings';
 
 interface PilotProfileDrawerProps {
   isOpen: boolean;
@@ -32,47 +37,18 @@ interface PilotProfileDrawerProps {
   onUpdateSettings: (newSettings: Partial<UserSettings>) => void;
   onConnectWallet: () => void;
   onClose: () => void;
+  badges: readonly ProfileBadge[];
+  practiceMode: boolean;
+  onPracticeModeChange: (practice: boolean) => void;
+  modeLocked: boolean;
+  liveAvailable: boolean;
 }
-
-const PILOT_ID = '#BNB-8849';
-
-const badges: readonly ProfileBadge[] = [
-  {
-    id: 'first-orbit',
-    name: 'First Orbit',
-    description: 'Completed first live market flight',
-    art: 'reward-gift',
-    earned: true,
-  },
-  {
-    id: 'hyperdrive-pilot',
-    name: 'Hyperdrive Pilot',
-    description: 'Achieved +2.0x multiplier on live trade',
-    art: 'reward-crown',
-    earned: true,
-  },
-  {
-    id: 'iron-discipline',
-    name: 'Iron Discipline',
-    description: 'Preserved capital via disciplined cash out',
-    art: 'reward-clover',
-    earned: true,
-  },
-  {
-    id: 'whale-hunter',
-    name: 'Whale Hunter',
-    description: 'Reach 5-round win streak',
-    art: 'locked-crown',
-    earned: false,
-    progress: { current: 3, goal: 5 },
-  },
-];
 
 const controlToggles: readonly SettingToggle[] = [
   { key: 'soundEnabled', label: 'Sound effects' },
   { key: 'hapticsEnabled', label: 'Haptic vibration' },
-  { key: 'useLiveBinance', label: 'Binance live stream' },
 ];
+
 
 const titleCase = (word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
 
@@ -91,8 +67,14 @@ export const PilotProfileDrawer: React.FC<PilotProfileDrawerProps> = ({
   onUpdateSettings,
   onConnectWallet,
   onClose,
+  badges,
+  practiceMode,
+  onPracticeModeChange,
+  modeLocked,
+  liveAvailable,
 }) => {
   const [hand, setHand] = useHandedness();
+  const dialogRef = useRef<HTMLDivElement>(null);
   const reduced = useMotionPref();
   // The drawer enters from — and is flung back toward — the thumb's own edge.
   const edgeSign = hand === 'left' ? -1 : 1;
@@ -104,7 +86,11 @@ export const PilotProfileDrawer: React.FC<PilotProfileDrawerProps> = ({
     onClose();
   };
 
-  const { brand, word } = splitTitle(progression.title);
+  useDialogFocus(dialogRef, isOpen, handleClose);
+
+  const { brand, word } = splitTitle(pilotTitle(progression));
+  const pilotId = wallet.isConnected && wallet.address ? formatHash(wallet.address) : 'not connected';
+  const explorerHref = wallet.isConnected && wallet.address ? explorerAddressUrl(wallet.address) : bscTestnet.explorer;
   const nextLevel = progression.level + 1;
   const xpToNext = Math.max(0, progression.nextLevelXp - progression.currentXp);
 
@@ -123,9 +109,11 @@ export const PilotProfileDrawer: React.FC<PilotProfileDrawerProps> = ({
           />
 
           <motion.div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-label="Pilot Profile"
+            tabIndex={-1}
             initial={offscreen}
             animate={onscreen}
             exit={offscreen}
@@ -153,7 +141,7 @@ export const PilotProfileDrawer: React.FC<PilotProfileDrawerProps> = ({
             <SheetHeader
               eyebrow={<AvatarDisc className="mx-auto mb-2" />}
               title="Pilot Profile"
-              subtitle={<span className="tabular-nums">id {PILOT_ID}</span>}
+              subtitle={<span className="tabular-nums">id {pilotId}</span>}
               action={
                 <Button variant="icon" size="md" icon="close" aria-label="Close profile" onClick={handleClose} />
               }
@@ -195,6 +183,8 @@ export const PilotProfileDrawer: React.FC<PilotProfileDrawerProps> = ({
 
               <BadgeGrid badges={badges} />
 
+              {wallet.isConnected && wallet.kind === 'guest' && <GuestKeyCard />}
+
               <Panel title="Controls" className="flex flex-col gap-2 p-3 pt-4">
                 <ChoiceRow
                   label={THUMB_SIDE_COPY.label}
@@ -213,17 +203,19 @@ export const PilotProfileDrawer: React.FC<PilotProfileDrawerProps> = ({
                     description={toggle.description}
                   />
                 ))}
+                <Toggle
+                  checked={practiceMode}
+                  onChange={onPracticeModeChange}
+                  disabled={modeLocked || (!liveAvailable && practiceMode)}
+                  label="Practice mode"
+                  description={practiceToggleCopy(modeLocked, liveAvailable)}
+                />
               </Panel>
             </div>
 
             <div className="flex justify-center border-t border-line px-6 py-2">
-              <a
-                href="https://testnet.bscscan.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={buttonClass('ghost', 'md')}
-              >
-                Verified on BscScan
+              <a href={explorerHref} target="_blank" rel="noopener noreferrer" className={buttonClass('ghost', 'md')}>
+                View on BscScan testnet
               </a>
             </div>
           </motion.div>

@@ -3,29 +3,20 @@ import { AnimatePresence, motion } from 'motion/react';
 import { GameStage, PositionDirection } from '../types/game';
 import { MICRO, useMotionPref } from '../ui/motion';
 import { PixAvatar } from './pix/PixAvatar';
-import { pixMoodFor } from './pix/mood';
+import { NEAR_STOP_FX_PNL, pixMoodFor } from './pix/mood';
 
 interface PixCompanionProps {
   gameStage: GameStage;
   targetProgressPct: number;
-  currentPnl: number;
+  fxPnl: number;
   selectedDirection: PositionDirection | null;
   onTap: () => void;
 }
 
-/**
- * docs/DESIGN_TOKENS.md's PIX bubble rule: "max 1-2 lines, disappears
- * automatically, use only for meaningful events, avoid constant chatter."
- * The old version had a line for every GameStage with a default fallback,
- * so something showed at all times the app was mounted. This version only
- * speaks on discrete events — direction picked, target approaching,
- * resolved — and auto-dismisses, using the same setTimeout pattern already
- * proven in MissionToast.tsx.
- */
 export const PixCompanion: React.FC<PixCompanionProps> = ({
   gameStage,
   targetProgressPct,
-  currentPnl,
+  fxPnl,
   selectedDirection,
   onTap,
 }) => {
@@ -48,14 +39,14 @@ export const PixCompanion: React.FC<PixCompanionProps> = ({
       say('SHORT set. Watching the downside.', 'dir-short');
     } else if (gameStage === 'LIVE_TRADE' && targetProgressPct >= 90) {
       say('Almost there.', 'near-target', 2000);
-    } else if (gameStage === 'LIVE_TRADE' && currentPnl <= -6) {
+    } else if (gameStage === 'LIVE_TRADE' && fxPnl <= NEAR_STOP_FX_PNL) {
       say('Approaching stop loss.', 'near-stop', 2400);
     } else if (gameStage === 'TARGET_HIT') {
       say('Nice landing.', 'target-hit', 2400);
     } else if (gameStage === 'LOSS_HIT') {
       say('Stop honored. Good risk control.', 'loss-hit', 2400);
     } else if (gameStage === 'RESULT') {
-      say(currentPnl >= 0 ? 'Nice landing.' : "Let's review the tape.", 'result', 2800);
+      say(fxPnl >= 0 ? 'Nice landing.' : "Let's review the tape.", 'result', 2800);
     }
 
     if (gameStage === 'HOME' || gameStage === 'PRE_TRADE') {
@@ -63,7 +54,7 @@ export const PixCompanion: React.FC<PixCompanionProps> = ({
       // the direction event, so re-entering PRE_TRADE can speak again.
       if (gameStage === 'HOME') lastEventRef.current = null;
     }
-  }, [gameStage, targetProgressPct, currentPnl, selectedDirection]);
+  }, [gameStage, targetProgressPct, fxPnl, selectedDirection]);
 
   useEffect(() => () => {
     if (dismissTimerRef.current) window.clearTimeout(dismissTimerRef.current);
@@ -80,7 +71,7 @@ export const PixCompanion: React.FC<PixCompanionProps> = ({
         aria-label="Open PIX assistant"
         className="pointer-events-auto flex size-12 items-center justify-center rounded-full cursor-pointer"
       >
-        <PixAvatar mood={pixMoodFor(currentPnl)} />
+        <PixAvatar mood={pixMoodFor(fxPnl)} />
       </button>
 
       <div role="status" aria-live="polite" className="absolute top-0 left-[calc(50%+32px)] right-6 flex min-h-12 items-center">

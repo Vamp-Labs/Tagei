@@ -48,7 +48,7 @@ export const HoldButton: React.FC<HoldButtonProps> = ({
   children,
   holdingLabel,
   disabled = false,
-  holdMs = 400,
+  holdMs = 700,
   className,
   ringClassName,
   ariaLabel,
@@ -160,7 +160,7 @@ export const HoldButton: React.FC<HoldButtonProps> = ({
 
   const handlePointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
     if (disabled) return;
-    // Holding a mouse button for 400ms is not a desktop idiom — and the
+    // Holding a mouse button is not a desktop idiom — and the
     // hold exists to guard a thumb stretching for the arc, which a cursor
     // never does. Fine pointers commit immediately.
     if (event.pointerType === 'mouse') {

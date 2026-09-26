@@ -30,37 +30,43 @@ export const useResultCounters = ({ resultId, pnl, startXp, targetXp, reduced, o
   useEffect(() => {
     if (reduced) {
       setPnlDisplay(pnl);
+      return;
+    }
+    const start = performance.now();
+    let lastTick = Number.NEGATIVE_INFINITY;
+    let frame = 0;
+    const step = (now: number) => {
+      const progress = progressAt(now - start, PNL_ROLL_MS);
+      setPnlDisplay(progress < 1 ? pnl * easeOutCubic(progress) : pnl);
+      if (progress < TICK_CUTOFF && now - lastTick > COUNT_TICK_MS) {
+        soundEngine.playCountTick();
+        lastTick = now;
+      }
+      if (progress < 1) frame = requestAnimationFrame(step);
+    };
+    setPnlDisplay(0);
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [resultId, pnl, reduced]);
+
+  useEffect(() => {
+    if (reduced || startXp === targetXp) {
       setXpDisplay(targetXp);
       onCompleteRef.current();
       return;
     }
-
     const start = performance.now();
-    let lastTick = Number.NEGATIVE_INFINITY;
     let frame = 0;
-
     const step = (now: number) => {
-      const elapsed = now - start;
-      const pnlProgress = progressAt(elapsed, PNL_ROLL_MS);
-      const xpProgress = progressAt(elapsed, XP_COUNT_MS);
-
-      setPnlDisplay(pnlProgress < 1 ? pnl * easeOutCubic(pnlProgress) : pnl);
-      setXpDisplay(xpProgress < 1 ? Math.floor(startXp + (targetXp - startXp) * xpProgress) : targetXp);
-
-      if (pnlProgress < TICK_CUTOFF && now - lastTick > COUNT_TICK_MS) {
-        soundEngine.playCountTick();
-        lastTick = now;
-      }
-
-      if (xpProgress < 1) frame = requestAnimationFrame(step);
+      const progress = progressAt(now - start, XP_COUNT_MS);
+      setXpDisplay(progress < 1 ? Math.floor(startXp + (targetXp - startXp) * progress) : targetXp);
+      if (progress < 1) frame = requestAnimationFrame(step);
       else onCompleteRef.current();
     };
-
-    setPnlDisplay(0);
     setXpDisplay(startXp);
     frame = requestAnimationFrame(step);
     return () => cancelAnimationFrame(frame);
-  }, [resultId, pnl, startXp, targetXp, reduced]);
+  }, [resultId, startXp, targetXp, reduced]);
 
   return { pnlDisplay, xpDisplay };
 };

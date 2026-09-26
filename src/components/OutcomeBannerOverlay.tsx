@@ -8,8 +8,8 @@ import { POP, REDUCED_FADE } from './outcome/tokens';
 
 interface OutcomeBannerOverlayProps {
   gameStage: GameStage;
-  pnl: number;
-  multiplier: number;
+  pnl: number | null;
+  multiplier: number | null;
 }
 
 const WIN_STAGGER_SECONDS = 0.07;
@@ -39,7 +39,7 @@ export const OutcomeBannerOverlay: React.FC<OutcomeBannerOverlayProps> = ({
   multiplier,
 }) => {
   const reduced = useMotionPref();
-  const isVisible = gameStage === 'TARGET_HIT' || gameStage === 'LOSS_HIT';
+  const isVisible = (gameStage === 'TARGET_HIT' || gameStage === 'LOSS_HIT') && pnl !== null;
   const isWin = gameStage === 'TARGET_HIT';
   const childVariants = reduced ? undefined : winChildVariants;
 
@@ -87,11 +87,13 @@ export const OutcomeBannerOverlay: React.FC<OutcomeBannerOverlayProps> = ({
                   TARGET HIT
                 </motion.p>
                 <motion.p variants={childVariants} className="mt-1">
-                  <SignedAmount value={pnl} className="text-display" />
+                  <SignedAmount value={pnl ?? 0} className="text-display" />
                 </motion.p>
-                <motion.p variants={childVariants} className="mt-1 text-caption tabular-nums text-ink-soft">
-                  {formatMultiplier(multiplier)} payout
-                </motion.p>
+                {multiplier !== null && (
+                  <motion.p variants={childVariants} className="mt-1 text-caption tabular-nums text-ink-soft">
+                    {formatMultiplier(multiplier)} payout
+                  </motion.p>
+                )}
               </div>
             </motion.div>
           ) : (
@@ -104,7 +106,7 @@ export const OutcomeBannerOverlay: React.FC<OutcomeBannerOverlayProps> = ({
             >
               <p className="text-label font-bold uppercase tracking-[0.08em] text-ink-soft">ROUND COMPLETE</p>
               <p className="mt-1">
-                <SignedAmount value={pnl} className="text-display" />
+                <SignedAmount value={pnl ?? 0} className="text-display" />
               </p>
               <p className="mt-1 text-caption text-ink-muted">Stop loss reached as planned.</p>
             </motion.div>

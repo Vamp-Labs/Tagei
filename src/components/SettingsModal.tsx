@@ -1,25 +1,23 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { UserSettings } from '../types/game';
 import { useHandedness } from '../ui/useHandedness';
+import { useDialogFocus } from '../ui/useDialogFocus';
 import { cardVariants, scrimVariants, STANDARD } from '../ui/motion';
-import { Button, Panel, Scrim, SheetHeader, Toggle, type SegmentedTabsItem } from '../ui/lucky';
+import { Button, Panel, Scrim, SheetHeader, Toggle } from '../ui/lucky';
 import { ChoiceRow } from './account/ChoiceRow';
-import { HAND_ITEMS, THUMB_SIDE_COPY, settingPatch, type SettingToggle } from './account/settings';
+import { HAND_ITEMS, MODE_ITEMS, THUMB_SIDE_COPY, practiceToggleCopy, settingPatch, type SettingToggle } from './account/settings';
 
 interface SettingsModalProps {
   isOpen: boolean;
   settings: UserSettings;
   onUpdateSettings: (newSettings: Partial<UserSettings>) => void;
   onClose: () => void;
+  practiceMode: boolean;
+  onPracticeModeChange: (practice: boolean) => void;
+  modeLocked: boolean;
+  liveAvailable: boolean;
 }
-
-type FeedMode = 'sandbox' | 'live';
-
-const FEED_ITEMS: readonly SegmentedTabsItem<FeedMode>[] = [
-  { value: 'sandbox', label: 'Sandbox' },
-  { value: 'live', label: 'Live' },
-];
 
 const settingsToggles: readonly SettingToggle[] = [
   { key: 'reducedMotion', label: 'Reduced motion', description: 'Subdues pitch and turns off parallax' },
@@ -32,8 +30,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   settings,
   onUpdateSettings,
   onClose,
+  practiceMode,
+  onPracticeModeChange,
+  modeLocked,
+  liveAvailable,
 }) => {
   const [hand, setHand] = useHandedness();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(dialogRef, isOpen, onClose);
+  const modeFixed = modeLocked || !liveAvailable;
 
   return (
     <AnimatePresence>
@@ -54,9 +59,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           }}
         >
           <motion.div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-label="Settings"
+            tabIndex={-1}
             variants={cardVariants}
             initial="hidden"
             animate="visible"
@@ -100,12 +107,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 />
               ))}
               <ChoiceRow
-                label="Market feed"
-                description={settings.useLiveBinance ? 'Binance live WebSocket' : 'High-volatility sandbox'}
-                ariaLabel="Market feed mode"
-                items={FEED_ITEMS}
-                value={settings.useLiveBinance ? 'live' : 'sandbox'}
-                onChange={(mode) => onUpdateSettings({ useLiveBinance: mode === 'live' })}
+                label="Mode"
+                description={
+                  modeFixed
+                    ? practiceToggleCopy(modeLocked, liveAvailable)
+                    : practiceMode
+                      ? 'Mock market, not on-chain, earns no XP'
+                      : 'BNB Chain testnet, Supra oracle prices'
+                }
+                ariaLabel="Play mode"
+                items={modeFixed ? MODE_ITEMS.filter((item) => item.value === (practiceMode ? 'practice' : 'live')) : MODE_ITEMS}
+                value={practiceMode ? 'practice' : 'live'}
+                onChange={(mode) => onPracticeModeChange(mode === 'practice')}
               />
             </Panel>
 

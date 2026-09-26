@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import type { PanInfo } from 'motion/react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import type { ConfigDTO } from '@bnbplay/shared/dto';
 import { MarketTrackCanvas } from './canvas/MarketTrackCanvas';
 import { Header } from './components/Header';
 import { HomeHeroOverlay } from './components/HomeHeroOverlay';
 import { PreTradePanel } from './components/PreTradePanel';
 import { LiveTradeOverlay } from './components/LiveTradeOverlay';
+import { LaunchCountdown } from './components/LaunchCountdown';
 import { SettlementOverlay } from './components/SettlementOverlay';
 import { ResultPanel } from './components/ResultPanel';
 import { SettingsModal } from './components/SettingsModal';
@@ -13,23 +16,44 @@ import { PixCompanion } from './components/PixCompanion';
 import { OutcomeBannerOverlay } from './components/OutcomeBannerOverlay';
 import { SimulationBar } from './components/SimulationBar';
 import { MissionToast } from './components/MissionToast';
+import { NoticeToast } from './components/NoticeToast';
 import { PilotProfileDrawer } from './components/PilotProfileDrawer';
 import { ActivePositionBanner } from './components/ActivePositionBanner';
 import { AssetSelector } from './components/AssetSelector';
+import { ConnectSheet } from './components/ConnectSheet';
 import { Menu } from './components/Menu';
 import { PixChat } from './components/PixChat';
 import { PositionDetails } from './components/PositionDetails';
+import { useLiveRound } from './components/game/useLiveRound';
+import { usePracticeRound, type PracticeLaunch } from './components/game/usePracticeRound';
+import { liveTierOptions, pickTier, practiceTierOptions, clampStake } from './components/game/tiers';
+import {
+  EMPTY_PROGRESSION,
+  badgeProgressFromProfile,
+  badgeViews,
+  mergeUnlocked,
+  missionNotice,
+  progressionFromEvent,
+  progressionFromProfile,
+  type BadgeProgress,
+  type MissionNotice,
+} from './components/game/progression';
+import { TIME_UP_COPY, roundEndMs } from './components/game/roundDisplay';
 import { Sheet } from './ui/Sheet';
 import { usePrefersReducedMotion } from './ui/motion';
 import { ConfettiLayer } from './ui/lucky/Confetti';
+import { formatHash } from './ui/lucky/format';
 
+import { apiClient, isBackendAvailable } from './api/runtime';
+import { toApiError } from './api/errors';
+import { fxPnlForRound } from './game/fx';
 import { marketFeed } from './services/marketFeed';
-import { SettlementEngine, DEFAULT_CONFIG } from './services/settlementEngine';
+import { roundService, type ProgressionPayload } from './services/roundService';
 import { web3Service, WalletState, SettlementStep } from './services/web3Service';
 import { soundEngine } from './services/audioHaptics';
 import { useDevScene } from './dev/useDevScene';
 
-import { AssetSymbol, PriceTick, SUPPORTED_ASSETS } from './types/market';
+import { AssetSymbol, MarketFeedStatus, PriceTick, SUPPORTED_ASSETS } from './types/market';
 import {
   GameStage,
   PositionDirection,
@@ -40,374 +64,316 @@ import {
   UserSettings,
 } from './types/game';
 type ActiveSheet = 'none' | 'menu' | 'asset-selector' | 'pix-chat' | 'position-details';
+
+const DEFAULT_STAKE = 10;
+const IDLE_STAGES: ReadonlySet<GameStage> = new Set<GameStage>(['HOME', 'PRE_TRADE']);
+const TRACK_SWIPE_STAGES: ReadonlySet<GameStage> = IDLE_STAGES;
+const RESOLVING_STAGES: ReadonlySet<GameStage> = new Set<GameStage>(['TARGET_HIT', 'LOSS_HIT', 'SETTLING']);
+const HUM_KEEP_STAGES: ReadonlySet<GameStage> = new Set<GameStage>(['LAUNCHING', 'LIVE_TRADE', 'TARGET_HIT']);
+
+const wallNow = () => Date.now();
+const serverNow = () => roundService.serverNow();
+
+const exitAtClientMs = (result: TradeResult): number =>
+  result.decisionSec !== undefined ? result.decisionSec * 1000 - (roundService.serverNow() - Date.now()) : result.timestamp;
+
 export const App: React.FC = () => {
-  // State Machine
-  const [stage, setStage] = useState<GameStage>('HOME');
+  const [appStage, setAppStage] = useState<GameStage>('HOME');
   const [currentAsset, setCurrentAsset] = useState<AssetSymbol>('BNB');
   const [latestTick, setLatestTick] = useState<PriceTick | null>(null);
+  const [feedStatus, setFeedStatus] = useState<MarketFeedStatus | null>(null);
 
-  // Pre-Trade Controls
   const [selectedDirection, setSelectedDirection] = useState<PositionDirection | null>(null);
+  const [stake, setStake] = useState<number>(DEFAULT_STAKE);
+  const [tierChoice, setTierChoice] = useState<number>(0);
 
-  // Active Trade State
   const [activeRound, setActiveRound] = useState<ActiveTradeRound | null>(null);
   const [targetProgressPct, setTargetProgressPct] = useState<number>(0);
   const [autoResolveEnabled, setAutoResolveEnabled] = useState<boolean>(true);
-  // Bumped on every Hold to Cash Out commit — a one-shot signal into the
-  // canvas for its own smaller payoff beat, distinct from TARGET_HIT's.
   const [cashOutSignal, setCashOutSignal] = useState<number>(0);
-  // Whether the round finalized in finalizeRound actually crossed a level
-  // threshold — computed there (where before/after are both in scope) and
-  // read by ResultPanel, since `progression` itself only carries the
-  // already-updated post-round state.
   const [justLeveledUp, setJustLeveledUp] = useState<boolean>(false);
 
-  // Settlement & Results
   const [settlementStep, setSettlementStep] = useState<SettlementStep>('idle');
   const [settlementTxHash, setSettlementTxHash] = useState<string>('');
   const [lastResult, setLastResult] = useState<TradeResult | null>(null);
   const [lastRoundSummary, setLastRoundSummary] = useState<LastRoundSummary | null>(null);
 
-  // Wallet State
   const [wallet, setWallet] = useState<WalletState>(() => web3Service.getState());
+  const [progression, setProgression] = useState<UserProgression>(EMPTY_PROGRESSION);
+  const [badgeProgress, setBadgeProgress] = useState<BadgeProgress[]>([]);
 
-  // User Progression (PRD §29 & §30)
-  const [progression, setProgression] = useState<UserProgression>({
-    level: 7,
-    title: 'MOMENTUM HUNTER',
-    currentXp: 720,
-    nextLevelXp: 770,
-    dailyRoundsPlayed: 2,
-    dailyRoundsGoal: 3,
-    missionCompleted: false,
-    streakDays: 3,
-  });
-
-  // Settings & Profile Drawers
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+  const [isConnectOpen, setIsConnectOpen] = useState<boolean>(false);
   const [isMissionToastOpen, setIsMissionToastOpen] = useState<boolean>(false);
-  const [settings, setSettings] = useState<UserSettings>({
+  const [mission, setMission] = useState<MissionNotice | null>(null);
+  const [practiceNotice, setPracticeNotice] = useState<{ id: number; title: string; body: string } | null>(null);
+  const [settings, setSettings] = useState<UserSettings>(() => ({
     reducedMotion: false,
     soundEnabled: false,
     hapticsEnabled: true,
     useLiveBinance: false,
-  });
+    practiceMode: !isBackendAvailable(),
+  }));
   const osReduced = usePrefersReducedMotion();
   const reduced = settings.reducedMotion || osReduced;
   useEffect(() => {
     document.documentElement.dataset.motion = reduced ? 'reduce' : 'full';
   }, [reduced]);
 
-  // Warp streak callback for asset switching
+  const [activeSheet, setActiveSheet] = useState<ActiveSheet>('none');
   const warpTriggerRef = useRef<(() => void) | null>(null);
+  const missionIdRef = useRef(0);
+  const noticeIdRef = useRef(0);
 
-  // Subscribe to Market Data
-  useEffect(() => {
-    marketFeed.setAsset(currentAsset, settings.useLiveBinance);
-    const unsub = marketFeed.subscribe((tick) => {
-      setLatestTick(tick);
-    });
-    return () => unsub();
-  }, [currentAsset, settings.useLiveBinance]);
-
-  // Subscribe to Web3 wallet changes
-  useEffect(() => {
-    const unsub = web3Service.subscribe((w) => setWallet(w));
-    return () => unsub();
+  const handleConnectWallet = useCallback(async () => {
+    await web3Service.connectWallet(true).catch(() => undefined);
   }, []);
 
-  // Sync settings with audio/haptics engine
+  const handlePlayNow = useCallback(() => {
+    setAppStage('PRE_TRADE');
+  }, []);
+
+  const devScene = useDevScene({
+    setStage: setAppStage,
+    setCurrentAsset,
+    setSelectedDirection,
+    setActiveRound,
+    setTargetProgressPct,
+    setJustLeveledUp,
+    setSettlementStep,
+    setSettlementTxHash,
+    setLastResult,
+    setLastRoundSummary,
+    setProgression,
+    setIsSettingsOpen,
+    setIsProfileOpen,
+    setIsMissionToastOpen,
+    setSettings,
+    setActiveSheet,
+    handleConnectWallet,
+    handlePlayNow,
+  });
+
+  const liveAvailable = isBackendAvailable() && !devScene.active;
+  const practice = !liveAvailable || (settings.practiceMode ?? !liveAvailable);
+
+  const queryClient = useQueryClient();
+  const handleProgression = useCallback(
+    (event: ProgressionPayload) => {
+      setProgression(progressionFromEvent(event));
+      setBadgeProgress((prev) => mergeUnlocked(prev, event.badgesUnlocked));
+      const notice = missionNotice(event, ++missionIdRef.current);
+      if (notice) {
+        setMission(notice);
+        setIsMissionToastOpen(true);
+      }
+      void queryClient.invalidateQueries({ queryKey: ['profile'] });
+    },
+    [queryClient],
+  );
+
+  const handleResume = useCallback((info: { asset: AssetSymbol; direction: PositionDirection | null }) => {
+    setCurrentAsset(info.asset);
+    if (info.direction) setSelectedDirection(info.direction);
+  }, []);
+
+  const live = useLiveRound(!practice, { onProgression: handleProgression, onResume: handleResume });
+  const liveView = live.view;
+  const liveOwnsStage = !practice && liveView.stage !== null;
+
+  const stage: GameStage = liveOwnsStage && liveView.stage ? liveView.stage : appStage;
+  const round = liveOwnsStage ? liveView.round : activeRound;
+  const progressPct = liveOwnsStage ? liveView.progressPct : targetProgressPct;
+  const result = liveOwnsStage ? liveView.result : lastResult;
+  const settleStep = liveOwnsStage ? liveView.settlement.step : settlementStep;
+  const settleTx = liveOwnsStage ? liveView.settlement.txHash : settlementTxHash;
+
+  const practiceRound = usePracticeRound({
+    enabled: practice,
+    stage: appStage,
+    activeRound,
+    autoResolveEnabled,
+    sink: {
+      setStage: setAppStage,
+      setActiveRound,
+      setTargetProgressPct,
+      setSettlementStep,
+      setSettlementTxHash,
+      setLastResult,
+      setLastRoundSummary,
+      onCashOutBeat: () => setCashOutSignal((s) => s + 1),
+    },
+  });
+
+  useEffect(() => {
+    marketFeed.setAsset(currentAsset, !practice);
+    return marketFeed.subscribe((tick) => setLatestTick(tick));
+  }, [currentAsset, practice]);
+
+  useEffect(() => marketFeed.subscribeStatus(setFeedStatus), []);
+
+  useEffect(() => web3Service.subscribe((w) => setWallet(w)), []);
+
   useEffect(() => {
     soundEngine.setSoundEnabled(settings.soundEnabled);
     soundEngine.setHapticsEnabled(settings.hapticsEnabled);
   }, [settings.soundEnabled, settings.hapticsEnabled]);
 
-  // Handle Asset Switch with Warp Animation (PRD §10)
-  const handleSelectAsset = (asset: AssetSymbol) => {
-    if (warpTriggerRef.current) {
-      warpTriggerRef.current();
-    }
-    setCurrentAsset(asset);
-    marketFeed.setAsset(asset, settings.useLiveBinance);
-  };
-
-  // Connect Wallet — always the mock/demo path (preferDemo=true). A real
-  // injected wallet (e.g. Brave's own) blocks on eth_requestAccounts
-  // waiting for an approval UI that never appears in a demo/judge/headless
-  // context, hanging "Connecting…" forever. This is a full-simulation app —
-  // settlement already only ever produces pseudo tx hashes — so there's no
-  // real chain interaction to gate behind an actual wallet anyway.
-  const handleConnectWallet = async () => {
-    await web3Service.connectWallet(true);
-  };
-
-  // Transition Home -> Pre-Trade (PRD §8)
-  const handlePlayNow = () => {
-    setStage('PRE_TRADE');
-  };
-
-  // Start Trade Trigger -> Direct Seamless Live Flight (No blocking modal)
-  const handleStartTrade = (stake: number) => {
-    if (!selectedDirection) return;
-
-    const currentPrice = marketFeed.getCurrentPrice();
-    const round = SettlementEngine.initRound(currentAsset, selectedDirection, stake, currentPrice);
-
-    setActiveRound(round);
-    setTargetProgressPct(0);
-    soundEngine.playLaunchIgnition();
-    soundEngine.startEngineHum();
-    setStage('LIVE_TRADE');
-  };
-
-  // Settle trade round helper
-  const finalizeRound = useCallback(
-    async (
-      outcome: 'win' | 'loss' | 'cashed_out' | 'timeout',
-      exitPrice: number,
-      finalPnl: number
-    ) => {
-      if (!activeRound) return;
-
-      soundEngine.stopEngineHum();
-      setStage('SETTLING');
-
-      // Execute transparent BNB Chain settlement checkpoint (PRD §27)
-      let txHash = '';
-      try {
-        txHash = await web3Service.executeSettlement((step, hash) => {
-          setSettlementStep(step);
-          if (hash) setSettlementTxHash(hash);
-        });
-      } catch {
-        txHash = '0x' + Array.from({ length: 64 }, () => 'f').join('');
-      }
-
-      // Calculate XP
-      const xpEarned = outcome === 'win' ? 50 : 25;
-      const nextRoundsPlayed = progression.dailyRoundsPlayed + 1;
-      const isJustCompleted =
-        !progression.missionCompleted && nextRoundsPlayed >= progression.dailyRoundsGoal;
-
-      // level/nextLevelXp used to never advance here — ResultPanel's
-      // level-up view just displayed `level + 1` as a one-off hack, so the
-      // threshold never moved and the celebration would silently refire on
-      // every future result. UserProgression has no separate "XP per
-      // level" field, so the step reuses the same round-number XP-award
-      // convention already used elsewhere in this function.
-      const gainedXp = xpEarned + (isJustCompleted ? 50 : 0);
-      let newXp = progression.currentXp + gainedXp;
-      let newLevel = progression.level;
-      let newNextLevelXp = progression.nextLevelXp;
-      while (newXp >= newNextLevelXp) {
-        newLevel += 1;
-        newNextLevelXp += 50;
-      }
-      const leveledUp = newLevel > progression.level;
-      setJustLeveledUp(leveledUp);
-
-      setProgression((prev) => ({
-        ...prev,
-        currentXp: newXp,
-        level: newLevel,
-        nextLevelXp: newNextLevelXp,
-        dailyRoundsPlayed: nextRoundsPlayed,
-        missionCompleted: nextRoundsPlayed >= prev.dailyRoundsGoal,
-      }));
-
-      if (isJustCompleted) {
-        setIsMissionToastOpen(true);
-      }
-
-      const result: TradeResult = {
-        id: activeRound.id,
-        asset: activeRound.asset,
-        direction: activeRound.direction,
-        stake: activeRound.stake,
-        entryPrice: activeRound.entryPrice,
-        exitPrice,
-        pnl: finalPnl,
-        multiplier: (activeRound.stake + finalPnl) / activeRound.stake,
-        outcome,
-        timestamp: Date.now(),
-        txHash,
-        xpEarned,
-      };
-
-      setLastResult(result);
-      setLastRoundSummary({
-        pnl: finalPnl,
-        direction: activeRound.direction,
-        asset: activeRound.asset,
-        entryPrice: activeRound.entryPrice,
-        exitPrice,
-        outcome: finalPnl >= 0 ? 'win' : 'loss',
-        timestamp: Date.now(),
-      });
-
-      setStage('RESULT');
-    },
-    [
-      activeRound,
-      progression.dailyRoundsPlayed,
-      progression.dailyRoundsGoal,
-      progression.missionCompleted,
-      progression.currentXp,
-      progression.level,
-      progression.nextLevelXp,
-    ]
-  );
-
-  // Cash Out handler (PRD §26)
-  const handleCashOut = () => {
-    if (!activeRound) return;
-    soundEngine.playCashOutChime();
-    // Only a genuinely profitable exit gets its own payoff beat — a
-    // break-even/losing cash-out stays exactly as quiet as it is today.
-    if (activeRound.currentPnl >= 0) {
-      setCashOutSignal((s) => s + 1);
-    }
-    const currentPrice = marketFeed.getCurrentPrice();
-    finalizeRound('cashed_out', currentPrice, activeRound.currentPnl);
-  };
-
-  // Timeout handler (PRD §25)
-  const handleTimeout = () => {
-    if (!activeRound) return;
-    const currentPrice = marketFeed.getCurrentPrice();
-    finalizeRound('timeout', currentPrice, activeRound.currentPnl);
-  };
-
-  // Evaluate ticks during LIVE_TRADE (PRD §17, §20, §23, §37)
+  const lastStageRef = useRef<GameStage>(stage);
   useEffect(() => {
-    if (stage !== 'LIVE_TRADE' || !activeRound) return;
+    if (lastStageRef.current === stage) return;
+    lastStageRef.current = stage;
+    if (stage === 'TARGET_HIT') soundEngine.playTargetHitChime();
+    else if (stage === 'LOSS_HIT') soundEngine.playRoundCompleteChime();
+    if (stage === 'LIVE_TRADE') soundEngine.startEngineHum();
+    else if (!HUM_KEEP_STAGES.has(stage)) soundEngine.stopEngineHum();
+  }, [stage]);
 
-    const unsub = marketFeed.subscribe((tick) => {
-      // Evaluate tick with exact raw price (PRD §37 Data Integrity)
-      const { updatedRound, isTargetHit, isLossHit, targetProgressPct: progPct } =
-        SettlementEngine.evaluateTick(activeRound, tick.price);
+  const [config, setConfig] = useState<ConfigDTO | null>(null);
+  const [configError, setConfigError] = useState<string | null>(null);
+  useEffect(() => {
+    if (practice) return;
+    let alive = true;
+    roundService
+      .getConfig()
+      .then((next) => {
+        if (!alive) return;
+        setConfig(next);
+        setConfigError(null);
+      })
+      .catch((error: unknown) => {
+        if (alive) setConfigError(toApiError(error, 'NETWORK').message);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [practice]);
 
-      setActiveRound(updatedRound);
-      setTargetProgressPct(progPct);
+  const tiers = useMemo(
+    () => (practice ? practiceTierOptions(currentAsset) : liveTierOptions(config, currentAsset)),
+    [practice, config, currentAsset],
+  );
+  const selectedTier = pickTier(tiers, tierChoice);
 
-      if (autoResolveEnabled) {
-        if (isTargetHit) {
-          soundEngine.playTargetHitChime();
-          setStage('TARGET_HIT');
-          setTimeout(() => {
-            finalizeRound('win', tick.price, updatedRound.currentPnl);
-          }, 1100);
-        } else if (isLossHit) {
-          soundEngine.playRoundCompleteChime();
-          setStage('LOSS_HIT');
-          setTimeout(() => {
-            finalizeRound('loss', tick.price, updatedRound.currentPnl);
-          }, 700);
-        }
-      }
+  useEffect(() => {
+    if (selectedTier) setStake((prev) => clampStake(prev, selectedTier));
+  }, [selectedTier]);
+
+  const address = wallet.isConnected ? wallet.address : null;
+  const profileQuery = useQuery({
+    queryKey: ['profile', address],
+    queryFn: () => apiClient.profile(address ?? ''),
+    enabled: !practice && apiClient.isEnabled() && address !== null,
+    staleTime: 30_000,
+  });
+  const profile = profileQuery.data ?? null;
+  useEffect(() => {
+    if (!profile) return;
+    setProgression(progressionFromProfile(profile));
+    setBadgeProgress(badgeProgressFromProfile(profile));
+  }, [profile]);
+
+  const lastLiveResultRef = useRef<string | null>(null);
+  useEffect(() => {
+    const settled = liveView.result;
+    if (!settled || settled.voided || !settled.roundId || lastLiveResultRef.current === settled.roundId) return;
+    lastLiveResultRef.current = settled.roundId;
+    setLastRoundSummary({
+      pnl: settled.pnl,
+      direction: settled.direction,
+      asset: settled.asset,
+      entryPrice: settled.entryPrice,
+      exitPrice: settled.exitPrice,
+      outcome: settled.pnl >= 0 ? 'win' : 'loss',
+      timestamp: exitAtClientMs(settled),
     });
+  }, [liveView.result]);
 
-    return () => unsub();
-  }, [stage, activeRound, autoResolveEnabled, finalizeRound]);
+  const displayName =
+    profile?.displayName ??
+    (wallet.isConnected && wallet.address ? (wallet.kind === 'guest' ? 'Guest pilot' : formatHash(wallet.address)) : 'Pilot');
+  const badges = useMemo(() => badgeViews(badgeProgress), [badgeProgress]);
 
-  // Restart handlers
-  const handlePlayAgain = () => {
+  const handleSelectAsset = (asset: AssetSymbol) => {
+    if (warpTriggerRef.current) warpTriggerRef.current();
+    setCurrentAsset(asset);
+  };
+
+  const practiceParams = (direction: PositionDirection | null = selectedDirection): PracticeLaunch => ({
+    asset: currentAsset,
+    direction: direction ?? 'LONG',
+    stake,
+    tier: selectedTier?.tier ?? 0,
+  });
+
+  const notifyPractice = (title: string, body: string) => setPracticeNotice({ id: ++noticeIdRef.current, title, body });
+
+  const handleStartTrade = (commitStake: number) => {
+    if (!selectedDirection || !selectedTier) return;
+    if (practice) {
+      const launched = practiceRound.launch({ asset: currentAsset, direction: selectedDirection, stake: commitStake, tier: selectedTier.tier });
+      if (!launched) notifyPractice('PRACTICE LANE UNAVAILABLE', `${currentAsset} has no practice lane right now.`);
+      return;
+    }
+    const predicted = marketFeed.getLastExactRound()?.price ?? marketFeed.getCurrentPrice();
+    void live.controller.launch(
+      { asset: currentAsset, tier: selectedTier.tier, direction: selectedDirection, stakeUsd: commitStake },
+      predicted,
+    );
+  };
+
+  const handleCashOut = () => {
+    soundEngine.playCashOutChime();
+    if (practice) {
+      practiceRound.cashOut();
+      return;
+    }
+    if (round && round.currentPnl >= 0) setCashOutSignal((s) => s + 1);
+    void live.controller.cashOut();
+  };
+
+  const finishRound = (next: GameStage) => {
+    if (liveOwnsStage) live.controller.acknowledge();
+    practiceRound.reset();
     setActiveRound(null);
     setTargetProgressPct(0);
     setSettlementStep('idle');
-    setStage('PRE_TRADE');
+    setSettlementTxHash('');
+    setJustLeveledUp(false);
+    setAppStage(next);
   };
 
-  const handleGoHome = () => {
-    setActiveRound(null);
-    setTargetProgressPct(0);
-    setSettlementStep('idle');
-    setStage('HOME');
-  };
+  const handlePlayAgain = () => finishRound('PRE_TRADE');
+  const handleGoHome = () => finishRound('HOME');
 
-  // --- Interactive Mock Simulation Handlers ---
   const handleSimulatePriceBump = (pct: number) => {
     soundEngine.playSurgeThrum();
     marketFeed.pushPriceDelta(pct);
   };
 
-  const handleSimulateTargetHit = () => {
-    const price = marketFeed.getCurrentPrice();
-    const round = activeRound || SettlementEngine.initRound(currentAsset, selectedDirection || 'LONG', 10, price);
-    setActiveRound(round);
-    setStage('TARGET_HIT');
-    soundEngine.playTargetHitChime();
-    setTimeout(() => {
-      finalizeRound('win', round.targetPrice, 18.4);
-    }, 900);
-  };
-
-  const handleSimulateLossHit = () => {
-    const price = marketFeed.getCurrentPrice();
-    const round = activeRound || SettlementEngine.initRound(currentAsset, selectedDirection || 'LONG', 10, price);
-    setActiveRound(round);
-    setStage('LOSS_HIT');
-    soundEngine.playRoundCompleteChime();
-    setTimeout(() => {
-      finalizeRound('loss', round.stopLossPrice, -4.2);
-    }, 800);
+  const handleSimulateLiveLong = () => {
+    setSelectedDirection('LONG');
+    setAutoResolveEnabled(false);
+    practiceRound.fly(practiceParams('LONG'));
   };
 
   const handleSimulateCashOut = () => {
-    if (activeRound) {
-      handleCashOut();
-    } else {
-      const price = marketFeed.getCurrentPrice();
-      const round = SettlementEngine.initRound(currentAsset, selectedDirection || 'LONG', 10, price);
-      setActiveRound(round);
-      finalizeRound('cashed_out', price, 12.5);
+    if (activeRound && appStage === 'LIVE_TRADE') handleCashOut();
+    else practiceRound.settleNow('cashed_out', practiceParams());
+  };
+
+  const handleSetStage = (target: GameStage) => {
+    if (target === 'LIVE_TRADE' && !activeRound) {
+      practiceRound.fly(practiceParams());
+      return;
     }
-  };
-
-  const handleSimulateLiveLong = () => {
-    const price = marketFeed.getCurrentPrice();
-    const round = SettlementEngine.initRound(currentAsset, 'LONG', 10, price);
-    setActiveRound(round);
-    setSelectedDirection('LONG');
-    setAutoResolveEnabled(false); // disable auto result popup so flight is continuous
-    soundEngine.playLaunchIgnition();
-    soundEngine.startEngineHum();
-    setStage('LIVE_TRADE');
-  };
-
-  const handleSetStage = (targetStage: GameStage) => {
-    const price = marketFeed.getCurrentPrice();
-    if (targetStage === 'LIVE_TRADE' && !activeRound) {
-      const round = SettlementEngine.initRound(currentAsset, selectedDirection || 'LONG', 10, price);
-      setActiveRound(round);
-    } else if (targetStage === 'RESULT' && !lastResult) {
-      setLastResult({
-        id: 'sim_result',
-        asset: currentAsset,
-        direction: 'LONG',
-        stake: 10,
-        entryPrice: price * 0.98,
-        exitPrice: price,
-        pnl: 18.4,
-        multiplier: 2.84,
-        outcome: 'win',
-        timestamp: Date.now(),
-        txHash: '0x9f83a24b12c5890e71ab456d',
-        xpEarned: 50,
-      });
+    if (target === 'RESULT' && !lastResult) {
+      practiceRound.settleNow('win', practiceParams());
+      return;
     }
-    setStage(targetStage);
+    setAppStage(target);
   };
-
-  // --- Navigation shell state (docs/ refactor) ---------------------------
-  // Which of the new stub/real screens is open, layered on top of the
-  // existing GameStage machine rather than folded into it — GameStage stays
-  // exactly as it is (see the plan's frozen-boundary note on this). The
-  // Trade Setup sheet is NOT tracked here: its visibility is simply
-  // `stage === 'PRE_TRADE'`, so it works whether opened via swipe-up, via
-  // "Trade Again", or via the dev SimulationBar's own stage jumps.
-  const [activeSheet, setActiveSheet] = useState<ActiveSheet>('none');
 
   const assetOrder = Object.keys(SUPPORTED_ASSETS) as AssetSymbol[];
 
@@ -418,17 +384,11 @@ export const App: React.FC = () => {
   };
 
   const handleTrackSwipe = (_: unknown, info: PanInfo) => {
-    if (stage === 'LIVE_TRADE' || stage === 'SETTLING') return;
+    if (!TRACK_SWIPE_STAGES.has(stage)) return;
     if (Math.abs(info.offset.x) > 70 || Math.abs(info.velocity.x) > 450) {
       cycleAsset(info.offset.x < 0 ? 1 : -1);
     }
   };
-
-  // The engine's real, fixed leverage (settlementEngine.ts DEFAULT_CONFIG) —
-  // read-only, never mutated. UI surfaces used to hardcode a mismatched
-  // "10x" label everywhere; this keeps every display honest to the actual
-  // engine value (18x) instead.
-  const leverage = Math.round(DEFAULT_CONFIG.multiplierLeverage);
 
   const handleSelectAssetAndClose = (asset: AssetSymbol) => {
     handleSelectAsset(asset);
@@ -440,22 +400,57 @@ export const App: React.FC = () => {
     setActiveSheet('none');
   };
 
-  const devScene = useDevScene({ setStage, setCurrentAsset, setSelectedDirection, setActiveRound, setTargetProgressPct, setJustLeveledUp, setSettlementStep, setSettlementTxHash, setLastResult, setLastRoundSummary, setProgression, setIsSettingsOpen, setIsProfileOpen, setIsMissionToastOpen, setSettings, setActiveSheet, handleConnectWallet, handlePlayNow });
+  const openConnect = () => {
+    setIsProfileOpen(false);
+    setActiveSheet('none');
+    setIsConnectOpen(true);
+  };
+
+  const modeLocked = !IDLE_STAGES.has(stage) || live.controller.isBusy();
+  const handlePracticeModeChange = (next: boolean) => {
+    if (modeLocked || (!next && !liveAvailable)) return;
+    setActiveRound(null);
+    setTargetProgressPct(0);
+    setSettings((prev) => ({ ...prev, practiceMode: next }));
+  };
+
+  const needsConnect = !practice && !wallet.isConnected;
+  const credits = wallet.creditsUsd ?? null;
+  const blockedReason = practice
+    ? null
+    : configError
+      ? `Lanes are unavailable: ${configError}`
+      : config && !config.contracts
+        ? 'Contracts are not deployed yet. Launch is paused.'
+        : feedStatus?.oracle && feedStatus.oracle !== 'ok'
+          ? `The oracle is ${feedStatus.oracle}. Launch is paused.`
+          : wallet.isConnected && credits !== null && selectedTier && credits < selectedTier.minStake
+            ? 'Not enough test credits for the minimum stake.'
+            : wallet.isConnected && credits !== null && stake > credits
+              ? 'This stake is above your test credits.'
+              : null;
+
+  const fx = round ? fxPnlForRound(round) : 0;
+  const roundNow = round?.mode === 'live' ? serverNow : wallNow;
+  const inFlight = round !== null && round.outcome === undefined && !IDLE_STAGES.has(stage) && stage !== 'RESULT';
+  const settlementVariant = (round?.mode ?? result?.mode) === 'practice' ? 'practice' : 'live';
+  const liveReason = liveOwnsStage ? liveView.settlement.reason : null;
+  const notice = liveView.notice ?? practiceNotice;
+
   return (
     <MotionConfig reducedMotion={reduced ? 'always' : 'never'}>
       <div className="app-frame flex flex-col w-full overflow-hidden bg-lobby font-sans sm:border-x sm:border-frame">
-        <Header wallet={wallet} onOpenMenu={() => setActiveSheet('menu')} />
+        <Header wallet={wallet} practice={practice} onOpenMenu={() => setActiveSheet('menu')} />
         <ConfettiLayer />
 
         <main id="track-stage" className="relative flex-1 flex flex-col overflow-hidden">
-          {/* Continuous 60 FPS Market Track Canvas (Full Viewport 100% Bleed) */}
           <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
             <MarketTrackCanvas
               gameStage={stage}
-              activeRound={activeRound}
+              activeRound={round}
               selectedDirection={selectedDirection}
               lastRound={lastRoundSummary}
-              targetProgressPct={targetProgressPct}
+              targetProgressPct={progressPct}
               currentAsset={currentAsset}
               reducedMotion={reduced}
               onWarpTrigger={(fn) => {
@@ -465,8 +460,6 @@ export const App: React.FC = () => {
             />
           </div>
 
-          {/* Swipe anywhere on the track to cycle assets — secondary to the
-              tap-the-asset-name path now that Asset Selector exists. */}
           <motion.div
             className="absolute inset-0 z-[15]"
             style={{ touchAction: 'pan-y' }}
@@ -479,23 +472,32 @@ export const App: React.FC = () => {
 
           <PixCompanion
             gameStage={stage}
-            targetProgressPct={targetProgressPct}
-            currentPnl={activeRound ? activeRound.currentPnl : 0}
+            targetProgressPct={progressPct}
+            fxPnl={fx}
             selectedDirection={selectedDirection}
             onTap={() => setActiveSheet('pix-chat')}
           />
 
-          {/* Bottom content — Home hero, active-trade HUD, or a resolving
-              indicator. Not a sheet: an active round is a persistent state
-              the player doesn't dismiss, unlike Trade Setup/Menu/etc. */}
+          <AnimatePresence>
+            {stage === 'LAUNCHING' &&
+              (liveOwnsStage && liveView.launch ? (
+                <LaunchCountdown key="launch-live" variant="live" launch={liveView.launch} now={wallNow} />
+              ) : activeRound ? (
+                <LaunchCountdown
+                  key="launch-practice"
+                  variant="practice"
+                  entryPrice={activeRound.entryPrice}
+                  direction={activeRound.direction}
+                  onLaunchComplete={practiceRound.completeLaunch}
+                />
+              ) : null)}
+          </AnimatePresence>
+
           <div className="relative z-20 mt-auto w-full px-6 pt-2 pad-safe-bottom flex flex-col gap-3 pointer-events-none">
             <AnimatePresence>
-              {stage === 'HOME' && activeRound && (
+              {stage === 'HOME' && round && (
                 <div className="pointer-events-auto">
-                  <ActivePositionBanner
-                    round={activeRound}
-                    onTap={() => setActiveSheet('position-details')}
-                  />
+                  <ActivePositionBanner round={round} onTap={() => setActiveSheet('position-details')} />
                 </div>
               )}
             </AnimatePresence>
@@ -504,7 +506,7 @@ export const App: React.FC = () => {
               {stage === 'HOME' && (
                 <HomeHeroOverlay
                   isWalletConnected={wallet.isConnected}
-                  onConnectWallet={handleConnectWallet}
+                  onConnectWallet={openConnect}
                   onOpenTradeSheet={handlePlayNow}
                   onOpenAssetSelector={() => setActiveSheet('asset-selector')}
                   currentAsset={currentAsset}
@@ -513,58 +515,57 @@ export const App: React.FC = () => {
                 />
               )}
 
-              {stage === 'LIVE_TRADE' && activeRound && (
+              {stage === 'LIVE_TRADE' && round && (
                 <LiveTradeOverlay
-                  round={activeRound}
-                  targetProgressPct={targetProgressPct}
-                  autoResolveEnabled={autoResolveEnabled}
+                  round={round}
+                  targetProgressPct={progressPct}
+                  autoResolveEnabled={liveOwnsStage || autoResolveEnabled}
                   onCashOut={handleCashOut}
-                  onTimeout={handleTimeout}
                   onOpenPositionDetails={() => setActiveSheet('position-details')}
-                  leverage={leverage}
+                  endMs={roundEndMs(round)}
+                  now={roundNow}
+                  cashOut={liveOwnsStage ? liveView.cashOut : undefined}
                 />
               )}
 
-              {(stage === 'TARGET_HIT' || stage === 'LOSS_HIT' || stage === 'SETTLING') && (
+              {RESOLVING_STAGES.has(stage) && (
                 <div
                   role="status"
                   aria-live="polite"
                   className="flex items-center justify-center gap-2 h-16 text-micro font-semibold uppercase tracking-[0.08em] text-ink-muted"
                 >
                   <span aria-hidden="true" className="w-2 h-2 rounded-full bg-ink-muted" />
-                  <span>Resolving round</span>
+                  <span>{liveReason === 'time' ? TIME_UP_COPY : 'Resolving round'}</span>
                 </div>
               )}
             </div>
           </div>
         </main>
 
-        {/* Dramatic TARGET HIT / LOSS HIT Impact Overlay (PRD §20 & §23) */}
-        <OutcomeBannerOverlay
-          gameStage={stage}
-          pnl={activeRound ? activeRound.currentPnl : 18.4}
-          multiplier={activeRound ? activeRound.currentMultiplier : 2.8}
-        />
+        <OutcomeBannerOverlay gameStage={stage} pnl={round ? round.currentPnl : null} multiplier={round ? round.currentMultiplier : null} />
 
-        {/* Settlement Checkpoint Modal (PRD §27) */}
         <AnimatePresence>
           {stage === 'SETTLING' && (
             <SettlementOverlay
-              step={settlementStep}
-              txHash={settlementTxHash}
-              pnl={activeRound ? activeRound.currentPnl : 0}
+              step={settleStep}
+              txHash={settleTx}
+              pnl={round ? round.currentPnl : 0}
+              variant={settlementVariant}
+              estimate={liveOwnsStage && liveReason !== 'target' && liveReason !== 'stop'}
+              reason={liveReason}
+              exitPrice={liveOwnsStage ? liveView.cashOut.exitPrice : null}
             />
           )}
         </AnimatePresence>
 
-        {/* Trade Result — docs/UI_UX_SPEC.md §6/§7 */}
         <AnimatePresence>
-          {stage === 'RESULT' && lastResult && (
+          {stage === 'RESULT' && result && (
             <ResultPanel
-              result={lastResult}
+              result={result}
               progression={progression}
-              leverage={leverage}
-              justLeveledUp={justLeveledUp}
+              justLeveledUp={liveOwnsStage ? false : justLeveledUp}
+              xp={liveOwnsStage ? liveView.xp : null}
+              xpPending={liveOwnsStage && liveView.xpPending}
               onPlayAgain={handlePlayAgain}
               onGoHome={handleGoHome}
               onViewDetails={() => setActiveSheet('position-details')}
@@ -573,9 +574,6 @@ export const App: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* Trade Setup — docs/UI_UX_SPEC.md §3. A real bottom sheet, off-screen
-            until stage reaches PRE_TRADE (swipe-up, "Trade Again", or the dev
-            SimulationBar), unlike the old permanently-docked cockpit HUD. */}
         <AnimatePresence>
           {stage === 'PRE_TRADE' && (
             <Sheet onClose={handleGoHome} variant="game">
@@ -584,19 +582,28 @@ export const App: React.FC = () => {
                 selectedDirection={selectedDirection}
                 onSelectDirection={(dir) => setSelectedDirection(dir)}
                 onStartTrade={handleStartTrade}
-                leverage={leverage}
+                mode={practice ? 'practice' : 'live'}
+                tiers={tiers}
+                selectedTier={selectedTier}
+                onSelectTier={setTierChoice}
+                stake={stake}
+                onStakeChange={setStake}
+                creditsUsd={credits}
+                blockedReason={blockedReason}
+                needsConnect={needsConnect}
+                onConnect={openConnect}
               />
             </Sheet>
           )}
         </AnimatePresence>
 
-        {/* Menu — docs/UI_UX_SPEC.md §11. Profile/Settings route to the
-            existing, working drawer/modal rather than duplicating them. */}
         <AnimatePresence>
           {activeSheet === 'menu' && (
             <Menu
               progression={progression}
               isWalletConnected={wallet.isConnected}
+              displayName={displayName}
+              openPositions={inFlight ? 1 : 0}
               onClose={() => setActiveSheet('none')}
               onOpenProfile={() => {
                 setActiveSheet('none');
@@ -611,7 +618,6 @@ export const App: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* Asset Selector — docs/UI_UX_SPEC.md §9 */}
         <AnimatePresence>
           {activeSheet === 'asset-selector' && (
             <AssetSelector
@@ -623,64 +629,64 @@ export const App: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* PIX AI Chat — docs/UI_UX_SPEC.md §10 */}
         <AnimatePresence>
           {activeSheet === 'pix-chat' && (
-            <PixChat
-              currentAsset={currentAsset}
-              change24h={latestTick ? latestTick.change24h : 0}
-              onClose={() => setActiveSheet('none')}
-            />
+            <PixChat currentAsset={currentAsset} change24h={latestTick ? latestTick.change24h : 0} onClose={() => setActiveSheet('none')} />
           )}
         </AnimatePresence>
 
-        {/* Position Details — docs/UI_UX_SPEC.md §8. Real data: activeRound
-            stays populated through LIVE_TRADE and RESULT (finalizeRound never
-            clears it — only Play Again/Home do), so this works from both. */}
         <AnimatePresence>
-          {activeSheet === 'position-details' && activeRound && (
-            <PositionDetails
-              round={activeRound}
-              leverage={leverage}
-              onClose={() => setActiveSheet('none')}
-            />
+          {activeSheet === 'position-details' && round && (
+            <PositionDetails round={round} now={roundNow} onClose={() => setActiveSheet('none')} />
           )}
         </AnimatePresence>
 
-        {/* Settings Modal */}
+        <AnimatePresence>{isConnectOpen && <ConnectSheet onClose={() => setIsConnectOpen(false)} />}</AnimatePresence>
+
         <SettingsModal
           isOpen={isSettingsOpen}
           settings={settings}
-          onUpdateSettings={(newSettings) =>
-            setSettings((prev) => ({ ...prev, ...newSettings }))
-          }
+          onUpdateSettings={(newSettings) => setSettings((prev) => ({ ...prev, ...newSettings }))}
           onClose={() => setIsSettingsOpen(false)}
+          practiceMode={practice}
+          onPracticeModeChange={handlePracticeModeChange}
+          modeLocked={modeLocked}
+          liveAvailable={liveAvailable}
         />
 
-        {/* Daily Mission Completion Toast (PRD §30) */}
         <MissionToast
           isOpen={isMissionToastOpen}
-          roundsPlayed={progression.dailyRoundsPlayed}
-          roundsGoal={progression.dailyRoundsGoal}
-          xpBonus={50}
+          roundsPlayed={mission?.progress ?? progression.dailyRoundsPlayed}
+          roundsGoal={mission?.goal ?? progression.dailyRoundsGoal}
+          xpBonus={mission?.xp}
+          title={mission?.title}
           onDismiss={() => setIsMissionToastOpen(false)}
         />
 
-        {/* Pilot Profile & Web3 Badges Drawer — reached via Menu now */}
+        <NoticeToast
+          notice={notice}
+          onDismiss={(id) => {
+            live.controller.dismissNotice(id);
+            setPracticeNotice((prev) => (prev?.id === id ? null : prev));
+          }}
+        />
+
         <PilotProfileDrawer
           isOpen={isProfileOpen}
           progression={progression}
           wallet={wallet}
           settings={settings}
-          onUpdateSettings={(newSettings) =>
-            setSettings((prev) => ({ ...prev, ...newSettings }))
-          }
-          onConnectWallet={handleConnectWallet}
+          onUpdateSettings={(newSettings) => setSettings((prev) => ({ ...prev, ...newSettings }))}
+          onConnectWallet={openConnect}
           onClose={() => setIsProfileOpen(false)}
+          badges={badges}
+          practiceMode={practice}
+          onPracticeModeChange={handlePracticeModeChange}
+          modeLocked={modeLocked}
+          liveAvailable={liveAvailable}
         />
 
-        {/* UI Mock Simulation Toolbar */}
-        {!devScene.active || devScene.sim ? (
+        {practice && (!devScene.active || devScene.sim) ? (
           <SimulationBar
             currentStage={stage}
             autoResolveEnabled={autoResolveEnabled}
@@ -688,8 +694,8 @@ export const App: React.FC = () => {
             onSimulateLiveLong={handleSimulateLiveLong}
             onSetStage={handleSetStage}
             onSimulatePriceBump={handleSimulatePriceBump}
-            onSimulateTargetHit={handleSimulateTargetHit}
-            onSimulateLossHit={handleSimulateLossHit}
+            onSimulateTargetHit={() => practiceRound.forceBarrier('target', practiceParams())}
+            onSimulateLossHit={() => practiceRound.forceBarrier('stop', practiceParams())}
             onSimulateCashOut={handleSimulateCashOut}
             onTriggerMissionToast={() => setIsMissionToastOpen(true)}
           />

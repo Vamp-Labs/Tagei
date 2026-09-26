@@ -1,4 +1,5 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { fxPnlForRound } from '../game/fx';
 import { marketFeed } from '../services/marketFeed';
 import { MarketTrackRenderer, type MarkerLabels } from './renderer';
 import { RocketAvatar } from './rocket';
@@ -6,9 +7,10 @@ import { ParticleSystem } from './particles';
 import { ActiveTradeRound, GameStage, LastRoundSummary, PositionDirection } from '../types/game';
 import { AssetSymbol } from '../types/market';
 import { soundEngine } from '../services/audioHaptics';
-import { DEFAULT_CONFIG } from '../services/settlementEngine';
 import { formatAmount, formatPrice } from '../ui/lucky/format';
+import { markerLabels, targetPnl } from '../components/game/roundDisplay';
 import { CLEAR, FX, TRACK } from './theme';
+import { exitTickIndex } from './trackMath';
 
 const MAX_FRAME_SECONDS = 0.05;
 const DEFAULT_FRAME_SECONDS = 1 / 60;
@@ -17,6 +19,7 @@ const LOSS_BEAT_BASE_HZ = 1.1;
 const LOSS_BEAT_RANGE_HZ = 2.2;
 const LOSS_BEAT_MAX_HZ = 2.5;
 const OUTCOME_STAGES: ReadonlySet<GameStage> = new Set<GameStage>(['TARGET_HIT', 'LOSS_HIT', 'SETTLING', 'RESULT']);
+const ENGINE_STAGES: ReadonlySet<GameStage> = new Set<GameStage>(['LAUNCHING', 'LIVE_TRADE', 'TARGET_HIT']);
 
 interface MarketTrackCanvasProps {
   gameStage: GameStage;
@@ -42,23 +45,8 @@ interface LiveProps {
   currentAsset: AssetSymbol;
   reducedMotion: boolean;
   labels: MarkerLabels | null;
+  fxPnl: number;
 }
-
-const markerLabels = (
-  stake: number,
-  targetPct: number,
-  stopPct: number,
-  targetPrice: number,
-  stopPrice: number
-): MarkerLabels => {
-  const leverage = DEFAULT_CONFIG.multiplierLeverage;
-  const win = stake * (targetPct / 100) * leverage;
-  const loss = -Math.min(stake, stake * (stopPct / 100) * leverage);
-  return {
-    target: `TARGET ${formatAmount(win)} · ${formatPrice(targetPrice)}`,
-    stop: `STOP ${formatAmount(loss)} · ${formatPrice(stopPrice)}`,
-  };
-};
 
 const stageLabel = ({ gameStage, activeRound, selectedDirection, lastRound, currentAsset, labels }: LiveProps) => {
   const asset = activeRound ? activeRound.asset : currentAsset;
@@ -100,9 +88,11 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const rendererRef = useRef<MarketTrackRenderer>(new MarketTrackRenderer());
-  const rocketRef = useRef<RocketAvatar>(new RocketAvatar());
-  const particlesRef = useRef<ParticleSystem>(new ParticleSystem());
+  const [world] = useState(() => ({
+    renderer: new MarketTrackRenderer(),
+    rocket: new RocketAvatar(),
+    particles: new ParticleSystem(),
+  }));
   const shakeMagnitudeRef = useRef<number>(0);
   // Two beats of the same TARGET_HIT impact, sharing a trigger moment but
   // decaying at different rates: punchRef is the fast hit-stop camera kick,
@@ -117,27 +107,13 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
   const lastHandledStageRef = useRef<GameStage | null>(null);
   const dprRef = useRef<number>(1);
 
-  const [, setTickCount] = useState<number>(0);
-
-  const labels = useMemo(
-    () =>
-      activeRound
-        ? markerLabels(
-            activeRound.stake,
-            activeRound.targetPct,
-            activeRound.stopLossPct,
-            activeRound.targetPrice,
-            activeRound.stopLossPrice
-          )
-        : null,
-    [
-      activeRound?.stake,
-      activeRound?.targetPct,
-      activeRound?.stopLossPct,
-      activeRound?.targetPrice,
-      activeRound?.stopLossPrice,
-    ]
-  );
+  const labelKey = activeRound
+    ? `${activeRound.id}|${activeRound.stake}|${activeRound.targetPrice}|${activeRound.stopLossPrice}|${activeRound.maxPayout ?? ''}|${activeRound.multiplierBps ?? ''}`
+    : null;
+  const roundForLabels = useRef(activeRound);
+  roundForLabels.current = activeRound;
+  const labels = useMemo(() => (labelKey && roundForLabels.current ? markerLabels(roundForLabels.current) : null), [labelKey]);
+  const fxPnl = activeRound ? fxPnlForRound(activeRound) : 0;
 
   const liveProps: LiveProps = {
     gameStage,
@@ -148,19 +124,12 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
     currentAsset,
     reducedMotion,
     labels,
+    fxPnl,
   };
   const liveRef = useRef<LiveProps>(liveProps);
   useLayoutEffect(() => {
     liveRef.current = liveProps;
   });
-
-  // Listen to live market price ticks
-  useEffect(() => {
-    const unsub = marketFeed.subscribe((_) => {
-      setTickCount((c) => c + 1);
-    });
-    return () => unsub();
-  }, []);
 
   // Expose warp effect trigger (e.g. for asset switching)
   useEffect(() => {
@@ -168,12 +137,12 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
       onWarpTrigger(() => {
         const canvas = canvasRef.current;
         if (canvas && !liveRef.current.reducedMotion) {
-          particlesRef.current.triggerWarpStreaks(canvas.width, canvas.height);
+          world.particles.triggerWarpStreaks(canvas.width, canvas.height);
           shakeMagnitudeRef.current = 4;
         }
       });
     }
-  }, [onWarpTrigger]);
+  }, [onWarpTrigger, world]);
 
   // Cash-out's own, smaller payoff beat — see cashOutSignal's doc comment.
   // Skips the initial mount (signal starts at 0 in App.tsx) so this only
@@ -185,18 +154,17 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
       return;
     }
     if (liveRef.current.reducedMotion) return;
-    const rocket = rocketRef.current;
-    particlesRef.current.emitCashOutSparkle(rocket.x, rocket.y + rocket.hoverOffset);
-  }, [cashOutSignal]);
+    const { rocket, particles } = world;
+    particles.emitCashOutSparkle(rocket.x, rocket.y + rocket.hoverOffset);
+  }, [cashOutSignal, world]);
 
   // Handle stage-specific rocket states and tactile impact effects
   useEffect(() => {
-    const rocket = rocketRef.current;
-    const particles = particlesRef.current;
+    const { rocket, particles } = world;
 
     rocket.isTargetHit = gameStage === 'TARGET_HIT';
     rocket.isDrifting = gameStage === 'LOSS_HIT';
-    rocket.engineActive = gameStage === 'LIVE_TRADE' || gameStage === 'TARGET_HIT';
+    rocket.engineActive = ENGINE_STAGES.has(gameStage);
 
     if (lastHandledStageRef.current !== gameStage) {
       lastHandledStageRef.current = gameStage;
@@ -206,7 +174,7 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
         punchRef.current = 1; // Fast hit-stop punch-zoom (PRD §20 Frame 1: Impact)
         boomRef.current = 1; // Slow background surge + victory flash (Frames 2-3)
         if (!reducedMotion) {
-          const rewardText = activeRound ? formatAmount(activeRound.currentPnl) : undefined;
+          const rewardText = activeRound ? formatAmount(targetPnl(activeRound)) : undefined;
           particles.emitTargetHitBurst(rocket.x, rocket.y, rewardText);
         }
       } else if (gameStage === 'LOSS_HIT') {
@@ -218,7 +186,7 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
         rocket.resetHull();
       }
     }
-  }, [gameStage, activeRound, reducedMotion]);
+  }, [gameStage, activeRound, reducedMotion, world]);
 
   // Main 60 FPS Canvas Render Loop
   useEffect(() => {
@@ -227,9 +195,7 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const renderer = rendererRef.current;
-    const rocket = rocketRef.current;
-    const particles = particlesRef.current;
+    const { renderer, rocket, particles } = world;
 
     let animationFrameId: number;
     let lastFrameAt: number | null = null;
@@ -282,6 +248,7 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
         currentAsset,
         reducedMotion,
         labels,
+        fxPnl,
       } = liveRef.current;
 
       // CSS pixels. canvas.width is the device-pixel backing store and the
@@ -337,7 +304,7 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
 
       // Track colour: ink-soft with a frame-blue glow when idle, profit or loss during a round.
       const colorScheme = activeRound
-        ? activeRound.currentPnl >= 0
+        ? fxPnl >= 0
           ? TRACK.profit
           : TRACK.loss
         : TRACK.idle;
@@ -358,17 +325,16 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
 
       // Update rocket direction & player alignment
       const effectiveDirection = activeRound ? activeRound.direction : selectedDirection;
-      const isGoodOutcome = activeRound ? activeRound.currentPnl >= 0 : true;
+      const isGoodOutcome = activeRound ? fxPnl >= 0 : true;
       rocket.setPlayerDirection(effectiveDirection, isGoodOutcome);
       rocket.targetProgressPct = targetProgressPct;
-      rocket.currentPnl = activeRound ? activeRound.currentPnl : 0;
+      rocket.currentPnl = fxPnl;
 
       // Audio Escalation & Real-Time Milestone Monitoring
       if (activeRound) {
-        soundEngine.updateEnginePitch(activeRound.currentPnl / 6);
+        soundEngine.updateEnginePitch(fxPnl / 6);
 
-        // Milestone Pings (every +$5 profit gain)
-        const currentTier = Math.floor(Math.max(0, activeRound.currentPnl) / 5);
+        const currentTier = Math.floor(Math.max(0, fxPnl) / 5);
         if (currentTier > lastPnlTierRef.current) {
           soundEngine.playMilestonePing();
           lastPnlTierRef.current = currentTier;
@@ -376,16 +342,14 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
           lastPnlTierRef.current = currentTier;
         }
 
-        // Deep Loss Emergency Radar Pulse (< -$6.00)
-        if (activeRound.currentPnl <= -6.0) {
+        if (fxPnl <= -6.0) {
           if (now - lastDangerAlertRef.current > 2200) {
             soundEngine.playDangerWarningPulse();
             lastDangerAlertRef.current = now;
           }
         }
 
-        // Hyperdrive Warp Streaks streaming at high profit (+$8.00+)
-        if (activeRound.currentPnl >= 8.0 && Math.random() < 0.08 && !reducedMotion) {
+        if (fxPnl >= 8.0 && Math.random() < 0.08 && !reducedMotion) {
           particles.triggerWarpStreaks(width, height);
         }
       } else {
@@ -424,9 +388,9 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
       }
 
       // 7. Render Last Round Marker on Home & Pre-Trade (PRD §31)
-      if ((gameStage === 'HOME' || gameStage === 'PRE_TRADE') && lastRound && points.length > 15) {
-        const markerPoint = points[Math.floor(points.length * 0.45)];
-        renderer.renderLastRoundMarker(ctx, markerPoint.x, markerPoint.y, lastRound);
+      if ((gameStage === 'HOME' || gameStage === 'PRE_TRADE') && lastRound && points.length > 1) {
+        const markerPoint = points[exitTickIndex(currentHistory, lastRound.timestamp)];
+        if (markerPoint) renderer.renderLastRoundMarker(ctx, markerPoint.x, markerPoint.y, lastRound);
       }
 
       // 8. Update & Render Particles & Rocket
@@ -438,11 +402,10 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
 
       // 9. Tiered Dynamic PnL Edge Atmosphere (Plus & Minus Escalation)
       if (gameStage === 'LIVE_TRADE' && activeRound && !reducedMotion) {
-        const isProfit = activeRound.currentPnl > 0;
+        const isProfit = fxPnl > 0;
 
         if (isProfit) {
-          // --- PLUS ESCALATION ---
-          const pnlIntensity = Math.min(1, activeRound.currentPnl / 12);
+          const pnlIntensity = Math.min(1, fxPnl / 12);
           const auraAlpha = 0.08 + pnlIntensity * 0.28;
           const pulse = 1 + Math.sin(now * 0.008) * 0.18;
 
@@ -451,7 +414,7 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
           ctx.strokeRect(0, 0, width, height);
 
           // Corner Speed Laser Flares at >= $6.00
-          if (activeRound.currentPnl >= 6.0) {
+          if (fxPnl >= 6.0) {
             ctx.strokeStyle = FX.winCorner.a(0.45 * pulse);
             ctx.lineWidth = 2.5;
             const cornerLen = 24 + pnlIntensity * 24;
@@ -464,9 +427,8 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
             // Bottom-right
             ctx.beginPath(); ctx.moveTo(width - cornerLen, height); ctx.lineTo(width, height); ctx.lineTo(width, height - cornerLen); ctx.stroke();
           }
-        } else if (activeRound.currentPnl < 0) {
-          // --- MINUS ESCALATION ---
-          const lossIntensity = Math.min(1, Math.abs(activeRound.currentPnl) / 9);
+        } else if (fxPnl < 0) {
+          const lossIntensity = Math.min(1, Math.abs(fxPnl) / 9);
           // Heartbeat tempo: accelerates with deeper loss, capped under the strobe limit
           const beatHz = Math.min(LOSS_BEAT_MAX_HZ, LOSS_BEAT_BASE_HZ + lossIntensity * LOSS_BEAT_RANGE_HZ);
           const heartbeat = Math.pow(Math.max(0, Math.sin(now * ((2 * Math.PI) / 1000) * beatHz)), 4);
@@ -477,7 +439,7 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
           ctx.strokeRect(0, 0, width, height);
 
           // Emergency Hazard scanlines when deep in minus (<= -$5.00)
-          if (activeRound.currentPnl <= -5.0) {
+          if (fxPnl <= -5.0) {
             ctx.strokeStyle = FX.lossEdge.a(0.35 * heartbeat);
             ctx.lineWidth = 1.5;
             ctx.setLineDash([8, 8]);
@@ -523,7 +485,7 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [world]);
 
   // Handle Retina DPR and Resize
   useEffect(() => {

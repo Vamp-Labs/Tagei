@@ -1,90 +1,77 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, animate, motion, useMotionValue, useTransform } from 'motion/react';
-import { Clock } from 'lucide-react';
 import { ActiveTradeRound } from '../types/game';
 import { soundEngine } from '../services/audioHaptics';
 import { HoldButton } from '../ui/HoldButton';
-import { EASE_OUT, MICRO, useMotionPref } from '../ui/motion';
+import { EASE_OUT, MICRO, POP_EASE, useMotionPref } from '../ui/motion';
 import { cn } from '../ui/cn';
-import { Button, DirectionChip, Icon, Pill, ROLE, formatAmount, formatTimer, signOf } from '../ui/lucky';
+import { Button, DirectionChip, Icon, Pill, ROLE, formatAmount, formatPrice, formatTimer, signOf } from '../ui/lucky';
+import type { CashOutView } from './game/liveRoundController';
+import { LEGACY_LEVERAGE, isLaneRound, leverageText } from './game/roundDisplay';
+import { useCountdown } from './game/useCountdown';
 
 interface LiveTradeOverlayProps {
   round: ActiveTradeRound;
   targetProgressPct: number;
   autoResolveEnabled?: boolean;
   onCashOut: () => void;
-  onTimeout: () => void;
   onOpenPositionDetails: () => void;
-  /** The engine's real, fixed leverage — see settlementEngine.ts. */
-  leverage: number;
+  endMs: number | null;
+  now: () => number;
+  cashOut?: CashOutView;
 }
 
-const POP_EASE = [0.34, 1.56, 0.64, 1] as const;
 const TIMER_WARN_SECONDS = 5;
+const NEAR_TARGET_PCT = [98, 90, 75] as const;
+const NEAR_TARGET_INTENSITY: Record<(typeof NEAR_TARGET_PCT)[number], number> = { 98: 1, 90: 1, 75: 0.6 };
+const IDLE_CASH_OUT: CashOutView = { phase: 'none', snapshotPnl: null, snapshotPrice: null, exitPrice: null };
 const pnlTone = (value: number) => (signOf(value) < 0 ? ROLE.loss.css : ROLE.profit.css);
 
-/**
- * docs/UI_UX_SPEC.md §4. Show only LIVE state, countdown, entry point (via
- * the canvas track, not this panel), current P&L, direction+leverage, and
- * the cash-out CTA. Full entry price, target, stop, liquidation, stake and
- * raw multiplier are hidden by default — they live behind "Position details".
- */
 export const LiveTradeOverlay: React.FC<LiveTradeOverlayProps> = ({
   round,
   targetProgressPct,
   autoResolveEnabled = true,
   onCashOut,
-  onTimeout,
   onOpenPositionDetails,
-  leverage,
+  endMs,
+  now,
+  cashOut = IDLE_CASH_OUT,
 }) => {
   const reduced = useMotionPref();
-  const [timeLeft, setTimeLeft] = useState<number>(round.durationSeconds);
+  const timeLeft = useCountdown(autoResolveEnabled ? endMs : null, now);
   const [stage, setStage] = useState<HTMLElement | null>(null);
   const [pulseOnMount] = useState(() => round.currentPnl >= 0);
+  const frozen = cashOut.phase !== 'none';
+  const shownPnl = frozen && cashOut.snapshotPnl !== null ? cashOut.snapshotPnl : round.currentPnl;
 
-  const onTimeoutRef = useRef(onTimeout);
-  onTimeoutRef.current = onTimeout;
-  const timeoutFiredRef = useRef(false);
-
-  // --- P&L "juice" ---------------------------------------------------
-  // The number glides (a spring-tweened MotionValue rendered straight into
-  // the DOM, never through React state), pops on meaningful moves, and
-  // throws off a brief floating "+0.12"/"−0.08" beside itself.
-  const pnlMV = useMotionValue(round.currentPnl);
+  const pnlMV = useMotionValue(shownPnl);
   const pnlText = useTransform(pnlMV, (v) => formatAmount(v, null));
   const pnlColor = useTransform(pnlMV, pnlTone);
   const scaleMV = useMotionValue(1);
 
-  const prevPnlRef = useRef(round.currentPnl);
   const popIdRef = useRef(0);
   const lastPopAtRef = useRef(0);
   const [deltaPops, setDeltaPops] = useState<{ id: number; delta: number }[]>([]);
 
-  useEffect(() => {
-    const delta = round.currentPnl - prevPnlRef.current;
-    prevPnlRef.current = round.currentPnl;
+  const prevPnlRef = useRef(shownPnl);
 
-    if (reduced) {
-      pnlMV.set(round.currentPnl);
+  useEffect(() => {
+    const delta = shownPnl - prevPnlRef.current;
+    prevPnlRef.current = shownPnl;
+
+    if (reduced || frozen) {
+      pnlMV.set(shownPnl);
     } else {
-      animate(pnlMV, round.currentPnl, { type: 'spring', stiffness: 260, damping: 26, mass: 0.6 });
+      animate(pnlMV, shownPnl, { type: 'spring', stiffness: 260, damping: 26, mass: 0.6 });
     }
 
-    // Gate the rest (pop, floating delta, haptic) on a meaningful move — the
-    // mock feed ticks ~4x/sec and most deltas are a few cents; without a
-    // floor this would spawn combat text and buzz haptics constantly.
     const MEANINGFUL_DELTA = 0.05;
-    if (Math.abs(delta) < MEANINGFUL_DELTA) return;
+    if (frozen || Math.abs(delta) < MEANINGFUL_DELTA) return;
 
-    // A cooldown on top of the delta floor — otherwise a volatile stretch
-    // (several qualifying ticks within a couple hundred ms) throws off a
-    // new pop on nearly every one, and they read as a pile-up rather than
-    // individually legible events.
-    const now = performance.now();
-    if (now - lastPopAtRef.current < 400) return;
-    lastPopAtRef.current = now;
+    const at = performance.now();
+    if (at - lastPopAtRef.current < 400) return;
+    lastPopAtRef.current = at;
 
     const gained = delta > 0;
     if (!reduced) {
@@ -101,44 +88,32 @@ export const LiveTradeOverlay: React.FC<LiveTradeOverlayProps> = ({
     }, 700);
 
     soundEngine.hapticLight();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [round.currentPnl]);
+  }, [shownPnl, frozen, reduced, pnlMV, scaleMV]);
 
-  // Aura intensity scales with position size — capped so a huge swing
-  // doesn't overwhelm the panel, floored so a fresh 0.00 round isn't dark.
-
-  // The flight HUD belongs at the top of the track, but the timer that drives
-  // it lives here. A portal keeps one instance — and therefore one countdown —
-  // while placing the markup in the glanceable tier.
   useEffect(() => {
     setStage(document.getElementById('track-stage'));
   }, []);
 
-  // Countdown timer (PRD §25): the updater only decrements, because StrictMode double-invokes updaters.
+  const cueRef = useRef(0);
   useEffect(() => {
-    if (!autoResolveEnabled) return;
-    const timer = window.setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : prev));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [autoResolveEnabled]);
-
-  useEffect(() => {
-    if (!autoResolveEnabled || timeLeft > 0 || timeoutFiredRef.current) return;
-    timeoutFiredRef.current = true;
-    onTimeoutRef.current();
-  }, [timeLeft, autoResolveEnabled]);
-
-  // Near target sound cues at 75% and 90% (PRD §19)
-  useEffect(() => {
-    if (targetProgressPct >= 90) {
-      soundEngine.playNearTargetTone(1.0);
-    } else if (targetProgressPct >= 75) {
-      soundEngine.playNearTargetTone(0.6);
-    }
+    const reached = NEAR_TARGET_PCT.find((pct) => targetProgressPct >= pct) ?? 0;
+    if (reached > cueRef.current) soundEngine.playNearTargetTone(NEAR_TARGET_INTENSITY[reached as keyof typeof NEAR_TARGET_INTENSITY]);
+    cueRef.current = reached;
   }, [targetProgressPct]);
 
-  const timerWarn = autoResolveEnabled && timeLeft <= TIMER_WARN_SECONDS;
+  const timerWarn = timeLeft !== null && timeLeft <= TIMER_WARN_SECONDS;
+  const timerText = timeLeft === null ? '∞' : formatTimer(timeLeft);
+  const lane = isLaneRound(round);
+  const cashOutLabel =
+    cashOut.phase === 'locked' ? 'EXIT LOCKED' : cashOut.phase === 'none' ? 'HOLD TO CASH OUT!' : 'CASHING OUT…';
+  const cashOutNote =
+    cashOut.phase === 'locked' && cashOut.exitPrice !== null
+      ? `EXIT LOCKED ${formatPrice(cashOut.exitPrice, { unit: 'USDT' })}`
+      : cashOut.phase === 'requested'
+        ? 'cash-out requested · exit locks at the next oracle round'
+        : cashOut.phase === 'pending'
+          ? 'signing your cash-out'
+          : null;
 
   const flightHud = (
     <div className="absolute top-3 left-6 right-6 z-20 flex items-center justify-between pointer-events-none max-w-md mx-auto">
@@ -154,12 +129,12 @@ export const LiveTradeOverlay: React.FC<LiveTradeOverlayProps> = ({
         {round.asset} · LIVE
       </Pill>
 
-      <span role="timer" aria-label={autoResolveEnabled ? `Time left ${formatTimer(timeLeft)}` : 'No time limit'}>
+      <span role="timer" aria-label={timeLeft === null ? 'No time limit' : `Time left ${timerText}`}>
         <Pill
           className={cn('bg-panel', timerWarn ? 'text-ink font-bold' : 'text-ink-soft font-semibold')}
-          icon={<Clock aria-hidden="true" className={cn('w-3.5 h-3.5', timerWarn ? 'text-ink' : 'text-ink-muted')} />}
+          icon={<Icon name="clock" size={14} className={timerWarn ? 'text-ink' : 'text-ink-muted'} />}
         >
-          {autoResolveEnabled ? formatTimer(timeLeft) : '∞'}
+          {timerText}
         </Pill>
       </span>
     </div>
@@ -176,6 +151,12 @@ export const LiveTradeOverlay: React.FC<LiveTradeOverlayProps> = ({
               className="relative flex items-baseline gap-1.5 whitespace-nowrap tabular-nums"
               style={{ color: pnlColor, scale: scaleMV }}
             >
+              {frozen && (
+                <span className="text-section font-bold">
+                  <span aria-hidden="true">≈</span>
+                  <span className="sr-only">about</span>
+                </span>
+              )}
               <motion.span className="text-display">{pnlText}</motion.span>
               <span className="text-label font-bold">USDT</span>
             </motion.div>
@@ -202,17 +183,31 @@ export const LiveTradeOverlay: React.FC<LiveTradeOverlayProps> = ({
             </div>
           </div>
 
-          <DirectionChip direction={round.direction} leverage={leverage} className="shrink-0" />
+          {lane ? (
+            <span className="flex flex-col items-end gap-1 shrink-0">
+              <DirectionChip direction={round.direction} />
+              <span className="text-micro font-bold tracking-[0.08em] text-ink-muted tabular-nums">{leverageText(round)}</span>
+            </span>
+          ) : (
+            <DirectionChip direction={round.direction} leverage={LEGACY_LEVERAGE} className="shrink-0" />
+          )}
         </div>
+
+        {cashOutNote && (
+          <p role="status" aria-live="polite" className="-mt-2 mb-3 text-micro font-semibold tabular-nums text-ink-soft">
+            {cashOutNote}
+          </p>
+        )}
 
         <HoldButton
           variant="hot"
           onCommit={onCashOut}
-          ariaLabel="Hold to cash out"
+          disabled={frozen}
+          ariaLabel={frozen ? cashOutLabel : 'Hold to cash out'}
           holdingLabel={<span>HOLDING…</span>}
-          className={cn('h-14', pulseOnMount && !reduced && 'lg-pulse-hot')}
+          className={cn('h-14', pulseOnMount && !reduced && !frozen && 'lg-pulse-hot')}
         >
-          <span>HOLD TO CASH OUT!</span>
+          <span>{cashOutLabel}</span>
         </HoldButton>
 
         <Button

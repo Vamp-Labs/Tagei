@@ -959,7 +959,7 @@
     color: var(--color-lucky);
   }
   .lg-statrow dd[data-tone="loss"] {
-    color: var(--color-amber);
+    color: var(--color-loss);
   }
   .lg-statrow dd[data-tone="short"] {
     color: var(--color-info);

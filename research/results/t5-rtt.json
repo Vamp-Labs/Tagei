@@ -1,0 +1,122 @@
+{
+ "generatedAt": "2026-09-26T09:37:14.328Z",
+ "n": 40,
+ "warmKeepAliveMs": {
+  "supraRest": {
+   "n": 40,
+   "p50": 69,
+   "p95": 108,
+   "max": 121
+  },
+  "bscDataseed": {
+   "n": 40,
+   "p50": 111,
+   "p95": 134,
+   "max": 187
+  },
+  "bscBnbchain": {
+   "n": 40,
+   "p50": 115,
+   "p95": 131,
+   "max": 188
+  },
+  "bscPublicnode": {
+   "n": 40,
+   "p50": 154,
+   "p95": 9252,
+   "max": 11657
+  }
+ },
+ "coldCurlMs": {
+  "supraRest": {
+   "total": {
+    "n": 20,
+    "p50": 227,
+    "p95": 252,
+    "max": 261
+   },
+   "tcpConnect": {
+    "n": 20,
+    "p50": 68,
+    "p95": 72,
+    "max": 78
+   },
+   "tlsDone": {
+    "n": 20,
+    "p50": 145,
+    "p95": 183,
+    "max": 190
+   }
+  },
+  "bscDataseed": {
+   "total": {
+    "n": 20,
+    "p50": 449,
+    "p95": 499,
+    "max": 768
+   },
+   "tcpConnect": {
+    "n": 20,
+    "p50": 17,
+    "p95": 51,
+    "max": 343
+   },
+   "tlsDone": {
+    "n": 20,
+    "p50": 324,
+    "p95": 371,
+    "max": 653
+   }
+  },
+  "bscBnbchain": {
+   "total": {
+    "n": 20,
+    "p50": 441,
+    "p95": 501,
+    "max": 505
+   },
+   "tcpConnect": {
+    "n": 20,
+    "p50": 17,
+    "p95": 57,
+    "max": 93
+   },
+   "tlsDone": {
+    "n": 20,
+    "p50": 323,
+    "p95": 391,
+    "max": 391
+   }
+  },
+  "bscPublicnode": {
+   "total": {
+    "n": 20,
+    "p50": 220,
+    "p95": 1711,
+    "max": 8758
+   },
+   "tcpConnect": {
+    "n": 20,
+    "p50": 30,
+    "p95": 34,
+    "max": 40
+   },
+   "tlsDone": {
+    "n": 20,
+    "p50": 68,
+    "p95": 94,
+    "max": 97
+   }
+  }
+ },
+ "wss": {
+  "url": "wss://bsc-testnet-rpc.publicnode.com",
+  "headsReceived": 40,
+  "arrivalMinusHeaderMs": {
+   "n": 40,
+   "p50": 178,
+   "p95": 516,
+   "max": 666
+  }
+ }
+}

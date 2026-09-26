@@ -1,0 +1,743 @@
+{
+ "fixture": "fixtures/supra-97-1790414769.json",
+ "generatedAt": "2026-09-26T09:32:16.011Z",
+ "realChain": {
+  "atBlock": 133262672,
+  "opcodes": {
+   "EIP-1153 TSTORE/TLOAD": {
+    "ok": true,
+    "result": "0x000000000000000000000000000000000000000000000000000000000000002a"
+   },
+   "EIP-5656 MCOPY": {
+    "ok": true,
+    "result": "0x000000000000000000000000000000000000000000000000000000000000002a000000000000000000000000000000000000000000000000000000000000002a"
+   },
+   "EIP-3855 PUSH0": {
+    "ok": true,
+    "result": "0x000000000000000000000000000000000000000000000000000000000000002a"
+   },
+   "EIP-7516 BLOBBASEFEE": {
+    "ok": true,
+    "result": "0x0000000000000000000000000000000000000000000000000000000000000001"
+   }
+  },
+  "timeChecks": [
+   {
+    "blockTimeMinusRoundSec": -60,
+    "ok": false,
+    "revertData": "0xc5184216000000000000000000000000000000000000000000000000000000000000ea60",
+    "revert": {
+     "name": "IncorrectFutureUpdate",
+     "arg": 60000
+    }
+   },
+   {
+    "blockTimeMinusRoundSec": -5,
+    "ok": false,
+    "revertData": "0xc51842160000000000000000000000000000000000000000000000000000000000001388",
+    "revert": {
+     "name": "IncorrectFutureUpdate",
+     "arg": 5000
+    }
+   },
+   {
+    "blockTimeMinusRoundSec": -4,
+    "ok": false,
+    "revertData": "0xc51842160000000000000000000000000000000000000000000000000000000000000fa0",
+    "revert": {
+     "name": "IncorrectFutureUpdate",
+     "arg": 4000
+    }
+   },
+   {
+    "blockTimeMinusRoundSec": -3,
+    "ok": true
+   },
+   {
+    "blockTimeMinusRoundSec": -2,
+    "ok": true
+   },
+   {
+    "blockTimeMinusRoundSec": -1,
+    "ok": true
+   },
+   {
+    "blockTimeMinusRoundSec": 0,
+    "ok": true
+   },
+   {
+    "blockTimeMinusRoundSec": 1,
+    "ok": true
+   },
+   {
+    "blockTimeMinusRoundSec": 60,
+    "ok": true
+   },
+   {
+    "blockTimeMinusRoundSec": 3600,
+    "ok": true
+   },
+   {
+    "blockTimeMinusRoundSec": 86400,
+    "ok": true
+   },
+   {
+    "blockTimeMinusRoundSec": 2592000,
+    "ok": true
+   },
+   {
+    "blockTimeMinusRoundSec": 31536000,
+    "ok": true
+   }
+  ],
+  "stateless": [
+   {
+    "label": "fixture proof[0] (untampered)",
+    "ok": true,
+    "estimateGasIncludingCreate": 563942,
+    "feeds": [
+     {
+      "pair": 0,
+      "price": "83995275000000000000000",
+      "timestamp": 1790414769163,
+      "round": 1790414769000
+     },
+     {
+      "pair": 1,
+      "price": "2682360000000000000000",
+      "timestamp": 1790414769163,
+      "round": 1790414769000
+     },
+     {
+      "pair": 3,
+      "price": "97008000000000000",
+      "timestamp": 1790414769163,
+      "round": 1790414769000
+     },
+     {
+      "pair": 10,
+      "price": "120050000000000000000",
+      "timestamp": 1790414769163,
+      "round": 1790414769000
+     },
+     {
+      "pair": 49,
+      "price": "770770500000000000000",
+      "timestamp": 1790414769163,
+      "round": 1790414769000
+     }
+    ]
+   },
+   {
+    "label": "fixture proof[0] with price+1 on first feed",
+    "ok": false,
+    "revertData": "0xf94e03210000000000000000000000000000000000000000000000000000000000000000",
+    "message": "execution reverted"
+   },
+   {
+    "label": "fixture proof[0] with sig[1] modified",
+    "ok": false,
+    "revertData": "0x7edd58eb",
+    "message": "execution reverted"
+   }
+  ],
+  "supraStorageNow": {
+   "0": {
+    "round": 1790406869000,
+    "ageSec": 8271
+   },
+   "1": {
+    "round": 1790406869000,
+    "ageSec": 8271
+   },
+   "3": {
+    "round": 1790406869000,
+    "ageSec": 8271
+   },
+   "10": {
+    "round": 1790406869000,
+    "ageSec": 8271
+   },
+   "49": {
+    "round": 1790406869000,
+    "ageSec": 8271
+   }
+  }
+ },
+ "fork": {
+  "forkBlock": 133261858,
+  "a_fresh": {
+   "status": "success",
+   "gasUsed": 460515,
+   "blockTimestamp": 1790414770,
+   "returned": {
+    "pairs": [
+     0,
+     1,
+     3,
+     10,
+     49
+    ],
+    "prices": [
+     "83995275000000000000000",
+     "2682360000000000000000",
+     "97008000000000000",
+     "120050000000000000000",
+     "770770500000000000000"
+    ],
+    "timestamp": [
+     1790414769163,
+     1790414769163,
+     1790414769163,
+     1790414769163,
+     1790414769163
+    ],
+    "decimal": [
+     18,
+     18,
+     18,
+     18,
+     18
+    ],
+    "round": [
+     1790414769000,
+     1790414769000,
+     1790414769000,
+     1790414769000,
+     1790414769000
+    ]
+   },
+   "revert": null,
+   "events": [
+    {
+     "name": "PriceUpdate",
+     "pairs": [
+      0,
+      1,
+      3,
+      10,
+      49
+     ],
+     "prices": [
+      "83995275000000000000000",
+      "2682360000000000000000",
+      "97008000000000000",
+      "120050000000000000000",
+      "770770500000000000000"
+     ],
+     "updateMask": [
+      1,
+      1,
+      1,
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  "a_storageAfter": {
+   "0": {
+    "round": 1790414769000,
+    "decimals": 18,
+    "time": 1790414769163,
+    "price": "83995275000000000000000"
+   },
+   "1": {
+    "round": 1790414769000,
+    "decimals": 18,
+    "time": 1790414769163,
+    "price": "2682360000000000000000"
+   },
+   "3": {
+    "round": 1790414769000,
+    "decimals": 18,
+    "time": 1790414769163,
+    "price": "97008000000000000"
+   },
+   "10": {
+    "round": 1790414769000,
+    "decimals": 18,
+    "time": 1790414769163,
+    "price": "120050000000000000000"
+   },
+   "49": {
+    "round": 1790414769000,
+    "decimals": 18,
+    "time": 1790414769163,
+    "price": "770770500000000000000"
+   }
+  },
+  "b_newer": {
+   "status": "success",
+   "gasUsed": 460340,
+   "blockTimestamp": 1790414775,
+   "returned": {
+    "pairs": [
+     0,
+     1,
+     3,
+     10,
+     49
+    ],
+    "prices": [
+     "83994530000000000000000",
+     "2682322500000000000000",
+     "97002500000000000",
+     "120055000000000000000",
+     "770785250000000000000"
+    ],
+    "timestamp": [
+     1790414774164,
+     1790414774164,
+     1790414774164,
+     1790414774164,
+     1790414774164
+    ],
+    "decimal": [
+     18,
+     18,
+     18,
+     18,
+     18
+    ],
+    "round": [
+     1790414774000,
+     1790414774000,
+     1790414774000,
+     1790414774000,
+     1790414774000
+    ]
+   },
+   "revert": null,
+   "events": [
+    {
+     "name": "PriceUpdate",
+     "pairs": [
+      0,
+      1,
+      3,
+      10,
+      49
+     ],
+     "prices": [
+      "83994530000000000000000",
+      "2682322500000000000000",
+      "97002500000000000",
+      "120055000000000000000",
+      "770785250000000000000"
+     ],
+     "updateMask": [
+      1,
+      1,
+      1,
+      1,
+      1
+     ]
+    }
+   ]
+  },
+  "b_older": {
+   "status": "success",
+   "gasUsed": 435853,
+   "blockTimestamp": 1790414776,
+   "returned": {
+    "pairs": [
+     0,
+     1,
+     3,
+     10,
+     49
+    ],
+    "prices": [
+     "83994530000000000000000",
+     "2682322500000000000000",
+     "97002500000000000",
+     "120055000000000000000",
+     "770785250000000000000"
+    ],
+    "timestamp": [
+     1790414774164,
+     1790414774164,
+     1790414774164,
+     1790414774164,
+     1790414774164
+    ],
+    "decimal": [
+     18,
+     18,
+     18,
+     18,
+     18
+    ],
+    "round": [
+     1790414774000,
+     1790414774000,
+     1790414774000,
+     1790414774000,
+     1790414774000
+    ]
+   },
+   "revert": null,
+   "events": [
+    {
+     "name": "PriceUpdate",
+     "pairs": [
+      0,
+      1,
+      3,
+      10,
+      49
+     ],
+     "prices": [
+      "83994530000000000000000",
+      "2682322500000000000000",
+      "97002500000000000",
+      "120055000000000000000",
+      "770785250000000000000"
+     ],
+     "updateMask": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "b_storageAfter": {
+   "0": {
+    "round": 1790414774000,
+    "decimals": 18,
+    "time": 1790414774164,
+    "price": "83994530000000000000000"
+   },
+   "1": {
+    "round": 1790414774000,
+    "decimals": 18,
+    "time": 1790414774164,
+    "price": "2682322500000000000000"
+   },
+   "3": {
+    "round": 1790414774000,
+    "decimals": 18,
+    "time": 1790414774164,
+    "price": "97002500000000000"
+   },
+   "10": {
+    "round": 1790414774000,
+    "decimals": 18,
+    "time": 1790414774164,
+    "price": "120055000000000000000"
+   },
+   "49": {
+    "round": 1790414774000,
+    "decimals": 18,
+    "time": 1790414774164,
+    "price": "770785250000000000000"
+   }
+  },
+  "b_summary": {
+   "olderProofRound": 1790414771000,
+   "newerProofRound": 1790414774000,
+   "returnedRoundsForOlderProof": [
+    1790414774000,
+    1790414774000,
+    1790414774000,
+    1790414774000,
+    1790414774000
+   ],
+   "returnedEqualsNewer": true,
+   "returnedEqualsOlder": false,
+   "olderTxStatus": "success",
+   "olderUpdateMask": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ]
+  },
+  "c_repeat": {
+   "status": "success",
+   "gasUsed": 175263,
+   "blockTimestamp": 1790414777,
+   "returned": {
+    "pairs": [
+     0,
+     1,
+     3,
+     10,
+     49
+    ],
+    "prices": [
+     "83994530000000000000000",
+     "2682322500000000000000",
+     "97002500000000000",
+     "120055000000000000000",
+     "770785250000000000000"
+    ],
+    "timestamp": [
+     1790414774164,
+     1790414774164,
+     1790414774164,
+     1790414774164,
+     1790414774164
+    ],
+    "decimal": [
+     18,
+     18,
+     18,
+     18,
+     18
+    ],
+    "round": [
+     1790414774000,
+     1790414774000,
+     1790414774000,
+     1790414774000,
+     1790414774000
+    ]
+   },
+   "revert": null,
+   "events": [
+    {
+     "name": "PriceUpdate",
+     "pairs": [
+      0,
+      1,
+      3,
+      10,
+      49
+     ],
+     "prices": [
+      "83994530000000000000000",
+      "2682322500000000000000",
+      "97002500000000000",
+      "120055000000000000000",
+      "770785250000000000000"
+     ],
+     "updateMask": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ]
+  },
+  "c_summary": {
+   "status": "success",
+   "gasUsed": 175263,
+   "updateMask": [
+    [
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "returnedRound": [
+    1790414774000,
+    1790414774000,
+    1790414774000,
+    1790414774000,
+    1790414774000
+   ]
+  },
+  "d_timeTravel": [
+   {
+    "increaseSec": 3600,
+    "status": "success",
+    "blockTimestamp": 1790418378,
+    "proofRound": 1790414775000,
+    "ageSec": 3603,
+    "updateMask": [
+     [
+      1,
+      1,
+      1,
+      1,
+      1
+     ]
+    ],
+    "gasUsed": 443316
+   },
+   {
+    "increaseSec": 86400,
+    "status": "success",
+    "blockTimestamp": 1790501177,
+    "proofRound": 1790414775000,
+    "ageSec": 86402,
+    "updateMask": [
+     [
+      1,
+      1,
+      1,
+      1,
+      1
+     ]
+    ],
+    "gasUsed": 443316
+   },
+   {
+    "increaseSec": 2592000,
+    "status": "success",
+    "blockTimestamp": 1793006778,
+    "proofRound": 1790414775000,
+    "ageSec": 2592003,
+    "updateMask": [
+     [
+      1,
+      1,
+      1,
+      1,
+      1
+     ]
+    ],
+    "gasUsed": 443316
+   }
+  ],
+  "d_future": {
+   "proofRound": 1790414791000,
+   "blockTimestamp": 1790414779,
+   "deltaMs": 12000,
+   "status": "reverted",
+   "revert": {
+    "name": "IncorrectFutureUpdate",
+    "arg": 12000
+   }
+  },
+  "e_supraStorageAfterNewest": {
+   "0": {
+    "round": 1790414791000,
+    "decimals": 18,
+    "time": 1790414791157,
+    "price": "83997350000000000000000"
+   },
+   "1": {
+    "round": 1790414791000,
+    "decimals": 18,
+    "time": 1790414791157,
+    "price": "2682207500000000000000"
+   },
+   "3": {
+    "round": 1790414791000,
+    "decimals": 18,
+    "time": 1790414791157,
+    "price": "96995000000000000"
+   },
+   "10": {
+    "round": 1790414791000,
+    "decimals": 18,
+    "time": 1790414791157,
+    "price": "120050000000000000000"
+   },
+   "49": {
+    "round": 1790414791000,
+    "decimals": 18,
+    "time": 1790414791157,
+    "price": "770720500000000000000"
+   }
+  },
+  "e_supraVerifyOldProof": {
+   "ok": true,
+   "result": {
+    "pairs": [
+     0,
+     1,
+     3,
+     10,
+     49
+    ],
+    "prices": [
+     "83997350000000000000000",
+     "2682207500000000000000",
+     "96995000000000000",
+     "120050000000000000000",
+     "770720500000000000000"
+    ],
+    "timestamp": [
+     1790414791157,
+     1790414791157,
+     1790414791157,
+     1790414791157,
+     1790414791157
+    ],
+    "decimal": [
+     18,
+     18,
+     18,
+     18,
+     18
+    ],
+    "round": [
+     1790414791000,
+     1790414791000,
+     1790414791000,
+     1790414791000,
+     1790414791000
+    ]
+   }
+  },
+  "e_stateless": [
+   {
+    "proofIndex": 0,
+    "round": 1790414769000,
+    "ok": true,
+    "estimateGas": 291714,
+    "returnedRounds": [
+     1790414769000
+    ],
+    "matchesFixture": true
+   },
+   {
+    "proofIndex": 1,
+    "round": 1790414770000,
+    "ok": true,
+    "estimateGas": 300236,
+    "returnedRounds": [
+     1790414770000
+    ],
+    "matchesFixture": true
+   },
+   {
+    "proofIndex": 10,
+    "round": 1790414779000,
+    "ok": true,
+    "estimateGas": 265985,
+    "returnedRounds": [
+     1790414779000
+    ],
+    "matchesFixture": true
+   },
+   {
+    "proofIndex": 21,
+    "round": 1790414790000,
+    "ok": true,
+    "estimateGas": 274642,
+    "returnedRounds": [
+     1790414790000
+    ],
+    "matchesFixture": true
+   },
+   {
+    "label": "tamperedPrice",
+    "ok": false,
+    "revertData": "0xf94e03210000000000000000000000000000000000000000000000000000000000000000",
+    "message": "Execution reverted with reason: custom error 0xf94e0321: \u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000."
+   },
+   {
+    "label": "tamperedSig",
+    "ok": false,
+    "revertData": "0x7edd58eb",
+    "message": "Execution reverted with reason: custom error 0x7edd58eb."
+   }
+  ],
+  "f_tstoreOnFork": "0x000000000000000000000000000000000000000000000000000000000000002a"
+ }
+}

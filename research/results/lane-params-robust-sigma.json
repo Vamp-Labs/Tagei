@@ -1,0 +1,542 @@
+{
+ "version": 1,
+ "sigmaModeForConstraints": "robust",
+ "generatedAt": "2026-09-26T10:17:57.997Z",
+ "recommendedDurationSec": 30,
+ "warnings": [
+  "Calibrated on Binance 1 s closes, NOT on Supra rounds: Supra is smoother (sigma1s ~20-37% lower) and lags Binance by ~1-2 s (spike-report.md section 6.4).",
+  "Informed-flow risk: on the recorded Supra hour a player betting the direction of Binance's last 5 s had positive expectation on every CRUISE/BOOST lane even with an 8 s entry delay; Supra-only 5 s momentum was negative-edge on all 20 lanes (spike-report.md section 6.3). Do not use with real value before Supra-native re-validation.",
+  "Tiers with enabled=false carry the closest candidate (T,S,stats) for reference only; see disabledReason."
+ ],
+ "methodology": {
+  "data": "Binance spot 1-second klines (close), data-api.binance.vision, used as a proxy for Supra DORA-2 per-second rounds (see results/t4-calibration-full.json proxyCheck for the Supra-vs-Binance validation).",
+  "roundModel": "entry = p[s]; seconds s+1..s+D checked in order; first touch wins (inclusive): favourable >= targetPpm -> stake*M; adverse >= stopPpm -> 0; else at s+D stake*V(r)*(1-fee), V=1+(M-1)r/T (r>=0), 1-|r|/S (r<0); r = simple return vs entry in ppm. LONG and SHORT, every start second (stride 1).",
+  "sigma1sPpm": "plain standard deviation of 1-second simple returns (ppm) over the window (includes microstructure noise; conservative for S>=4*sigma and the gap margin). Robust alternatives reported in results/t4-calibration-full.json.",
+  "gapMarginPpm": "0.5826 * sigma1sPpm (Broadie-Glasserman-Kou discrete-monitoring shift beta = -zeta(1/2)/sqrt(2*pi))",
+  "maxJumpPpm": "niceCeil(max(2 * max observed |1s return|, 10 * p99.99 |1s return|)) over the window: should essentially never trigger on real data.",
+  "constraints": {
+   "guard": "(M-1)*S + max(0, M-2)*gapMarginPpm <= T",
+   "stopMin": "S >= 4*sigma1sPpm",
+   "houseEdge": "[2%, 6%], target 3-4%",
+   "worstRegimeEdge": ">= 0 over {vol-quartile hours Q1..Q4, weekday, weekend} x {LONG, SHORT}",
+   "pTPBands": {
+    "CRUISE": [
+     0.4,
+     0.55
+    ],
+    "BOOST": [
+     0.3,
+     0.45
+    ],
+    "HYPER": [
+     0.2,
+     0.35
+    ],
+    "WARP": [
+     0.15,
+     0.25
+    ]
+   }
+  },
+  "selection": "exhaustive (T,S) grid (log-spaced 0.5..120 sigma, 110 levels) -> filter constraints -> prefer edge in [3%,4%], then highest touch-resolution P(TP)+P(SL), then edge closest to 3.5%; final values rounded to integer ppm (guard preserved) and re-simulated exactly.",
+  "houseEdge": "1 - E[payout/stake], LONG/SHORT averaged (50/50 flow). worstRegimeEdge = min over regimes and directions.",
+  "statisticalPrecision": "~30k independent D-second windows per asset in 7 days => edge standard error roughly +-0.3-0.6 percentage points; treat 2% as the practical floor."
+ },
+ "dataWindow": {
+  "source": "https://data-api.binance.vision/api/v3/klines interval=1s (spot, close price)",
+  "startMs": 1789809840000,
+  "endMs": 1790414640000,
+  "startIso": "2026-09-19T09:24:00.000Z",
+  "endIso": "2026-09-26T09:24:00.000Z",
+  "seconds": 604800
+ },
+ "assets": {
+  "BNB": {
+   "pairId": 49,
+   "sigma1sPpm": 63.55,
+   "sigma1sRobustPpm": 44.88,
+   "gapMarginPpm": 26.15,
+   "maxJumpPpm": 15000,
+   "durationSec": 30,
+   "tiers": [
+    {
+     "tier": 1,
+     "label": "CRUISE",
+     "multiplierBps": 15000,
+     "targetPpm": 227,
+     "stopPpm": 435,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.322357,
+      "pSL": 0.139107,
+      "pTimeout": 0.538535,
+      "houseEdge": 0.059889,
+      "worstRegimeEdge": 0.044701,
+      "edgeLong": 0.062162,
+      "edgeShort": 0.057615,
+      "expectedPayout": 0.940111,
+      "meanResolveSec": 22.789062,
+      "momentumWorstEdge": 0.042726
+     },
+     "disabledReason": "P(TP) band [40.0%, 55.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 32.3%"
+    },
+    {
+     "tier": 2,
+     "label": "BOOST",
+     "multiplierBps": 20000,
+     "targetPpm": 216,
+     "stopPpm": 185,
+     "feeBps": 100,
+     "enabled": true,
+     "stats": {
+      "pTP": 0.311346,
+      "pSL": 0.353863,
+      "pTimeout": 0.334792,
+      "houseEdge": 0.039104,
+      "worstRegimeEdge": 0.022166,
+      "edgeLong": 0.045715,
+      "edgeShort": 0.032493,
+      "expectedPayout": 0.960896,
+      "meanResolveSec": 18.355026,
+      "momentumWorstEdge": 0.00542
+     }
+    },
+    {
+     "tier": 3,
+     "label": "HYPER",
+     "multiplierBps": 30000,
+     "targetPpm": 533,
+     "stopPpm": 185,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.09397,
+      "pSL": 0.376458,
+      "pTimeout": 0.529572,
+      "houseEdge": 0.022883,
+      "worstRegimeEdge": 0.002719,
+      "edgeLong": 0.026768,
+      "edgeShort": 0.018999,
+      "expectedPayout": 0.977117,
+      "meanResolveSec": 22.290666,
+      "momentumWorstEdge": -0.01548
+     },
+     "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 9.4%"
+    },
+    {
+     "tier": 4,
+     "label": "WARP",
+     "multiplierBps": 50000,
+     "targetPpm": 1192,
+     "stopPpm": 185,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.010357,
+      "pSL": 0.379113,
+      "pTimeout": 0.61053,
+      "houseEdge": 0.034762,
+      "worstRegimeEdge": 0.003861,
+      "edgeLong": 0.03769,
+      "edgeShort": 0.031833,
+      "expectedPayout": 0.965238,
+      "meanResolveSec": 23.359475,
+      "momentumWorstEdge": -0.005677
+     },
+     "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 1.0%"
+    }
+   ]
+  },
+  "BTC": {
+   "pairId": 0,
+   "sigma1sPpm": 52.67,
+   "sigma1sRobustPpm": 36.11,
+   "gapMarginPpm": 21.04,
+   "maxJumpPpm": 10000,
+   "durationSec": 30,
+   "tiers": [
+    {
+     "tier": 1,
+     "label": "CRUISE",
+     "multiplierBps": 15000,
+     "targetPpm": 213,
+     "stopPpm": 407,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.253463,
+      "pSL": 0.109218,
+      "pTimeout": 0.637319,
+      "houseEdge": 0.058984,
+      "worstRegimeEdge": 0.040642,
+      "edgeLong": 0.058653,
+      "edgeShort": 0.059316,
+      "expectedPayout": 0.941016,
+      "meanResolveSec": 24.391525,
+      "momentumWorstEdge": 0.024533
+     },
+     "disabledReason": "P(TP) band [40.0%, 55.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 25.4%"
+    },
+    {
+     "tier": 2,
+     "label": "BOOST",
+     "multiplierBps": 20000,
+     "targetPpm": 165,
+     "stopPpm": 149,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.286167,
+      "pSL": 0.306276,
+      "pTimeout": 0.407557,
+      "houseEdge": 0.020566,
+      "worstRegimeEdge": 0.001609,
+      "edgeLong": 0.022067,
+      "edgeShort": 0.019066,
+      "expectedPayout": 0.979434,
+      "meanResolveSec": 19.51758,
+      "momentumWorstEdge": -0.05981
+     },
+     "disabledReason": "P(TP) band [30.0%, 45.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 28.6%"
+    },
+    {
+     "tier": 3,
+     "label": "HYPER",
+     "multiplierBps": 30000,
+     "targetPpm": 499,
+     "stopPpm": 156,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.073311,
+      "pSL": 0.321911,
+      "pTimeout": 0.604778,
+      "houseEdge": 0.026571,
+      "worstRegimeEdge": 0.005024,
+      "edgeLong": 0.027341,
+      "edgeShort": 0.025801,
+      "expectedPayout": 0.973429,
+      "meanResolveSec": 23.493401,
+      "momentumWorstEdge": -0.050412
+     },
+     "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 7.3%"
+    },
+    {
+     "tier": 4,
+     "label": "WARP",
+     "multiplierBps": 50000,
+     "targetPpm": 1115,
+     "stopPpm": 156,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.009356,
+      "pSL": 0.324501,
+      "pTimeout": 0.666143,
+      "houseEdge": 0.035411,
+      "worstRegimeEdge": 0.002005,
+      "edgeLong": 0.034567,
+      "edgeShort": 0.036256,
+      "expectedPayout": 0.964589,
+      "meanResolveSec": 24.340834,
+      "momentumWorstEdge": -0.042809
+     },
+     "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 0.9%"
+    }
+   ]
+  },
+  "ETH": {
+   "pairId": 1,
+   "sigma1sPpm": 78.19,
+   "sigma1sRobustPpm": 57.11,
+   "gapMarginPpm": 33.27,
+   "maxJumpPpm": 15000,
+   "durationSec": 30,
+   "tiers": [
+    {
+     "tier": 1,
+     "label": "CRUISE",
+     "multiplierBps": 15000,
+     "targetPpm": 261,
+     "stopPpm": 501,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.322269,
+      "pSL": 0.142485,
+      "pTimeout": 0.535246,
+      "houseEdge": 0.058827,
+      "worstRegimeEdge": 0.048649,
+      "edgeLong": 0.061566,
+      "edgeShort": 0.056089,
+      "expectedPayout": 0.941173,
+      "meanResolveSec": 22.542067,
+      "momentumWorstEdge": 0.043193
+     },
+     "disabledReason": "P(TP) band [40.0%, 55.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 32.2%"
+    },
+    {
+     "tier": 2,
+     "label": "BOOST",
+     "multiplierBps": 20000,
+     "targetPpm": 261,
+     "stopPpm": 235,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.298775,
+      "pSL": 0.328579,
+      "pTimeout": 0.372647,
+      "houseEdge": 0.02845,
+      "worstRegimeEdge": 0.007839,
+      "edgeLong": 0.032681,
+      "edgeShort": 0.024219,
+      "expectedPayout": 0.97155,
+      "meanResolveSec": 19.021609,
+      "momentumWorstEdge": -0.004793
+     },
+     "disabledReason": "P(TP) band [30.0%, 45.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 29.9%"
+    },
+    {
+     "tier": 3,
+     "label": "HYPER",
+     "multiplierBps": 30000,
+     "targetPpm": 679,
+     "stopPpm": 248,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.081522,
+      "pSL": 0.339869,
+      "pTimeout": 0.578609,
+      "houseEdge": 0.022778,
+      "worstRegimeEdge": 0.000565,
+      "edgeLong": 0.027352,
+      "edgeShort": 0.018203,
+      "expectedPayout": 0.977222,
+      "meanResolveSec": 23.165223,
+      "momentumWorstEdge": -0.00867
+     },
+     "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 8.2%"
+    },
+    {
+     "tier": 4,
+     "label": "WARP",
+     "multiplierBps": 50000,
+     "targetPpm": 1442,
+     "stopPpm": 235,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.011375,
+      "pSL": 0.356227,
+      "pTimeout": 0.632398,
+      "houseEdge": 0.033182,
+      "worstRegimeEdge": 0.006129,
+      "edgeLong": 0.036151,
+      "edgeShort": 0.030213,
+      "expectedPayout": 0.966818,
+      "meanResolveSec": 23.780188,
+      "momentumWorstEdge": -0.000157
+     },
+     "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 1.1%"
+    }
+   ]
+  },
+  "SOL": {
+   "pairId": 10,
+   "sigma1sPpm": 111.65,
+   "sigma1sRobustPpm": 86.94,
+   "gapMarginPpm": 50.65,
+   "maxJumpPpm": 20000,
+   "durationSec": 30,
+   "tiers": [
+    {
+     "tier": 1,
+     "label": "CRUISE",
+     "multiplierBps": 15000,
+     "targetPpm": 241,
+     "stopPpm": 461,
+     "feeBps": 100,
+     "enabled": true,
+     "stats": {
+      "pTP": 0.474245,
+      "pSL": 0.220268,
+      "pTimeout": 0.305487,
+      "houseEdge": 0.052071,
+      "worstRegimeEdge": 0.040076,
+      "edgeLong": 0.056349,
+      "edgeShort": 0.047794,
+      "expectedPayout": 0.947929,
+      "meanResolveSec": 17.504508,
+      "momentumWorstEdge": 0.036902
+     }
+    },
+    {
+     "tier": 2,
+     "label": "BOOST",
+     "multiplierBps": 20000,
+     "targetPpm": 418,
+     "stopPpm": 359,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.292576,
+      "pSL": 0.315386,
+      "pTimeout": 0.392038,
+      "houseEdge": 0.027359,
+      "worstRegimeEdge": 0.012871,
+      "edgeLong": 0.031326,
+      "edgeShort": 0.023392,
+      "expectedPayout": 0.972641,
+      "meanResolveSec": 20.051978,
+      "momentumWorstEdge": 0.006951
+     },
+     "disabledReason": "P(TP) band [30.0%, 45.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 29.3%"
+    },
+    {
+     "tier": 3,
+     "label": "HYPER",
+     "multiplierBps": 30000,
+     "targetPpm": 982,
+     "stopPpm": 377,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.069709,
+      "pSL": 0.318775,
+      "pTimeout": 0.611516,
+      "houseEdge": 0.02329,
+      "worstRegimeEdge": 0.008381,
+      "edgeLong": 0.02345,
+      "edgeShort": 0.02313,
+      "expectedPayout": 0.97671,
+      "meanResolveSec": 24.057845,
+      "momentumWorstEdge": 0.002473
+     },
+     "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 7.0%"
+    },
+    {
+     "tier": 4,
+     "label": "WARP",
+     "multiplierBps": 50000,
+     "targetPpm": 2088,
+     "stopPpm": 377,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.007439,
+      "pSL": 0.320533,
+      "pTimeout": 0.672027,
+      "houseEdge": 0.026272,
+      "worstRegimeEdge": 0.005417,
+      "edgeLong": 0.026328,
+      "edgeShort": 0.026216,
+      "expectedPayout": 0.973728,
+      "meanResolveSec": 24.827386,
+      "momentumWorstEdge": 0.00445
+     },
+     "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 0.7%"
+    }
+   ]
+  },
+  "DOGE": {
+   "pairId": 3,
+   "sigma1sPpm": 173.71,
+   "sigma1sRobustPpm": 141.47,
+   "gapMarginPpm": 82.42,
+   "maxJumpPpm": 40000,
+   "durationSec": 30,
+   "tiers": [
+    {
+     "tier": 1,
+     "label": "CRUISE",
+     "multiplierBps": 15000,
+     "targetPpm": 372,
+     "stopPpm": 714,
+     "feeBps": 100,
+     "enabled": true,
+     "stats": {
+      "pTP": 0.436927,
+      "pSL": 0.211327,
+      "pTimeout": 0.351746,
+      "houseEdge": 0.058795,
+      "worstRegimeEdge": 0.046263,
+      "edgeLong": 0.05885,
+      "edgeShort": 0.05874,
+      "expectedPayout": 0.941205,
+      "meanResolveSec": 18.539076,
+      "momentumWorstEdge": 0.052011
+     }
+    },
+    {
+     "tier": 2,
+     "label": "BOOST",
+     "multiplierBps": 20000,
+     "targetPpm": 615,
+     "stopPpm": 584,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.273711,
+      "pSL": 0.298377,
+      "pTimeout": 0.427911,
+      "houseEdge": 0.023392,
+      "worstRegimeEdge": 0.007663,
+      "edgeLong": 0.02348,
+      "edgeShort": 0.023305,
+      "expectedPayout": 0.976608,
+      "meanResolveSec": 20.635874,
+      "momentumWorstEdge": 0.013605
+     },
+     "disabledReason": "P(TP) band [30.0%, 45.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 27.4%"
+    },
+    {
+     "tier": 3,
+     "label": "HYPER",
+     "multiplierBps": 30000,
+     "targetPpm": 1445,
+     "stopPpm": 584,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.07319,
+      "pSL": 0.31671,
+      "pTimeout": 0.610101,
+      "houseEdge": 0.024446,
+      "worstRegimeEdge": 0.001879,
+      "edgeLong": 0.021819,
+      "edgeShort": 0.027073,
+      "expectedPayout": 0.975554,
+      "meanResolveSec": 23.950162,
+      "momentumWorstEdge": 0.015549
+     },
+     "disabledReason": "P(TP) band [20.0%, 35.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 7.3%"
+    },
+    {
+     "tier": 4,
+     "label": "WARP",
+     "multiplierBps": 50000,
+     "targetPpm": 3072,
+     "stopPpm": 584,
+     "feeBps": 100,
+     "enabled": false,
+     "stats": {
+      "pTP": 0.009186,
+      "pSL": 0.319104,
+      "pTimeout": 0.67171,
+      "houseEdge": 0.02729,
+      "worstRegimeEdge": 0.010207,
+      "edgeLong": 0.02432,
+      "edgeShort": 0.03026,
+      "expectedPayout": 0.97271,
+      "meanResolveSec": 24.773559,
+      "momentumWorstEdge": 0.016548
+     },
+     "disabledReason": "P(TP) band [15.0%, 25.0%] unreachable: with guard (M-1)S+max(0,M-2)g<=T, S>=4σ and edge in [2%,6%] (worst regime >= 0) the max P(TP) is 0.9%"
+    }
+   ]
+  }
+ }
+}

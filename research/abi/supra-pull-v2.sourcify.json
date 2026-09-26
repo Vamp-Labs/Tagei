@@ -1,0 +1,30 @@
+{
+  "source": "https://sourcify.dev/server/v2/contract/97/0x4B065DEb38b05119b4cE27AD35d4d4c7c844F499 (exact_match, verified 2026-06-10)",
+  "compilation": {
+    "language": "Solidity",
+    "compiler": "solc",
+    "compilerVersion": "0.8.24+commit.e11b9ed9",
+    "compilerSettings": {
+      "viaIR": true,
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "libraries": {},
+      "optimizer": {
+        "runs": 200,
+        "enabled": true
+      },
+      "evmVersion": "paris",
+      "remappings": [
+        ":ds-test/=lib/forge-std/lib/ds-test/src/",
+        ":erc4626-tests/=lib/openzeppelin-contracts-upgradeable/lib/erc4626-tests/",
+        ":forge-std/=lib/forge-std/src/",
+        ":openzeppelin-contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/",
+        ":openzeppelin-contracts/=lib/openzeppelin-contracts/",
+        ":openzeppelin/=lib/openzeppelin-contracts-upgradeable/contracts/"
+      ]
+    },
+    "name": "SupraOraclePull",
+    "fullyQualifiedName": "src/SupraOraclePull_V2.sol:SupraOraclePull"
+  }
+}

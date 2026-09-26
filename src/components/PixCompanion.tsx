@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { GameStage, PositionDirection } from '../types/game';
-import { MICRO } from '../ui/motion';
+import { MICRO, useMotionPref } from '../ui/motion';
+import { PixAvatar } from './pix/PixAvatar';
+import { pixMoodFor } from './pix/mood';
 
 interface PixCompanionProps {
   gameStage: GameStage;
@@ -41,19 +43,19 @@ export const PixCompanion: React.FC<PixCompanionProps> = ({
 
   useEffect(() => {
     if (gameStage === 'PRE_TRADE' && selectedDirection === 'LONG') {
-      say('LONG chosen — momentum looks prime.', 'dir-long');
+      say('LONG set. Watching for momentum.', 'dir-long');
     } else if (gameStage === 'PRE_TRADE' && selectedDirection === 'SHORT') {
-      say('SHORT locked — riding the downside.', 'dir-short');
+      say('SHORT set. Watching the downside.', 'dir-short');
     } else if (gameStage === 'LIVE_TRADE' && targetProgressPct >= 90) {
-      say('Almost there!', 'near-target', 2000);
+      say('Almost there.', 'near-target', 2000);
     } else if (gameStage === 'LIVE_TRADE' && currentPnl <= -6) {
       say('Approaching stop loss.', 'near-stop', 2400);
     } else if (gameStage === 'TARGET_HIT') {
-      say('Nice landing! 🎯', 'target-hit', 2400);
+      say('Nice landing.', 'target-hit', 2400);
     } else if (gameStage === 'LOSS_HIT') {
       say('Stop honored. Good risk control.', 'loss-hit', 2400);
     } else if (gameStage === 'RESULT') {
-      say(currentPnl >= 0 ? 'Nice landing!' : "Let's review the tape.", 'result', 2800);
+      say(currentPnl >= 0 ? 'Nice landing.' : "Let's review the tape.", 'result', 2800);
     }
 
     if (gameStage === 'HOME' || gameStage === 'PRE_TRADE') {
@@ -67,34 +69,37 @@ export const PixCompanion: React.FC<PixCompanionProps> = ({
     if (dismissTimerRef.current) window.clearTimeout(dismissTimerRef.current);
   }, []);
 
-  const eyes = currentPnl >= 4 ? '★‿★' : currentPnl < -2.5 ? '•︵•' : '•‿•';
+  const reduced = useMotionPref();
+  const bubbleHidden = reduced ? { opacity: 0 } : { opacity: 0, y: -4, scale: 0.94 };
 
   return (
-    <button
-      onClick={onTap}
-      aria-label="Open PIX AI"
-      className="absolute top-16 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1.5 pointer-events-auto select-none cursor-pointer"
-    >
-      <div className="w-9 h-9 rounded-[var(--radius-sm)] bg-[color:var(--color-panel)] border border-[color:var(--color-line)] flex items-center justify-center">
-        <span className="font-mono text-[10px] font-bold text-[color:var(--color-text-1)]">{eyes}</span>
-      </div>
+    <div className="absolute inset-x-0 top-16 z-20 flex flex-col items-center gap-2 pointer-events-none select-none">
+      <button
+        type="button"
+        onClick={onTap}
+        aria-label="Open PIX assistant"
+        className="pointer-events-auto flex size-12 items-center justify-center rounded-full cursor-pointer"
+      >
+        <PixAvatar mood={pixMoodFor(currentPnl)} />
+      </button>
 
-      <AnimatePresence mode="wait">
-        {speech && (
-          <motion.div
-            key={speech}
-            initial={{ opacity: 0, y: -4, scale: 0.94 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, scale: 0.94 }}
-            transition={MICRO}
-            className="max-w-[200px] px-2.5 py-1.5 rounded-[var(--radius-sm)] bg-[color:var(--color-panel)] border border-[color:var(--color-line)]"
-          >
-            <p className="text-[length:var(--text-micro)] font-medium text-[color:var(--color-text-1)] leading-tight">
+      <div role="status" aria-live="polite" className="flex justify-center px-6">
+        <AnimatePresence mode="wait">
+          {speech && (
+            <motion.p
+              key={speech}
+              initial={bubbleHidden}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={bubbleHidden}
+              transition={MICRO}
+              onClick={onTap}
+              className="pointer-events-auto cursor-pointer max-w-[220px] px-3 py-2 rounded-md bg-panel border border-line text-caption text-ink-soft text-center line-clamp-2"
+            >
               {speech}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </button>
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
   );
 };

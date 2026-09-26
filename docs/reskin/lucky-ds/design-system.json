@@ -1,0 +1,180 @@
+{
+  "v": 3,
+  "assetGroups": {
+    "Currency": {
+      "files": {
+        "btc.png": {
+          "blob": "cefe9663b69b8e7595e8f4cc770c1818",
+          "name": "btc.png",
+          "size": 5723,
+          "type": "image/png"
+        },
+        "eur.png": {
+          "blob": "4343a3aa0f008d901a79eba75aeb4ba0",
+          "name": "eur.png",
+          "size": 6705,
+          "type": "image/png"
+        },
+        "usd.png": {
+          "blob": "504b43436ffb7496aeebfdc7f1bfe0b1",
+          "name": "usd.png",
+          "size": 5167,
+          "type": "image/png"
+        },
+        "usdt.png": {
+          "blob": "878ec941fb01c4b801448f2171ac1ca4",
+          "name": "usdt.png",
+          "size": 5619,
+          "type": "image/png"
+        }
+      },
+      "name": "Currency",
+      "order": [
+        "usd.png",
+        "eur.png",
+        "btc.png",
+        "usdt.png"
+      ],
+      "tile": "s"
+    },
+    "Illustrations": {
+      "files": {
+        "avatar.png": {
+          "blob": "e08847abd985708a7a50ea8e9c30e412",
+          "name": "avatar.png",
+          "size": 3685,
+          "type": "image/png"
+        },
+        "clover-mark.png": {
+          "blob": "4bde1a5e25b68d20a70eb12d68f6b8c3",
+          "name": "clover-mark.png",
+          "size": 2982,
+          "type": "image/png"
+        },
+        "coin.png": {
+          "blob": "03bba6aede8066f1b8bc0ba236da6db9",
+          "name": "coin.png",
+          "size": 10814,
+          "type": "image/png"
+        },
+        "hero-bomb.png": {
+          "blob": "5353e6737f1efd75ee456f8b80bd09b5",
+          "name": "hero-bomb.png",
+          "size": 53912,
+          "type": "image/png"
+        },
+        "locked-bolt.png": {
+          "blob": "c452a743aecd964d055ac3872f45d64b",
+          "name": "locked-bolt.png",
+          "size": 7660,
+          "type": "image/png"
+        },
+        "locked-crown.png": {
+          "blob": "72194c29c7b5eb74cded4b9e7f76979a",
+          "name": "locked-crown.png",
+          "size": 8789,
+          "type": "image/png"
+        },
+        "locked-magnet.png": {
+          "blob": "c45eaaadaef04203931c5849b7b65dc7",
+          "name": "locked-magnet.png",
+          "size": 8732,
+          "type": "image/png"
+        },
+        "pro-bolt.png": {
+          "blob": "cc8573482de37a8d222b887102b49877",
+          "name": "pro-bolt.png",
+          "size": 7557,
+          "type": "image/png"
+        },
+        "pro-chip.png": {
+          "blob": "d53038762c7cc9d9016087953866cf18",
+          "name": "pro-chip.png",
+          "size": 9884,
+          "type": "image/png"
+        },
+        "reward-clover.png": {
+          "blob": "f4ff6816da32ea28f3448a16df382cce",
+          "name": "reward-clover.png",
+          "size": 8231,
+          "type": "image/png"
+        },
+        "reward-crown.png": {
+          "blob": "0edb0a1480ee68fee040590bf7ac63fe",
+          "name": "reward-crown.png",
+          "size": 6213,
+          "type": "image/png"
+        },
+        "reward-gift.png": {
+          "blob": "85b47088f3b9c24fc3604242057383c4",
+          "name": "reward-gift.png",
+          "size": 5993,
+          "type": "image/png"
+        },
+        "room-crash-race.png": {
+          "blob": "61ea6d12f8c38b04959cbefa902d115c",
+          "name": "room-crash-race.png",
+          "size": 22670,
+          "type": "image/png"
+        },
+        "room-m-money.png": {
+          "blob": "c57270dd6e29be5f1f448af240971853",
+          "name": "room-m-money.png",
+          "size": 23391,
+          "type": "image/png"
+        }
+      },
+      "name": "Illustrations",
+      "order": [
+        "clover-mark.png",
+        "hero-bomb.png",
+        "room-crash-race.png",
+        "room-m-money.png",
+        "reward-crown.png",
+        "reward-gift.png",
+        "reward-clover.png",
+        "locked-magnet.png",
+        "locked-crown.png",
+        "locked-bolt.png",
+        "pro-chip.png",
+        "pro-bolt.png",
+        "coin.png",
+        "avatar.png"
+      ],
+      "tile": "m"
+    }
+  },
+  "blobs": {},
+  "createdOnFiles": {
+    "at": "2026-09-26T08:53:22Z",
+    "v": 1
+  },
+  "docs": {
+    "readme": "project/README.md",
+    "sections": []
+  },
+  "groups": [
+    "Illustrations",
+    "Currency"
+  ],
+  "lastChange": {
+    "at": "2026-09-26T08:53:22Z",
+    "by": "C4N",
+    "note": "Built from the Lucky Games mobile screens screenshot",
+    "via": "Claude (Cowork)"
+  },
+  "layout": "files",
+  "libraries": [
+    {
+      "name": "react",
+      "version": "18"
+    },
+    {
+      "name": "react-dom",
+      "version": "18"
+    }
+  ],
+  "namespace": "LuckyGames",
+  "sections": {},
+  "title": "Lucky Games"
+}

@@ -1,0 +1,57 @@
+<!-- @dsCard height=288 -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lucky Games</title>
+<style>
+  html, body { margin:0; height:100%; }
+  body { background:var(--bg-sheet); color:var(--ink); font-family:var(--font-sans); overflow:hidden; }
+  .cover { position:relative; height:288px; overflow:hidden; }
+  .art { position:absolute; top:0; left:480px; width:480px; height:288px; overflow:hidden; }
+  .art svg { display:block; width:480px; height:288px; }
+  .blue { fill:var(--frame); }
+  .lucky { fill:var(--lucky); }
+  .sky { fill:var(--hero-sky); }
+  .gold { fill:var(--gold); }
+  .hot { fill:var(--hot); }
+  .cut { fill:var(--bg-sheet); }
+  .coin { fill:var(--gold); }
+  .words { position:absolute; left:var(--space-5); bottom:var(--space-5); max-width:440px; }
+  .name { margin:0; font-size:104px; line-height:.95; font-weight:800; letter-spacing:-.02em; color:var(--ink); }
+  .tag { margin:var(--space-2) 0 0 4px; font-size:14px; line-height:20px; color:var(--ink-muted); }
+</style>
+</head>
+<body>
+<div class="cover">
+<div class="art" aria-hidden="true">
+<svg viewBox="0 0 480 288" width="480" height="288">
+<!--
+  blocks      frame (electric blue) 128×236 bled off the top · lucky 208×208, the largest, the brand · hero-sky 128×112 bleeding off the right (the tint) · gold coin disc r44 · hot 96×24 pill once (it only ever means "tap this") — ≈38% of 960×288
+  arrangement one big lucky square flanked by a tall blue slab and a sky block with its coin, bottoms on one line space-5 above the edge, space-3/space-4 gutters
+  pattern     literal motif, from "one electric green that means luck": a four-leaf clover cut from the lucky block in the ground, built from radius-full discs; plus twelve gold coin discs on the sky block at a space-5 pitch
+  scales      sides in space-2 multiples; gutters space-3/space-4; pitch space-5; corners radius-xl (slab, square), radius-lg (sky), radius-full (pill, discs)
+-->
+<rect class="blue" x="0" y="-28" width="128" height="236" rx="36"/>
+<rect class="hot" x="16" y="224" width="96" height="24" rx="12"/>
+<rect class="lucky" x="144" y="40" width="208" height="208" rx="36"/>
+<rect class="cut" x="234" y="132" width="12" height="96" rx="6" transform="rotate(-30 240 132)"/>
+<circle class="cut" cx="240" cy="102" r="30"/>
+<circle class="cut" cx="270" cy="132" r="30"/>
+<circle class="cut" cx="240" cy="162" r="30"/>
+<circle class="cut" cx="210" cy="132" r="30"/>
+<circle class="cut" cx="240" cy="132" r="16"/>
+<circle class="coin" cx="420" cy="72" r="44"/>
+<rect class="sky" x="368" y="136" width="128" height="112" rx="20"/>
+<circle class="gold" cx="388" cy="160" r="6"/><circle class="gold" cx="412" cy="160" r="6"/><circle class="gold" cx="436" cy="160" r="6"/><circle class="gold" cx="460" cy="160" r="6"/>
+<circle class="gold" cx="388" cy="184" r="6"/><circle class="gold" cx="412" cy="184" r="6"/><circle class="gold" cx="436" cy="184" r="6"/><circle class="gold" cx="460" cy="184" r="6"/>
+<circle class="gold" cx="388" cy="208" r="6"/><circle class="gold" cx="412" cy="208" r="6"/><circle class="gold" cx="436" cy="208" r="6"/><circle class="gold" cx="460" cy="208" r="6"/>
+</svg>
+</div>
+<div class="words">
+<h1 class="name">Lucky<br>Games</h1>
+<p class="tag">Dark navy, one lucky green, and a single thing to tap.</p>
+</div>
+</div>
+</body>
+</html>

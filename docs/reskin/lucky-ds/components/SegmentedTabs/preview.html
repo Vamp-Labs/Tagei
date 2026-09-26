@@ -1,0 +1,12 @@
+<!-- @dsCard group="Navigation" height=110 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>SegmentedTabs — preview</title></head>
+<body>
+<div id="root" class="lg-stage-col lg-on-lobby"></div>
+<script>
+  var L = window.LuckyGames, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(h(L.SegmentedTabs, { defaultValue: 'casino', items: [{ value: 'roulette', label: 'Roulette' }, { value: 'casino', label: 'Casino', eyebrow: 'crypto' }, { value: 'opencase', label: 'Opencase' }] }));
+</script>
+</body>
+</html>

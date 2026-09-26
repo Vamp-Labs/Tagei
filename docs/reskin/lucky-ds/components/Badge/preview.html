@@ -1,0 +1,12 @@
+<!-- @dsCard group="Status" height=100 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Badge — preview</title></head>
+<body>
+<div id="root" class="lg-stage"></div>
+<script>
+  var L = window.LuckyGames, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(h(React.Fragment, null, h(L.Badge, { tone: 'pro' }, 'Pro'), h(L.Badge, { tone: 'count' }, '36'), h(L.Badge, { tone: 'check' })));
+</script>
+</body>
+</html>

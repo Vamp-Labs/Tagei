@@ -1,0 +1,12 @@
+<!-- @dsCard group="Rewards" height=290 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>RewardTile — preview</title></head>
+<body>
+<div id="root" class="lg-stage"></div>
+<script>
+  var L = window.LuckyGames, h = React.createElement;
+  ReactDOM.createRoot(document.getElementById('root')).render(h('div', { className: 'lg-panel', style: { display: 'grid', gridTemplateColumns: 'repeat(3, 112px)', gap: 8 } }, h(L.RewardTile, { state: 'claimed', art: '/_blob/0edb0a1480ee68fee040590bf7ac63fe', name: 'Premium', timer: '20:08:24' }), h(L.RewardTile, { state: 'claimed', art: '/_blob/85b47088f3b9c24fc3604242057383c4', name: 'Gift', timer: '01:09:24' }), h(L.RewardTile, { state: 'selected', art: '/_blob/f4ff6816da32ea28f3448a16df382cce', label: 'Lucky clover' }), h(L.RewardTile, { state: 'locked', art: '/_blob/c45eaaadaef04203931c5849b7b65dc7', progress: 30, label: 'Locked' }), h(L.RewardTile, { state: 'locked', art: '/_blob/72194c29c7b5eb74cded4b9e7f76979a', progress: 80, progressTone: 'lucky', label: 'Locked' }), h(L.RewardTile, { state: 'pro', art: '/_blob/d53038762c7cc9d9016087953866cf18', label: 'Pro reward' })));
+</script>
+</body>
+</html>

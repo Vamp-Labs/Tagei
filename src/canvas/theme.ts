@@ -119,7 +119,7 @@ export const MARKER = {
   profitLabel: rgba(CANVAS.target, 0.8),
   stopLabel: rgba(CANVAS.stop, 0.8),
   entryLine: rgba(CANVAS.entry, 0.75),
-  entryRing: rgba(CANVAS.entry, 0.5),
+  entryRing: rgba(CANVAS.entryRing, 0.5),
   entry: CANVAS.entry.hex,
   tagBg: CANVAS.labelBg.hex,
   tagBgSoft: rgba(CANVAS.labelBg, 0.92),

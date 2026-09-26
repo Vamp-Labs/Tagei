@@ -167,7 +167,7 @@ export const PilotProfileDrawer: React.FC<PilotProfileDrawerProps> = ({
                   word={word}
                   value={formatXp(progression.currentXp)}
                   art={ART.coin.src}
-                  className="px-3 pb-1 pt-2 [&_b]:whitespace-nowrap"
+                  className="px-3 pb-1 pt-2"
                 />
                 <ProgressBar
                   value={progression.currentXp}
@@ -181,7 +181,7 @@ export const PilotProfileDrawer: React.FC<PilotProfileDrawerProps> = ({
               </Panel>
 
               <Panel title="Stats" className="p-3 pt-4">
-                <div className="lg-stats [&>.lg-stat-tile]:justify-start">
+                <div className="lg-stats">
                   <StatTile value={plural(progression.streakDays ?? 0, 'day', 'days')} label="Streak" />
                   <StatTile
                     value={`${progression.dailyRoundsPlayed}/${progression.dailyRoundsGoal}`}

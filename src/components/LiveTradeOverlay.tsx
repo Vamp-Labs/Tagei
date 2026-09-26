@@ -8,7 +8,6 @@ import { HoldButton } from '../ui/HoldButton';
 import { EASE_OUT, MICRO, useMotionPref } from '../ui/motion';
 import { cn } from '../ui/cn';
 import { Button, DirectionChip, Icon, Pill, ROLE, formatAmount, formatTimer, signOf } from '../ui/lucky';
-import { HOLD_RING_VISIBLE } from './trade/holdRing';
 
 interface LiveTradeOverlayProps {
   round: ActiveTradeRound;
@@ -211,7 +210,7 @@ export const LiveTradeOverlay: React.FC<LiveTradeOverlayProps> = ({
           onCommit={onCashOut}
           ariaLabel="Hold to cash out"
           holdingLabel={<span>HOLDING…</span>}
-          className={cn('h-14', HOLD_RING_VISIBLE, pulseOnMount && !reduced && 'lg-pulse-hot')}
+          className={cn('h-14', pulseOnMount && !reduced && 'lg-pulse-hot')}
         >
           <span>HOLD TO CASH OUT!</span>
         </HoldButton>

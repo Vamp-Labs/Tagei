@@ -97,7 +97,7 @@ Placement:
 - **`src/ui/HoldButton.tsx`**
   - Change: drive the ring rect's `opacity` through a MotionValue, `animate`, or a plain attribute, not a static `style` value.
   - Why: Motion memoises an SVG element's static `style` at mount, so `style={{ opacity: isHolding ? 1 : 0 }}` on the `motion.rect` stays at 0. The hold ring never shows. This was already true before E0.
-  - Workaround: `src/components/trade/holdRing.ts` exports `HOLD_RING_VISIBLE` (`[&>svg>rect]:!opacity-100`). Both hot hold buttons use it. At rest the ring is fully dash-offset, so it stays invisible.
+  - Status: **resolved in QA** — HoldButton now drives the ring opacity with a MotionValue; the local `holdRing.ts` workaround was deleted.
 - **`src/ui/lucky/SegmentedTabs.tsx`**
   - Change: an optional per-cell press scale (for example `pressScale?: number`, applied with `whileTap` and MICRO).
   - Why: the LONG/SHORT cells must keep their 0.97 MICRO tap scale, and the primitive renders plain buttons.

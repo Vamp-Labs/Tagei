@@ -1,5 +1,5 @@
 import React from 'react';
-import { AssetDisc, Button, Panel, Pill, formatHash } from '../../ui/lucky';
+import { AssetDisc, Button, Panel, Pill, WalletRow, formatHash } from '../../ui/lucky';
 import type { WalletState } from '../../services/web3Service';
 
 const TESTNET_CHAIN_ID = 97;
@@ -13,25 +13,27 @@ export const ChainCard: React.FC<ChainCardProps> = ({ wallet, onConnectWallet })
   const connected = wallet.isConnected;
   return (
     <Panel className="flex flex-col gap-3 p-3">
-      <div className="lg-wallet lg-wallet--compact cursor-default pr-4">
-        <span className="lg-wallet-icon">
-          <AssetDisc symbol="BNB" />
-        </span>
-        <span className="lg-wallet-text">
-          <span className="lg-wallet-title">BNB Chain</span>
-          {connected ? (
-            <span className="lg-wallet-amount">{wallet.balanceBNB} tBNB</span>
+      <WalletRow
+        mode="static"
+        compact
+        icon={<AssetDisc symbol="BNB" />}
+        title="BNB Chain"
+        amount={
+          connected ? (
+            `${wallet.balanceBNB} tBNB`
           ) : (
-            <span className="whitespace-nowrap text-caption font-semibold text-ink-soft">Not connected</span>
-          )}
-          {connected && wallet.address && (
-            <span className="lg-wallet-bonus is-muted tabular-nums">{wallet.isDemoWallet ? wallet.address : formatHash(wallet.address)}</span>
-          )}
-        </span>
-        <span className="lg-wallet-trailing">
-          <Pill size="sm">testnet · {TESTNET_CHAIN_ID}</Pill>
-        </span>
-      </div>
+            <span className="block whitespace-nowrap text-caption font-semibold text-ink-soft">Not connected</span>
+          )
+        }
+        bonus={
+          connected && wallet.address ? (
+            <span className="tabular-nums">{wallet.isDemoWallet ? wallet.address : formatHash(wallet.address)}</span>
+          ) : undefined
+        }
+        bonusTone="muted"
+        trailing={<Pill size="sm">testnet · {TESTNET_CHAIN_ID}</Pill>}
+        className="pr-4"
+      />
       {!connected && (
         <Button variant="hot" block onClick={onConnectWallet}>
           CONNECT WALLET!

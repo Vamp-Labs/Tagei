@@ -8,7 +8,6 @@ import { MICRO, useMotionPref } from '../ui/motion';
 import { cn } from '../ui/cn';
 import { CURRENCY, DirectionChip, Icon, Pill, buttonClass, formatAmount, formatLeverage } from '../ui/lucky';
 import { DirectionToggle } from './trade/DirectionToggle';
-import { HOLD_RING_VISIBLE } from './trade/holdRing';
 
 interface PreTradePanelProps {
   currentAsset: AssetSymbol;
@@ -187,7 +186,7 @@ export const PreTradePanel: React.FC<PreTradePanelProps> = ({
         disabled={!selectedDirection}
         ariaLabel={selectedDirection ? `Hold to launch ${selectedDirection}` : 'Select a direction first'}
         holdingLabel={<span>HOLDING…</span>}
-        className={cn('h-14', HOLD_RING_VISIBLE, selectedDirection && !reduced && 'lg-pulse-hot')}
+        className={cn('h-14', selectedDirection && !reduced && 'lg-pulse-hot')}
       >
         <span>{selectedDirection ? 'HOLD TO LAUNCH!' : 'SELECT LONG OR SHORT'}</span>
       </HoldButton>

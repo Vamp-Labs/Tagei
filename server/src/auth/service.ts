@@ -23,7 +23,7 @@ export type LoginVerifier = (args: {
 /** ECDSA first; with a public client, ERC-1271 / ERC-6492 smart accounts too. */
 export function createLoginVerifier(publicClient?: PublicClient): LoginVerifier {
   return async ({ address, message, signature, chainId }) => {
-    const typed = { domain: apiDomain(chainId), types: loginTypes, primaryType: 'Login' as const, message: { ...message, expiresAt: message.expiresAt } };
+    const typed = { domain: apiDomain(chainId), types: loginTypes, primaryType: 'Login' as const, message };
     try {
       if (await verifyTypedData({ address, signature, ...typed })) return true;
     } catch {

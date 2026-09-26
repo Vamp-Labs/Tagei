@@ -40,7 +40,7 @@ export function createTypedDataVerifier(publicClient?: PublicClient): TypedDataV
     }
     if (!publicClient) return false;
     try {
-      return await publicClient.verifyTypedData(args);
+      return await publicClient.verifyTypedData(args as Parameters<PublicClient['verifyTypedData']>[0]);
     } catch {
       return false;
     }

@@ -77,7 +77,7 @@ const reviewKey = (player: string, roundId: bigint) => `${player}|${roundId}`;
 
 const cloneDay = (d: DayState): DayState => ({ ...d, missionsCompleted: [...d.missionsCompleted] });
 
-export function createMemoryProgressionStore(now: () => number = Date.now): ProgressionStore {
+export function createMemoryProgressionStore(): ProgressionStore {
   const state: MemState = {
     rounds: new Map(),
     ledger: new Map(),
@@ -213,7 +213,6 @@ export function createMemoryProgressionStore(now: () => number = Date.now): Prog
       } else {
         for (const l of state.ledger.values()) if (l.day >= opts.weekStartDay) rows.set(l.player, (rows.get(l.player) ?? 0) + l.amount);
       }
-      void now;
       return [...rows.entries()]
         .filter(([, xp]) => xp > 0)
         .map(([player, xp]) => ({ player, xp, totalXp: state.progress.get(player)?.xp ?? 0 }))

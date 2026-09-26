@@ -1,8 +1,11 @@
 import React from 'react';
-import { AnimatePresence, motion } from 'motion/react';
-import { Trophy, ShieldAlert } from 'lucide-react';
+import { AnimatePresence, motion, type Variants } from 'motion/react';
 import { GameStage } from '../types/game';
-import { HERO, MICRO } from '../ui/motion';
+import { HERO, MICRO, useMotionPref } from '../ui/motion';
+import { SignedAmount } from '../ui/lucky/SignedAmount';
+import { formatMultiplier } from '../ui/lucky/format';
+import { OutcomeArt } from './outcome/OutcomeArt';
+import { POP, REDUCED_FADE } from './outcome/tokens';
 
 interface OutcomeBannerOverlayProps {
   gameStage: GameStage;
@@ -10,21 +13,36 @@ interface OutcomeBannerOverlayProps {
   multiplier: number;
 }
 
-/** Punchy overshoot pop — same ease LiveTradeOverlay's P&L "juice" uses. */
-const POP_EASE = [0.34, 1.56, 0.64, 1] as const;
+const WIN_STAGGER_SECONDS = 0.07;
+const WIN_DELAY_SECONDS = 0.05;
+const BLOOM_SECONDS = 0.55;
 
-const winChildVariants = {
-  hidden: { opacity: 0, y: 10, scale: 0.85 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.32, ease: POP_EASE } },
+const winCardVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.7, y: 24 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { ...HERO, staggerChildren: WIN_STAGGER_SECONDS, delayChildren: WIN_DELAY_SECONDS },
+  },
 };
+
+const winChildVariants: Variants = {
+  hidden: { opacity: 0, y: 10, scale: 0.85 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: POP },
+};
+
+const CARD_CLASS = 'lg-card relative flex flex-col items-center bg-sheet/92 px-8 py-6 text-center';
 
 export const OutcomeBannerOverlay: React.FC<OutcomeBannerOverlayProps> = ({
   gameStage,
   pnl,
   multiplier,
 }) => {
+  const reduced = useMotionPref();
   const isVisible = gameStage === 'TARGET_HIT' || gameStage === 'LOSS_HIT';
   const isWin = gameStage === 'TARGET_HIT';
+  const childVariants = reduced ? undefined : winChildVariants;
 
   return (
     <AnimatePresence>
@@ -32,127 +50,64 @@ export const OutcomeBannerOverlay: React.FC<OutcomeBannerOverlayProps> = ({
         <motion.div
           key={gameStage}
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1, transition: MICRO }}
+          animate={{ opacity: 1, transition: reduced ? REDUCED_FADE : MICRO }}
           exit={{ opacity: 0, transition: MICRO }}
-          className="absolute inset-0 z-35 flex flex-col items-center justify-center pointer-events-none"
+          className="absolute inset-0 z-35 flex flex-col items-center justify-center px-6 pointer-events-none"
         >
           {isWin ? (
             <motion.div
-              initial="hidden"
-              animate="visible"
-              exit={{ opacity: 0, scale: 1.08, transition: MICRO }}
-              variants={{
-                hidden: { opacity: 0, scale: 0.7, y: 24 },
-                visible: {
-                  opacity: 1,
-                  scale: 1,
-                  y: 0,
-                  transition: { ...HERO, staggerChildren: 0.07, delayChildren: 0.05 },
-                },
-              }}
-              className="relative flex flex-col items-center text-center"
+              role="status"
+              initial={reduced ? { opacity: 0 } : 'hidden'}
+              animate={reduced ? { opacity: 1, transition: REDUCED_FADE } : 'visible'}
+              exit={{ opacity: 0, scale: reduced ? 1 : 1.08, transition: MICRO }}
+              variants={reduced ? undefined : winCardVariants}
+              className="relative flex flex-col items-center"
             >
-              {/* A momentary bloom behind the whole badge stack — separate
-                  from the badge's own steady .glow-green box-shadow, and
-                  from the canvas's own radial flash underneath the DOM
-                  layer, so this reads as one continuation of that flash
-                  rather than a second, competing burst. */}
-              <motion.div
-                aria-hidden="true"
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: [0, 0.55, 0.22], scale: [0.6, 1.25, 1.05] }}
-                transition={{ duration: 0.55, times: [0, 0.35, 1], ease: 'easeOut' }}
-                className="absolute -inset-10 rounded-full pointer-events-none"
-                style={{
-                  background:
-                    'radial-gradient(circle, var(--color-long) 0%, transparent 70%)',
-                  filter: 'blur(18px)',
-                }}
-              />
-
-              {/* Opaque card behind the badge/number/subtext — the canvas's
-                  own win flash (MarketTrackCanvas boomRef) peaks near-white
-                  at 95% alpha in the same hue as this text, so a same-color
-                  glow alone doesn't hold contrast. This reuses the exact
-                  --color-panel + backdrop-blur pattern LiveTradeOverlay's
-                  HUD pills, ResultPanel, and SettlementOverlay already use
-                  for legibility over the canvas — sized to its content, not
-                  the full screen, so the rocket/market track stay visible
-                  around it (PRD §20: "avoid covering the entire UI"). */}
-              <div className="relative glass-panel rounded-[var(--radius-xl)] px-8 py-6 flex flex-col items-center">
-                {/* Glowing Target Hit Badge */}
+              {!reduced && (
                 <motion.div
-                  variants={winChildVariants}
-                  className="relative flex items-center gap-2 px-5 py-2 rounded-full border-2 glow-green mb-2"
+                  aria-hidden="true"
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{ opacity: [0, 0.55, 0.22], scale: [0.6, 1.25, 1.05] }}
+                  transition={{ duration: BLOOM_SECONDS, times: [0, 0.35, 1], ease: 'easeOut' }}
+                  className="absolute -inset-10 rounded-full pointer-events-none"
                   style={{
-                    backgroundColor: 'rgba(0,232,154,0.18)',
-                    borderColor: 'var(--color-long)',
+                    background: 'radial-gradient(circle, var(--color-lucky) 0%, transparent 70%)',
+                    filter: 'blur(18px)',
                   }}
-                >
-                  <Trophy className="w-5 h-5" style={{ color: 'var(--color-long)' }} />
-                  <span
-                    className="text-sm font-black tracking-widest uppercase font-mono"
-                    style={{ color: 'var(--color-long)' }}
-                  >
-                    TARGET HIT! WIN
-                  </span>
-                </motion.div>
+                />
+              )}
 
-                <motion.div
-                  variants={winChildVariants}
-                  className="relative text-5xl font-black font-mono text-glow-green tracking-tight"
-                  style={{ color: 'var(--color-long)' }}
-                >
-                  +${pnl.toFixed(2)}
+              <div className={CARD_CLASS}>
+                <motion.div variants={childVariants}>
+                  <OutcomeArt name="reward-crown" />
                 </motion.div>
-                <motion.div
-                  variants={winChildVariants}
-                  className="relative text-sm font-black font-mono text-white mt-1"
+                <motion.p
+                  variants={childVariants}
+                  className="mt-3 text-label font-extrabold uppercase tracking-[0.08em] text-lucky"
                 >
-                  +{multiplier.toFixed(1)}x PAYOUT
-                </motion.div>
+                  TARGET HIT
+                </motion.p>
+                <motion.p variants={childVariants} className="mt-1">
+                  <SignedAmount value={pnl} className="text-display" />
+                </motion.p>
+                <motion.p variants={childVariants} className="mt-1 text-caption tabular-nums text-ink-soft">
+                  {formatMultiplier(multiplier)} payout
+                </motion.p>
               </div>
             </motion.div>
           ) : (
             <motion.div
-              initial={{ opacity: 0, scale: 0.88, y: 16 }}
-              animate={{ opacity: 1, scale: 1, y: 0, transition: HERO }}
-              exit={{ opacity: 0, scale: 0.96, transition: MICRO }}
-              className="flex flex-col items-center text-center"
+              role="status"
+              initial={reduced ? { opacity: 0 } : { opacity: 0, y: 16 }}
+              animate={reduced ? { opacity: 1, transition: REDUCED_FADE } : { opacity: 1, y: 0, transition: HERO }}
+              exit={{ opacity: 0, transition: MICRO }}
+              className={CARD_CLASS}
             >
-              {/* Same legibility card as the win branch (see its comment) —
-                  the loss subtext previously had zero shadow/backdrop at
-                  all, the least protected text in the component. */}
-              <div className="glass-panel rounded-[var(--radius-xl)] px-8 py-6 flex flex-col items-center">
-                {/* Gentle Round Complete Badge — restrained per PRD §22, no
-                    bounce/glow-pulse; a clear, dignified outcome, not a
-                    bigger effect than the win state. */}
-                <div
-                  className="flex items-center gap-2 px-5 py-2 rounded-full border glow-magenta-sm mb-2"
-                  style={{
-                    backgroundColor: 'rgba(255,59,107,0.14)',
-                    borderColor: 'var(--color-short)',
-                  }}
-                >
-                  <ShieldAlert className="w-5 h-5" style={{ color: 'var(--color-short)' }} />
-                  <span
-                    className="text-sm font-black tracking-widest uppercase font-mono"
-                    style={{ color: 'var(--color-short)' }}
-                  >
-                    ROUND COMPLETE
-                  </span>
-                </div>
-
-                <div
-                  className="text-4xl font-black font-mono text-glow-magenta tracking-tight"
-                  style={{ color: 'var(--color-short)' }}
-                >
-                  -${Math.abs(pnl).toFixed(2)}
-                </div>
-                <div className="text-xs font-semibold mt-1 font-mono text-[color:var(--color-text-3)]">
-                  Stop Loss Threshold Honored
-                </div>
-              </div>
+              <p className="text-label font-bold uppercase tracking-[0.08em] text-ink-soft">ROUND COMPLETE</p>
+              <p className="mt-1">
+                <SignedAmount value={pnl} className="text-display" />
+              </p>
+              <p className="mt-1 text-caption text-ink-muted">Stop loss reached as planned.</p>
             </motion.div>
           )}
         </motion.div>

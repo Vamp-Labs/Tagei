@@ -5,6 +5,7 @@ import { MICRO, useMotionPref } from '../ui/motion';
 import { cn } from '../ui/cn';
 import { Icon, SheetHeader } from '../ui/lucky';
 import { PixAvatar } from './pix/PixAvatar';
+import type { PixExpression } from './pix/expressions';
 import { PIX_DISCLAIMER, PixAIService } from '../services/pixAI';
 import type { PixChatMessage } from '../api/schemas';
 import { AssetSymbol } from '../types/market';
@@ -32,6 +33,7 @@ interface Message {
 const EMPTY_AVATAR_SIZE = 72;
 const CHIP_PRESS_SCALE = 0.97;
 const MAX_PROMPT_LENGTH = 500;
+const WAVE_DURATION_MS = 1200;
 
 const toHistory = (messages: readonly Message[]): PixChatMessage[] =>
   messages
@@ -42,6 +44,7 @@ export const PixChat: React.FC<PixChatProps> = ({ currentAsset, change24h, onClo
   const [messages, setMessages] = useState<Message[]>([]);
   const [draft, setDraft] = useState('');
   const [busy, setBusy] = useState(false);
+  const [waving, setWaving] = useState(true);
   const reduced = useMotionPref();
   const abortRef = useRef<AbortController | null>(null);
   const nextIdRef = useRef(0);
@@ -49,6 +52,13 @@ export const PixChat: React.FC<PixChatProps> = ({ currentAsset, change24h, onClo
   messagesRef.current = messages;
 
   useEffect(() => () => abortRef.current?.abort(), []);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setWaving(false), WAVE_DURATION_MS);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const faceExpression: PixExpression = busy ? 'thinking' : waving ? 'wave' : 'idle';
 
   const ask = async (prompt: string) => {
     const text = prompt.trim().slice(0, MAX_PROMPT_LENGTH);
@@ -93,7 +103,7 @@ export const PixChat: React.FC<PixChatProps> = ({ currentAsset, change24h, onClo
         <div role="log" aria-live="polite" aria-label="PIX conversation" className="flex flex-1 flex-col gap-3 px-6">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-6 text-center">
-              <PixAvatar mood="neutral" size={EMPTY_AVATAR_SIZE} />
+              <PixAvatar mood="neutral" size={EMPTY_AVATAR_SIZE} expression={faceExpression} />
               <p className="text-section text-ink">Hey, I'm PIX</p>
               <p className="text-caption text-ink-soft">Your AI co-pilot for smarter trades.</p>
             </div>

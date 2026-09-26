@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { GameStage, PositionDirection } from '../types/game';
 import { MICRO, useMotionPref } from '../ui/motion';
 import { PixAvatar } from './pix/PixAvatar';
+import { pixExpressionFor } from './pix/expressions';
 import { NEAR_STOP_FX_PNL, pixMoodFor } from './pix/mood';
 
 interface PixCompanionProps {
@@ -71,7 +72,11 @@ export const PixCompanion: React.FC<PixCompanionProps> = ({
         aria-label="Open PIX assistant"
         className="pointer-events-auto flex size-12 items-center justify-center rounded-full cursor-pointer"
       >
-        <PixAvatar mood={pixMoodFor(fxPnl)} />
+        <PixAvatar
+          mood={pixMoodFor(fxPnl)}
+          expression={pixExpressionFor({ gameStage, targetProgressPct, fxPnl, selectedDirection })}
+          direction={selectedDirection}
+        />
       </button>
 
       <div role="status" aria-live="polite" className="absolute top-0 left-[calc(50%+32px)] right-6 flex min-h-12 items-center">

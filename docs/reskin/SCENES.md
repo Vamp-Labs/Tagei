@@ -156,10 +156,20 @@ Progression is 650/770 XP, 2/3 rounds and level 7 unless noted. Every scene exce
 
 Result scenes follow `finalizeRound`'s shapes: `TradeResult` (multiplier `(stake + pnl) / stake`, XP 50 for a win and 25 otherwise), a matching `lastRoundSummary`, settlement step `confirmed` with the hash, and `activeRound` kept.
 
+## pix-gallery
+
+`pix-gallery.html` is a separate dev-only page from E5 that shows every `PixExpression` (`idle`, `ready` for both LONG and SHORT, `happy`, `alert`, `celebrate`, `concerned`, `loading`, `thinking`, `wave`) at 40px and 72px, mirroring `gallery.html`'s wiring (same `<head>`, same `bg-canvas text-ink` body, a module script loading its `src/dev/PixGallery.tsx` entry). It is not referenced by `index.html`, so `vite build` never bundles it.
+
+```bash
+bash $WT/scripts/shots.sh --port <yourPort> --out "$RESKIN_SHOTS/e5" --path /pix-gallery.html
+bash $WT/scripts/shots.sh --port <yourPort> --out "$RESKIN_SHOTS/e5" --path /pix-gallery.html --reduced
+```
+
 ## Contracts for other epics
 
 - **Confetti (E0a):** no-op when `document.documentElement.dataset.sceneFreeze === '1'`. Please also honor `dataset.sceneFx === '0'`.
 - **Gallery (E0a):** set `dataset.sceneReady = '1'` once `document.fonts.ready` resolves. `--path /gallery.html` waits for it.
+- **PIX gallery (E5):** same contract as the Lucky primitives gallery — `--path /pix-gallery.html` waits for `dataset.sceneReady`.
 - **PIX quick prompt (E5):** `pix-chat-thread` clicks `[data-scene-target="pix-prompt"]` first. If nothing matches, it falls back to the button whose text is exactly "What's the trend for BNB?". Put that attribute on the first quick prompt if you reword it. If neither matches, the scene reports `No PIX quick prompt found` in `__scene.errors`.
 - **Stable hooks for `--click`/`--hold`:** prefer `aria-label` or `data-*` over classes. The scripts tap with real touch events, so pointer-driven components like `HoldButton` respond as they do on a phone.
 

@@ -27,6 +27,7 @@ import { marketFeed } from './services/marketFeed';
 import { SettlementEngine, DEFAULT_CONFIG } from './services/settlementEngine';
 import { web3Service, WalletState, SettlementStep } from './services/web3Service';
 import { soundEngine } from './services/audioHaptics';
+import { useDevScene } from './dev/useDevScene';
 
 import { AssetSymbol, PriceTick, SUPPORTED_ASSETS } from './types/market';
 import {
@@ -38,6 +39,7 @@ import {
   UserProgression,
   UserSettings,
 } from './types/game';
+type ActiveSheet = 'none' | 'menu' | 'asset-selector' | 'pix-chat' | 'position-details';
 export const App: React.FC = () => {
   // State Machine
   const [stage, setStage] = useState<GameStage>('HOME');
@@ -405,7 +407,6 @@ export const App: React.FC = () => {
   // Trade Setup sheet is NOT tracked here: its visibility is simply
   // `stage === 'PRE_TRADE'`, so it works whether opened via swipe-up, via
   // "Trade Again", or via the dev SimulationBar's own stage jumps.
-  type ActiveSheet = 'none' | 'menu' | 'asset-selector' | 'pix-chat' | 'position-details';
   const [activeSheet, setActiveSheet] = useState<ActiveSheet>('none');
 
   const assetOrder = Object.keys(SUPPORTED_ASSETS) as AssetSymbol[];
@@ -439,6 +440,7 @@ export const App: React.FC = () => {
     setActiveSheet('none');
   };
 
+  const devScene = useDevScene({ setStage, setCurrentAsset, setSelectedDirection, setActiveRound, setTargetProgressPct, setJustLeveledUp, setSettlementStep, setSettlementTxHash, setLastResult, setLastRoundSummary, setProgression, setIsSettingsOpen, setIsProfileOpen, setIsMissionToastOpen, setSettings, setActiveSheet, handleConnectWallet, handlePlayNow });
   return (
     <MotionConfig reducedMotion={reduced ? 'always' : 'never'}>
       <div className="app-frame flex flex-col w-full overflow-hidden bg-lobby font-sans sm:border-x sm:border-frame">
@@ -681,18 +683,20 @@ export const App: React.FC = () => {
         />
 
         {/* UI Mock Simulation Toolbar */}
-        <SimulationBar
-          currentStage={stage}
-          autoResolveEnabled={autoResolveEnabled}
-          onToggleAutoResolve={() => setAutoResolveEnabled((prev) => !prev)}
-          onSimulateLiveLong={handleSimulateLiveLong}
-          onSetStage={handleSetStage}
-          onSimulatePriceBump={handleSimulatePriceBump}
-          onSimulateTargetHit={handleSimulateTargetHit}
-          onSimulateLossHit={handleSimulateLossHit}
-          onSimulateCashOut={handleSimulateCashOut}
-          onTriggerMissionToast={() => setIsMissionToastOpen(true)}
-        />
+        {!devScene.active || devScene.sim ? (
+          <SimulationBar
+            currentStage={stage}
+            autoResolveEnabled={autoResolveEnabled}
+            onToggleAutoResolve={() => setAutoResolveEnabled((prev) => !prev)}
+            onSimulateLiveLong={handleSimulateLiveLong}
+            onSetStage={handleSetStage}
+            onSimulatePriceBump={handleSimulatePriceBump}
+            onSimulateTargetHit={handleSimulateTargetHit}
+            onSimulateLossHit={handleSimulateLossHit}
+            onSimulateCashOut={handleSimulateCashOut}
+            onTriggerMissionToast={() => setIsMissionToastOpen(true)}
+          />
+        ) : null}
       </div>
     </MotionConfig>
   );

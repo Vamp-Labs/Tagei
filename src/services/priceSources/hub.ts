@@ -102,7 +102,6 @@ export class HubPriceSource {
   }
 
   private attach(): void {
-    const release = this.stream.retain();
     const offs = [
       this.stream.on('hello', (hello) => this.setOracle(hello.oracle.status)),
       this.stream.on('prices.snapshot', (snapshot) => this.applySnapshot(snapshot)),
@@ -110,6 +109,7 @@ export class HubPriceSource {
       this.stream.on('stats', (stats) => this.setChange(stats.asset, stats.change24hPct)),
       this.stream.on('oracle.status', (status) => this.setOracle(status.status)),
     ];
+    const release = this.stream.retain();
     this.detach = () => {
       offs.forEach((off) => off());
       release();

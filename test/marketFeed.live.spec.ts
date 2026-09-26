@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FakeStream } from '../src/api/fakeStream';
 import type { StreamLike } from '../src/api/stream';
 import { toPrice18 } from '../src/game/units';
+import { FakeBackend } from '../src/services/fakeBackend';
 import { MarketFeedService } from '../src/services/marketFeed';
 import { BinanceDisplaySource, type SocketLike } from '../src/services/priceSources/binance';
 import type { ExactRound, PriceTick } from '../src/types/market';
@@ -158,6 +159,19 @@ describe('MarketFeedService — live mode (hub + Binance fallback)', () => {
     await vi.advanceTimersByTimeAsync(150);
     expect(feed.getHistory().at(-1)?.price).toBe(601);
     feed.cleanup();
+  });
+
+  it('seeds from the hello and snapshot a synchronous stream sends on retain', () => {
+    const backend = new FakeBackend({ autoPrices: false });
+    const feed = new MarketFeedService({ stream: () => backend.stream, binance: new BinanceDisplaySource({ createSocket: null }) });
+    feed.setAsset('ETH', true);
+    feed.setAsset('BNB', true);
+    expect(feed.getExactHistory('BNB').length).toBe(120);
+    expect(feed.getStatus()).toMatchObject({ source: 'hub', oracle: 'ok' });
+    const history = feed.getHistory();
+    expect(new Set(history.map((tick) => tick.price)).size).toBeGreaterThan(20);
+    feed.cleanup();
+    backend.dispose();
   });
 
   it('uses the mock walk when neither the hub nor WebSocket is available', () => {

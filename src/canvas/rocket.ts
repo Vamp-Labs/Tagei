@@ -8,22 +8,24 @@ const TIME_UNITS_PER_SECOND = 3.0;
 const DEFAULT_FRAME_SECONDS = 1 / 60;
 const SOOT_STROKE_SHARE = 0.8;
 
-/** Surface points on the fuselage with outward normals, sampled off the bezier. */
+/** Surface points on the fuselage with outward normals, sampled off the new nose/cylinder/tail-taper outline. */
 const HULL_SKIN: readonly [number, number, number, number][] = [
-  [15.6, -4.0, 0.42, -0.91],
-  [11.4, -5.4, 0.24, -0.97],
-  [7.0, -6.4, 0.14, -0.99],
-  [2.4, -7.1, 0.04, -1.0],
-  [-2.1, -7.5, -0.03, -1.0],
-  [-6.3, -7.5, -0.1, -0.99],
-  [-11.6, -7.1, -0.34, -0.94],
-  [-11.6, 7.1, -0.34, 0.94],
-  [-6.3, 7.5, -0.1, 0.99],
-  [-2.1, 7.5, -0.03, 1.0],
-  [2.4, 7.1, 0.04, 1.0],
-  [7.0, 6.4, 0.14, 0.99],
-  [11.4, 5.4, 0.24, 0.97],
-  [15.6, 4.0, 0.42, 0.91],
+  [20.5, -3.2, 0.55, -0.83],
+  [17.5, -6.2, 0.3, -0.95],
+  [13.5, -8.4, 0.12, -0.99],
+  [8.0, -8.75, 0.02, -1.0],
+  [0.0, -8.8, 0.0, -1.0],
+  [-6.5, -8.5, -0.08, -0.99],
+  [-11.5, -7.7, -0.28, -0.96],
+  [-15.0, -6.0, -0.55, -0.83],
+  [-15.0, 6.0, -0.55, 0.83],
+  [-11.5, 7.7, -0.28, 0.96],
+  [-6.5, 8.5, -0.08, 0.99],
+  [0.0, 8.8, 0.0, 1.0],
+  [8.0, 8.75, 0.02, 1.0],
+  [13.5, 8.4, 0.12, 0.99],
+  [17.5, 6.2, 0.3, 0.95],
+  [20.5, 3.2, 0.55, 0.83],
 ];
 
 export class RocketAvatar {
@@ -79,6 +81,8 @@ export class RocketAvatar {
   private jitterX: number = 0;
   private jitterY: number = 0;
   private readonly fuselage: Path2D;
+  private readonly fins: Path2D;
+  private readonly nozzleBell: Path2D;
   private readonly veins: Path2D;
   private readonly visorArc: Path2D;
   /** Gradient coordinates resolve against the CTM at paint time, so caching is safe. */
@@ -110,26 +114,60 @@ export class RocketAvatar {
 
     // Built once. Re-specifying this bezier every frame for the tint, vein
     // clip and rim light would be four extra path constructions per frame.
+    // Nose cone (tight curvature reaching near-full radius fast) and
+    // cylindrical mid-body (near-parallel sides) are two distinct bezier
+    // segments rather than one long taper, then a short boat-tail into the fins.
     this.fuselage = new Path2D();
     this.fuselage.moveTo(22, 0);
-    this.fuselage.bezierCurveTo(14, -8, -10, -9, -15, -6);
-    this.fuselage.lineTo(-15, 6);
-    this.fuselage.bezierCurveTo(-10, 9, 14, 8, 22, 0);
+    this.fuselage.bezierCurveTo(19.5, -6.6, 15, -8.6, 12, -8.7);
+    this.fuselage.bezierCurveTo(5, -8.8, -3, -8.6, -9.5, -8.3);
+    this.fuselage.bezierCurveTo(-13, -8.0, -15, -6.8, -16.5, -5.5);
+    this.fuselage.lineTo(-16.5, 5.5);
+    this.fuselage.bezierCurveTo(-15, 6.8, -13, 8.0, -9.5, 8.3);
+    this.fuselage.bezierCurveTo(-3, 8.6, 5, 8.8, 12, 8.7);
+    this.fuselage.bezierCurveTo(15, 8.6, 19.5, 6.6, 22, 0);
     this.fuselage.closePath();
+
+    // Three flared fins in one Path2D so the fanned tail costs one fill and
+    // one stroke instead of one pair per blade: an "up" fin and two fanned
+    // "down" fins, each a curved sail rather than a flat triangle.
+    this.fins = new Path2D();
+    this.fins.moveTo(-8.5, -8.0);
+    this.fins.quadraticCurveTo(-14.0, -11.5, -20.0, -14.0);
+    this.fins.quadraticCurveTo(-17.0, -11.8, -14.0, -6.2);
+    this.fins.closePath();
+    this.fins.moveTo(-7.0, 8.2);
+    this.fins.quadraticCurveTo(-10.5, 11.8, -15.0, 14.0);
+    this.fins.quadraticCurveTo(-13.0, 11.3, -9.5, 6.9);
+    this.fins.closePath();
+    this.fins.moveTo(-11.5, 7.6);
+    this.fins.quadraticCurveTo(-16.0, 10.2, -20.0, 12.5);
+    this.fins.quadraticCurveTo(-18.0, 9.3, -15.0, 6.3);
+    this.fins.closePath();
+
+    // Tapered engine bell: narrow at the throat where it meets the hull,
+    // flaring to a wider exit rim.
+    this.nozzleBell = new Path2D();
+    this.nozzleBell.moveTo(-14.5, -2.0);
+    this.nozzleBell.bezierCurveTo(-16.0, -2.2, -17.7, -2.9, -19.0, -4.2);
+    this.nozzleBell.lineTo(-19.0, 4.2);
+    this.nozzleBell.bezierCurveTo(-17.7, 2.9, -16.0, 2.2, -14.5, 2.0);
+    this.nozzleBell.closePath();
 
     // Three conduits, each defined tail -> nose so a negative lineDashOffset
     // makes the dashes travel forward. All in one Path2D: a flow layer costs
     // one stroke() call instead of three.
     this.veins = new Path2D();
-    this.veins.moveTo(-13.5, -3.4);
-    this.veins.bezierCurveTo(-6, -5.4, 2, -5.6, 16.5, -1.8);
-    this.veins.moveTo(-13.5, 3.6);
-    this.veins.bezierCurveTo(-6, 5.6, 4, 5.4, 17.0, 1.2);
-    this.veins.moveTo(-8.5, -2.0);
+    this.veins.moveTo(-14.5, -3.4);
+    this.veins.bezierCurveTo(-7, -5.4, 2, -5.6, 16.5, -1.8);
+    this.veins.moveTo(-14.5, 3.6);
+    this.veins.bezierCurveTo(-7, 5.6, 4, 5.4, 17.0, 1.2);
+    this.veins.moveTo(-9.5, -2.0);
     this.veins.bezierCurveTo(-3, 0.6, 3, 1.4, 11.5, 0.2);
 
+    // Full porthole, centered inside the cylindrical mid-body.
     this.visorArc = new Path2D();
-    this.visorArc.arc(8, 0, 4.5, -Math.PI / 2, Math.PI / 2);
+    this.visorArc.arc(10.5, 0, 4.2, 0, Math.PI * 2);
     this.visorArc.closePath();
   }
 
@@ -582,39 +620,39 @@ export class RocketAvatar {
       const flameLen = Math.max(10, baseFlameLen + flicker);
       const flameHalfWidth = 4.5 * (1 + (this.reduced ? 0 : Math.sin(this.time * 22) * 0.12));
 
-      // A. Outer Plasma Flame Plume
-      const flameGrad = ctx.createLinearGradient(-18, 0, -18 - flameLen, 0);
+      // A. Outer Plasma Flame Plume — anchored at the engine bell's exit rim
+      const flameGrad = ctx.createLinearGradient(-19, 0, -19 - flameLen, 0);
       flameGrad.addColorStop(0, flame.hex);
       flameGrad.addColorStop(0.55, flame.a(0.53));
       flameGrad.addColorStop(1, CLEAR);
 
       ctx.fillStyle = flameGrad;
       ctx.beginPath();
-      ctx.moveTo(-18, -flameHalfWidth);
-      ctx.quadraticCurveTo(-18 - flameLen * 0.45, -flameHalfWidth * 1.3, -18 - flameLen, 0);
-      ctx.quadraticCurveTo(-18 - flameLen * 0.45, flameHalfWidth * 1.3, -18, flameHalfWidth);
+      ctx.moveTo(-19, -flameHalfWidth);
+      ctx.quadraticCurveTo(-19 - flameLen * 0.45, -flameHalfWidth * 1.3, -19 - flameLen, 0);
+      ctx.quadraticCurveTo(-19 - flameLen * 0.45, flameHalfWidth * 1.3, -19, flameHalfWidth);
       ctx.closePath();
       ctx.fill();
 
       // B. Inner Hot Core Torch (White-Hot Supersonic Core)
       const coreLen = flameLen * 0.52;
-      const coreGrad = ctx.createLinearGradient(-18, 0, -18 - coreLen, 0);
+      const coreGrad = ctx.createLinearGradient(-19, 0, -19 - coreLen, 0);
       coreGrad.addColorStop(0, ROCKET.flameCore);
       coreGrad.addColorStop(0.6, flame.hex);
       coreGrad.addColorStop(1, CLEAR);
 
       ctx.fillStyle = coreGrad;
       ctx.beginPath();
-      ctx.moveTo(-18, -2.2);
-      ctx.quadraticCurveTo(-18 - coreLen * 0.5, -2.8, -18 - coreLen, 0);
-      ctx.quadraticCurveTo(-18 - coreLen * 0.5, 2.8, -18, 2.2);
+      ctx.moveTo(-19, -2.2);
+      ctx.quadraticCurveTo(-19 - coreLen * 0.5, -2.8, -19 - coreLen, 0);
+      ctx.quadraticCurveTo(-19 - coreLen * 0.5, 2.8, -19, 2.2);
       ctx.closePath();
       ctx.fill();
 
       // C. Supersonic Mach Shock Diamonds (Supersonic standing shock nodes)
       const diamondCount = this.currentPnl >= 4 ? 4 : this.boostIntensity > 1.2 ? 3 : 2;
       for (let d = 1; d <= diamondCount; d++) {
-        const dX = -18 - d * (flameLen / (diamondCount + 1.2));
+        const dX = -19 - d * (flameLen / (diamondCount + 1.2));
         const dPulse = this.reduced ? 1 : 1 + Math.sin(this.time * 32 + d) * 0.22;
         ctx.fillStyle = ROCKET.flameCore;
         ctx.beginPath();
@@ -678,33 +716,17 @@ export class RocketAvatar {
       ctx.restore();
     }
 
-    // Tail Fins
+    // Tail Fins — one up, two fanned down, all in one Path2D
     ctx.fillStyle = ROCKET.finFill;
     ctx.strokeStyle = ROCKET.finEdge;
     ctx.lineWidth = 1.5;
-
-    // Top fin
-    ctx.beginPath();
-    ctx.moveTo(-10, -4);
-    ctx.lineTo(-20, -14);
-    ctx.lineTo(-12, -4);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Bottom fin
-    ctx.beginPath();
-    ctx.moveTo(-10, 4);
-    ctx.lineTo(-20, 14);
-    ctx.lineTo(-12, 4);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
+    ctx.fill(this.fins);
+    ctx.stroke(this.fins);
 
     // Main fuselage. The path is built once in the constructor and reused for
     // fill, stroke and clip rather than re-specified four times per frame.
     ctx.fillStyle = this.grad('hull', () => {
-      const g = ctx.createLinearGradient(0, -9, 0, 9);
+      const g = ctx.createLinearGradient(0, -8.8, 0, 8.8);
       g.addColorStop(0, ROCKET.hullLight);
       g.addColorStop(0.5, ROCKET.hullMid);
       g.addColorStop(1, ROCKET.hullDark);
@@ -762,10 +784,10 @@ export class RocketAvatar {
     // b. BNB Gold Stripe Accent — inside the clip, so soot browns it out too
     ctx.fillStyle = ROCKET.stripe;
     ctx.beginPath();
-    ctx.moveTo(3, -7.5);
-    ctx.lineTo(8, -6.5);
-    ctx.lineTo(6, 6.5);
-    ctx.lineTo(1, 7.5);
+    ctx.moveTo(0.5, -8.3);
+    ctx.lineTo(6, -7.2);
+    ctx.lineTo(4.5, 7.2);
+    ctx.lineTo(-0.5, 8.3);
     ctx.closePath();
     ctx.fill();
 
@@ -775,7 +797,7 @@ export class RocketAvatar {
     if (charge > 0.02) {
       ctx.globalCompositeOperation = 'overlay';
       ctx.fillStyle = this.grad(`tint|${gk}`, () => {
-        const g = ctx.createLinearGradient(-15, 0, 22, 0);
+        const g = ctx.createLinearGradient(-16.5, 0, 22, 0);
         g.addColorStop(0, col.a(0.1 * charge));
         g.addColorStop(0.55, col.a(0.42 * charge));
         g.addColorStop(1, col.lift.a(0.3 * charge));
@@ -790,7 +812,7 @@ export class RocketAvatar {
     if (scorch > 0.02) {
       ctx.globalCompositeOperation = 'multiply';
       ctx.fillStyle = this.grad(`scorch|${gk}`, () => {
-        const g = ctx.createLinearGradient(-15, 0, 14, 0);
+        const g = ctx.createLinearGradient(-16.5, 0, 14, 0);
         g.addColorStop(0, ROCKET.sootDark.a(0.2 + scorch * 0.75));
         g.addColorStop(0.45, ROCKET.sootMid.a(0.15 + scorch * 0.55));
         g.addColorStop(1, TONE.ink.a(0));
@@ -852,27 +874,27 @@ export class RocketAvatar {
       const strobe = this.reduced ? 0.55 : 0.12 + Math.pow(raw, 8) * 0.88;
 
       ctx.globalCompositeOperation = 'lighter';
-      for (const ly of [-4.6, 4.6]) {
+      for (const ly of [-7.3, 7.3]) {
         ctx.fillStyle = this.grad(
           `lamp|${ly}|${(strobe * 10) | 0}|${(dmg * 8) | 0}`,
           () => {
-            const g = ctx.createRadialGradient(-6, ly, 0.4, -6, ly, 5.2);
+            const g = ctx.createRadialGradient(-10, ly, 0.4, -10, ly, 5.2);
             g.addColorStop(0, TONE.ink.a(0.75 * strobe * dmg));
             g.addColorStop(0.35, ROCKET.hazard.a(0.7 * strobe * dmg));
             g.addColorStop(1, ROCKET.hazard.a(0));
             return g;
           }
         );
-        ctx.fillRect(-11.2, ly - 5.2, 10.4, 10.4);
+        ctx.fillRect(-15.2, ly - 5.2, 10.4, 10.4);
       }
       ctx.globalCompositeOperation = 'source-over';
 
       ctx.fillStyle = ROCKET.hazard.a(0.5 + 0.5 * strobe);
       ctx.beginPath();
-      ctx.arc(-6, -4.6, 1.6, 0, Math.PI * 2);
+      ctx.arc(-10, -7.3, 1.6, 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
-      ctx.arc(-6, 4.6, 1.6, 0, Math.PI * 2);
+      ctx.arc(-10, 7.3, 1.6, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -908,7 +930,7 @@ export class RocketAvatar {
     //    outer half, leaving a clean inner rim — no shadowBlur needed.
     const rimA = Math.min(1, 0.16 + charge * 0.62 + this.rimFlare * 0.5);
     ctx.strokeStyle = this.grad(`rim|${gk}|${(this.rimFlare * 8) | 0}`, () => {
-      const g = ctx.createLinearGradient(0, -9, 0, 9);
+      const g = ctx.createLinearGradient(0, -8.8, 0, 8.8);
       g.addColorStop(0, col.a(rimA));
       g.addColorStop(0.3, col.lift.a(rimA * 0.9));
       g.addColorStop(0.72, col.a(rimA * 0.35));
@@ -930,7 +952,7 @@ export class RocketAvatar {
         : 1;
 
     ctx.fillStyle = this.grad(`visor|${gk}`, () => {
-      const g = ctx.createLinearGradient(4, -4, 12, 4);
+      const g = ctx.createLinearGradient(6.5, -4.2, 14.5, 4.2);
       if (scorch > 0.15) {
         const k = scorch;
         g.addColorStop(0, mix(ROCKET.visorScorchLight, ROCKET.visorScorchSink, k));
@@ -958,13 +980,13 @@ export class RocketAvatar {
       ctx.strokeStyle = ROCKET.glass.a(0.35 + 0.35 * flick);
       ctx.lineWidth = 0.7;
       ctx.beginPath();
-      ctx.moveTo(6.2, -4.2);
-      ctx.lineTo(8.1, -0.9);
-      ctx.lineTo(7.0, 2.6);
-      ctx.moveTo(8.1, -0.9);
-      ctx.lineTo(11.4, -1.8);
-      ctx.moveTo(8.1, -0.9);
-      ctx.lineTo(9.6, 3.9);
+      ctx.moveTo(8.8, -3.9);
+      ctx.lineTo(10.6, -0.8);
+      ctx.lineTo(9.6, 2.4);
+      ctx.moveTo(10.6, -0.8);
+      ctx.lineTo(13.7, -1.7);
+      ctx.moveTo(10.6, -0.8);
+      ctx.lineTo(12.0, 3.6);
       ctx.stroke();
       ctx.restore();
     }
@@ -974,8 +996,8 @@ export class RocketAvatar {
     ctx.fillStyle = TONE.ink.a(0.85 + visorHot * 0.15);
     ctx.beginPath();
     ctx.arc(
-      7 + (this.reduced ? 0 : Math.sin(this.time * 1.7) * 0.25),
-      -1.8,
+      9.6 + (this.reduced ? 0 : Math.sin(this.time * 1.7) * 0.25),
+      -1.7,
       gr * (scorch > 0.3 ? 0.55 : 1),
       0,
       Math.PI * 2
@@ -989,18 +1011,16 @@ export class RocketAvatar {
       ctx.strokeStyle = TONE.ink.a(0.55 * fl);
       ctx.lineWidth = 0.8;
       ctx.beginPath();
-      ctx.moveTo(7 - 5 * fl, -1.8);
-      ctx.lineTo(7 + 5 * fl, -1.8);
-      ctx.moveTo(7, -1.8 - 3.4 * fl);
-      ctx.lineTo(7, -1.8 + 3.4 * fl);
+      ctx.moveTo(9.6 - 5 * fl, -1.7);
+      ctx.lineTo(9.6 + 5 * fl, -1.7);
+      ctx.moveTo(9.6, -1.7 - 3.4 * fl);
+      ctx.lineTo(9.6, -1.7 + 3.4 * fl);
       ctx.stroke();
     }
 
-    // Thruster Nozzle
+    // Thruster Nozzle — tapered engine bell, cached in the constructor
     ctx.fillStyle = ROCKET.nozzle;
-    ctx.beginPath();
-    ctx.roundRect(-18, -4, 4, 8, 2);
-    ctx.fill();
+    ctx.fill(this.nozzleBell);
 
     // Aerodynamic Sonic Vapor Condensation Cone (Forms at high speed / target lock >= 80% or profit >= $6)
     const shouldShowCone = (this.targetProgressPct >= 80 || this.currentPnl >= 6.0) && !this.isDrifting;
@@ -1045,9 +1065,9 @@ export class RocketAvatar {
       ctx.shadowColor = ROCKET.arc;
       ctx.shadowBlur = 8;
       ctx.beginPath();
-      ctx.moveTo(-16 + (Math.random() - 0.5) * 4, -4);
-      ctx.lineTo(2 + (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10);
-      ctx.lineTo(16 + (Math.random() - 0.5) * 4, 0);
+      ctx.moveTo(-15 + (Math.random() - 0.5) * 4, -4);
+      ctx.lineTo(3 + (Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10);
+      ctx.lineTo(18 + (Math.random() - 0.5) * 4, 0);
       ctx.stroke();
       ctx.restore();
     }

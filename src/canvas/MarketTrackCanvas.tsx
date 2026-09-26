@@ -1,11 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { marketFeed } from '../services/marketFeed';
-import { MarketTrackRenderer } from './renderer';
+import { MarketTrackRenderer, PNL_TRACKER_LIFT, type MarkerLabels } from './renderer';
 import { RocketAvatar } from './rocket';
 import { ParticleSystem } from './particles';
 import { ActiveTradeRound, GameStage, LastRoundSummary, PositionDirection } from '../types/game';
 import { AssetSymbol } from '../types/market';
 import { soundEngine } from '../services/audioHaptics';
+import { DEFAULT_CONFIG } from '../services/settlementEngine';
+import { formatAmount, formatPrice } from '../ui/lucky/format';
+import { CLEAR, FX, TEXT_HALO, TRACK, TextMemo, font } from './theme';
 
 interface MarketTrackCanvasProps {
   gameStage: GameStage;
@@ -21,6 +24,59 @@ interface MarketTrackCanvasProps {
    * to distinguish a cash-out's LIVE_TRADE→SETTLING jump from a timeout's. */
   cashOutSignal?: number;
 }
+
+interface LiveProps {
+  gameStage: GameStage;
+  activeRound: ActiveTradeRound | null;
+  selectedDirection: PositionDirection | null;
+  lastRound: LastRoundSummary | null;
+  targetProgressPct: number;
+  currentAsset: AssetSymbol;
+  reducedMotion: boolean;
+  labels: MarkerLabels | null;
+}
+
+const markerLabels = (
+  stake: number,
+  targetPct: number,
+  stopPct: number,
+  targetPrice: number,
+  stopPrice: number
+): MarkerLabels => {
+  const leverage = DEFAULT_CONFIG.multiplierLeverage;
+  const win = stake * (targetPct / 100) * leverage;
+  const loss = -Math.min(stake, stake * (stopPct / 100) * leverage);
+  return {
+    target: `TARGET ${formatAmount(win)} · ${formatPrice(targetPrice)}`,
+    stop: `STOP ${formatAmount(loss)} · ${formatPrice(stopPrice)}`,
+  };
+};
+
+const stageLabel = ({ gameStage, activeRound, selectedDirection, lastRound, currentAsset, labels }: LiveProps) => {
+  const asset = activeRound ? activeRound.asset : currentAsset;
+  const market = `${asset}/USDT market track`;
+  if (activeRound && labels) {
+    const round = `${activeRound.direction} round from ${formatPrice(activeRound.entryPrice)}. ${labels.target}. ${labels.stop}`;
+    switch (gameStage) {
+      case 'TARGET_HIT':
+        return `${market}. Target hit, ${formatAmount(activeRound.currentPnl)}.`;
+      case 'LOSS_HIT':
+        return `${market}. Stop loss reached, ${formatAmount(activeRound.currentPnl)}.`;
+      case 'SETTLING':
+      case 'RESULT':
+        return `${market}. Round closed at ${formatAmount(activeRound.currentPnl)}.`;
+      case 'LIVE_TRADE':
+        return `${market}. Live ${round}.`;
+      default:
+        return `${market}. Open ${round}.`;
+    }
+  }
+  if (gameStage === 'PRE_TRADE') {
+    return selectedDirection ? `${market}. ${selectedDirection} selected.` : `${market}. Pick a direction.`;
+  }
+  if (lastRound) return `${market}. Your last play ${formatAmount(lastRound.pnl)}.`;
+  return `${market}.`;
+};
 
 export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
   gameStage,
@@ -60,8 +116,44 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
   const lastSurgeCueRef = useRef<number>(0);
   const lastHandledStageRef = useRef<GameStage | null>(null);
   const dprRef = useRef<number>(1);
+  const trackerTextRef = useRef(new TextMemo((v) => formatAmount(v)));
 
   const [, setTickCount] = useState<number>(0);
+
+  const labels = useMemo(
+    () =>
+      activeRound
+        ? markerLabels(
+            activeRound.stake,
+            activeRound.targetPct,
+            activeRound.stopLossPct,
+            activeRound.targetPrice,
+            activeRound.stopLossPrice
+          )
+        : null,
+    [
+      activeRound?.stake,
+      activeRound?.targetPct,
+      activeRound?.stopLossPct,
+      activeRound?.targetPrice,
+      activeRound?.stopLossPrice,
+    ]
+  );
+
+  const liveProps: LiveProps = {
+    gameStage,
+    activeRound,
+    selectedDirection,
+    lastRound,
+    targetProgressPct,
+    currentAsset,
+    reducedMotion,
+    labels,
+  };
+  const liveRef = useRef<LiveProps>(liveProps);
+  useLayoutEffect(() => {
+    liveRef.current = liveProps;
+  });
 
   // Listen to live market price ticks
   useEffect(() => {
@@ -76,7 +168,7 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
     if (onWarpTrigger) {
       onWarpTrigger(() => {
         const canvas = canvasRef.current;
-        if (canvas) {
+        if (canvas && !liveRef.current.reducedMotion) {
           particlesRef.current.triggerWarpStreaks(canvas.width, canvas.height);
           shakeMagnitudeRef.current = 4;
         }
@@ -93,6 +185,7 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
       hasMountedCashOutRef.current = true;
       return;
     }
+    if (liveRef.current.reducedMotion) return;
     const rocket = rocketRef.current;
     particlesRef.current.emitCashOutSparkle(rocket.x, rocket.y + rocket.hoverOffset);
   }, [cashOutSignal]);
@@ -113,14 +206,13 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
         shakeMagnitudeRef.current = 14; // Punchy victory camera screen shake
         punchRef.current = 1; // Fast hit-stop punch-zoom (PRD §20 Frame 1: Impact)
         boomRef.current = 1; // Slow background surge + victory flash (Frames 2-3)
-        const rewardText =
-          activeRound && activeRound.currentPnl >= 0
-            ? `+$${activeRound.currentPnl.toFixed(2)}`
-            : '+$18.40';
-        particles.emitTargetHitBurst(rocket.x, rocket.y, rewardText);
+        if (!reducedMotion) {
+          const rewardText = activeRound ? formatAmount(activeRound.currentPnl) : undefined;
+          particles.emitTargetHitBurst(rocket.x, rocket.y, rewardText);
+        }
       } else if (gameStage === 'LOSS_HIT') {
         shakeMagnitudeRef.current = 6; // Tactile rumble thud
-        particles.emitLossMist(rocket.x, rocket.y);
+        if (!reducedMotion) particles.emitLossMist(rocket.x, rocket.y);
       } else if (gameStage === 'PRE_TRADE' || gameStage === 'HOME') {
         // Scorch ratchets and heals slowly by design, so it has to be cleared
         // explicitly or last round's damage carries into the next one.
@@ -130,7 +222,7 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
         prevTrackerPnlRef.current = 0;
       }
     }
-  }, [gameStage, activeRound]);
+  }, [gameStage, activeRound, reducedMotion]);
 
   // Main 60 FPS Canvas Render Loop
   useEffect(() => {
@@ -145,7 +237,51 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
 
     let animationFrameId: number;
 
+    // A sharp move should be felt, not just seen. The rocket detects the
+    // surge on a rising edge; the scene answers with a camera kick and — far
+    // more sparingly — a sound, so a volatile stretch does not become noise.
+    rocket.onSurge = (power, climbing) => {
+      shakeMagnitudeRef.current = Math.max(
+        shakeMagnitudeRef.current,
+        (climbing ? 5.5 : 4) * power
+      );
+
+      const now = performance.now();
+      if (power > 0.55 && now - lastSurgeCueRef.current > 900) {
+        lastSurgeCueRef.current = now;
+        if (climbing) {
+          soundEngine.playSurgeThrum();
+          soundEngine.hapticLight();
+        } else {
+          soundEngine.playCountTick();
+        }
+      }
+    };
+
+    rocket.onTier = (tier, gained) => {
+      // The $2.50 visual ladder and the $5 audio ladder coincide on every
+      // even tier, and playMilestonePing() already fires hapticLight()
+      // internally — so skip those or the device double-buzzes.
+      const collidesWithAudioPing = gained && tier > 0 && tier % 2 === 0;
+      if (gained) {
+        if (!collidesWithAudioPing) soundEngine.hapticMedium();
+      } else if (tier <= -1) {
+        soundEngine.hapticWarning();
+      }
+    };
+
     const render = () => {
+      const {
+        gameStage,
+        activeRound,
+        selectedDirection,
+        lastRound,
+        targetProgressPct,
+        currentAsset,
+        reducedMotion,
+        labels,
+      } = liveRef.current;
+
       // CSS pixels. canvas.width is the device-pixel backing store and the
       // context is already scaled by dpr in the resize handler, so using it
       // here would lay the scene out at dpr x its intended size.
@@ -191,30 +327,12 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
       const currentHistory = marketFeed.getHistory();
       const points = renderer.calculateScreenPoints(currentHistory, width, height, activeRound);
 
-      // Determine track color scheme. Cyan retired (docs/DESIGN_TOKENS.md: not
-      // a fifth semantic color) — the neutral/no-round state uses brand yellow.
-      let colorScheme = {
-        stroke: '#F0B90B',
-        glow: 'rgba(240, 185, 11, 0.4)',
-        fill: 'rgba(240, 185, 11, 0.08)',
-      };
-
-      if (activeRound) {
-        const isGood = activeRound.currentPnl >= 0;
-        if (isGood) {
-          colorScheme = {
-            stroke: '#00E89A',
-            glow: 'rgba(0, 232, 154, 0.55)',
-            fill: 'rgba(0, 232, 154, 0.12)',
-          };
-        } else {
-          colorScheme = {
-            stroke: '#FF3B6B',
-            glow: 'rgba(255, 59, 107, 0.55)',
-            fill: 'rgba(255, 59, 107, 0.12)',
-          };
-        }
-      }
+      // Track colour: ink-soft with a frame-blue glow when idle, profit or loss during a round.
+      const colorScheme = activeRound
+        ? activeRound.currentPnl >= 0
+          ? TRACK.profit
+          : TRACK.loss
+        : TRACK.idle;
 
       // 3. Render Market Track Spline
       renderer.renderTrack(ctx, points, width, height, colorScheme);
@@ -292,7 +410,8 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
           rocket.x,
           rocket.y,
           activeRound.direction,
-          activeRound.currentPnl
+          activeRound.currentPnl,
+          labels ?? undefined
         );
       }
 
@@ -305,39 +424,6 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
       // 8. Update & Render Particles & Rocket
       particles.update();
       particles.render(ctx);
-
-      // A sharp move should be felt, not just seen. The rocket detects the
-      // surge on a rising edge; the scene answers with a camera kick and — far
-      // more sparingly — a sound, so a volatile stretch does not become noise.
-      rocket.onSurge = (power, climbing) => {
-        shakeMagnitudeRef.current = Math.max(
-          shakeMagnitudeRef.current,
-          (climbing ? 5.5 : 4) * power
-        );
-
-        const now = performance.now();
-        if (power > 0.55 && now - lastSurgeCueRef.current > 900) {
-          lastSurgeCueRef.current = now;
-          if (climbing) {
-            soundEngine.playSurgeThrum();
-            soundEngine.hapticLight();
-          } else {
-            soundEngine.playCountTick();
-          }
-        }
-      };
-
-      rocket.onTier = (tier, gained) => {
-        // The $2.50 visual ladder and the $5 audio ladder coincide on every
-        // even tier, and playMilestonePing() already fires hapticLight()
-        // internally — so skip those or the device double-buzzes.
-        const collidesWithAudioPing = gained && tier > 0 && tier % 2 === 0;
-        if (gained) {
-          if (!collidesWithAudioPing) soundEngine.hapticMedium();
-        } else if (tier <= -1) {
-          soundEngine.hapticWarning();
-        }
-      };
 
       rocket.update(particles, reducedMotion);
       rocket.render(ctx);
@@ -365,21 +451,24 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
 
         if (activeRound && pnlTrackerAlphaRef.current > 0.01) {
           const trackerPnl = activeRound.currentPnl;
-          const trackerColor = trackerPnl >= 0 ? '#00E89A' : '#FF3B6B';
-          const trackerLabel = `${trackerPnl < 0 ? '-' : '+'}$${Math.abs(trackerPnl).toFixed(2)}`;
+          const trackerColor = trackerPnl >= 0 ? TRACK.profit.stroke : TRACK.loss.stroke;
           // Reduced motion keeps the number legible but drops the pop kick.
           const pop = reducedMotion ? 0 : pnlTrackerPopRef.current;
-          const trackerFontSize = 15 + pop * 5;
+          const trackerFont = font(15 + pop * 5);
 
           ctx.save();
           ctx.globalAlpha = pnlTrackerAlphaRef.current;
-          ctx.font = `900 ${trackerFontSize}px monospace`;
-          ctx.textAlign = 'center';
+          const tracker = trackerTextRef.current.update(ctx, trackerPnl, trackerFont);
+          ctx.textAlign = 'left';
           ctx.textBaseline = 'middle';
+          const trackerX = rocket.x - tracker.width / 2;
+          const trackerY = rocket.y + rocket.hoverOffset - PNL_TRACKER_LIFT;
+          ctx.lineWidth = 3;
+          ctx.lineJoin = 'round';
+          ctx.strokeStyle = TEXT_HALO;
+          ctx.strokeText(tracker.text, trackerX, trackerY);
           ctx.fillStyle = trackerColor;
-          ctx.shadowColor = trackerColor;
-          ctx.shadowBlur = 10;
-          ctx.fillText(trackerLabel, rocket.x, rocket.y + rocket.hoverOffset - 34);
+          ctx.fillText(tracker.text, trackerX, trackerY);
           ctx.restore();
         }
       }
@@ -394,13 +483,13 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
           const auraAlpha = 0.08 + pnlIntensity * 0.28;
           const pulse = 1 + Math.sin(performance.now() * 0.008) * 0.18;
 
-          ctx.strokeStyle = `rgba(0, 255, 163, ${auraAlpha * pulse})`;
+          ctx.strokeStyle = FX.winEdge.a(auraAlpha * pulse);
           ctx.lineWidth = 10 + pnlIntensity * 12;
           ctx.strokeRect(0, 0, width, height);
 
           // Corner Speed Laser Flares at >= $6.00
           if (activeRound.currentPnl >= 6.0) {
-            ctx.strokeStyle = `rgba(0, 240, 255, ${0.45 * pulse})`;
+            ctx.strokeStyle = FX.winCorner.a(0.45 * pulse);
             ctx.lineWidth = 2.5;
             const cornerLen = 24 + pnlIntensity * 24;
             // Top-left
@@ -420,13 +509,13 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
           const heartbeat = Math.pow(Math.max(0, Math.sin(performance.now() * beatSpeed)), 4);
           const alertAlpha = 0.1 + lossIntensity * 0.38 * heartbeat;
 
-          ctx.strokeStyle = `rgba(255, 0, 85, ${alertAlpha})`;
+          ctx.strokeStyle = FX.lossEdge.a(alertAlpha);
           ctx.lineWidth = 12 + lossIntensity * 14;
           ctx.strokeRect(0, 0, width, height);
 
           // Emergency Hazard scanlines when deep in minus (<= -$5.00)
           if (activeRound.currentPnl <= -5.0) {
-            ctx.strokeStyle = `rgba(255, 0, 85, ${0.35 * heartbeat})`;
+            ctx.strokeStyle = FX.lossEdge.a(0.35 * heartbeat);
             ctx.lineWidth = 1.5;
             ctx.setLineDash([8, 8]);
             ctx.strokeRect(6, 6, width - 12, height - 12);
@@ -452,9 +541,9 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
             rocket.y,
             Math.max(width, height) * 0.9
           );
-          flashGrad.addColorStop(0, `rgba(255, 255, 255, ${boomRef.current * 0.95})`);
-          flashGrad.addColorStop(0.35, `rgba(0, 255, 163, ${boomRef.current * 0.55})`);
-          flashGrad.addColorStop(1, 'transparent');
+          flashGrad.addColorStop(0, FX.flashCore.a(boomRef.current * 0.95));
+          flashGrad.addColorStop(0.35, FX.flashRing.a(boomRef.current * 0.55));
+          flashGrad.addColorStop(1, CLEAR);
           ctx.fillStyle = flashGrad;
           ctx.fillRect(0, 0, width, height);
         }
@@ -471,7 +560,7 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [gameStage, activeRound, selectedDirection, lastRound, targetProgressPct, reducedMotion, currentAsset]);
+  }, []);
 
   // Handle Retina DPR and Resize
   useEffect(() => {
@@ -507,6 +596,8 @@ export const MarketTrackCanvas: React.FC<MarketTrackCanvasProps> = ({
     >
       <canvas
         ref={canvasRef}
+        role="img"
+        aria-label={stageLabel(liveProps)}
         className="block w-full h-full"
       />
     </div>

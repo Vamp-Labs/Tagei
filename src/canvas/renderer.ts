@@ -1,5 +1,16 @@
 import { PriceTick, AssetSymbol } from '../types/market';
 import { ActiveTradeRound, LastRoundSummary, PositionDirection } from '../types/game';
+import { formatAmount, formatPrice } from '../ui/lucky/format';
+import {
+  CLEAR,
+  LABEL_FONT,
+  MARKER,
+  STAGE,
+  TEXT_HALO,
+  TextMemo,
+  boomStep,
+  type TrackScheme,
+} from './theme';
 
 interface Star {
   x: number;
@@ -8,20 +19,31 @@ interface Star {
   alpha: number;
   speed: number;
   twinkleSpeed: number;
+  tint: string;
 }
 
-interface Star {
-  x: number;
-  y: number;
-  size: number;
-  alpha: number;
-  speed: number;
-  twinkleSpeed: number;
+export interface MarkerLabels {
+  target: string;
+  stop: string;
 }
+
+const TAG_HEIGHT = 22;
+const TAG_PAD_X = 8;
+const TAG_RADIUS = 6;
+const ZONE_TRI = 5;
+const ZONE_LABEL_X = 20;
+export const PNL_TRACKER_LIFT = 34;
+const TRACKER_CLEARANCE = 26;
 
 export class MarketTrackRenderer {
   private stars: Star[] = [];
   private time: number = 0;
+  private reduced: boolean = false;
+  private readonly entryTag = new TextMemo((v) => `ENTRY ${formatPrice(v)}`);
+  private readonly deltaTag = new TextMemo((v) => formatAmount(v));
+  private readonly targetFallback = new TextMemo((v) => `TARGET ${formatPrice(v)}`);
+  private readonly stopFallback = new TextMemo((v) => `STOP ${formatPrice(v)}`);
+  private readonly lastPlayTag = new TextMemo((v) => `YOUR PLAY ${formatAmount(v)}`);
 
   constructor() {
     this.initStars(140);
@@ -37,13 +59,14 @@ export class MarketTrackRenderer {
         alpha: 0.2 + Math.random() * 0.8,
         speed: 0.00015 + Math.random() * 0.00045,
         twinkleSpeed: 0.02 + Math.random() * 0.06,
+        tint: Math.random() < STAGE.starTintShare ? STAGE.starTint : STAGE.star,
       });
     }
   }
 
   /**
-   * Renders clean deep-space background:
-   * Cosmic void gradient, parallax twinkling stars, subtle horizon glow, and grid lines
+   * Renders the blue lobby stage:
+   * lobby gradient, parallax twinkling stars, subtle horizon glow, and grid lines
    */
   public renderBackground(
     ctx: CanvasRenderingContext2D,
@@ -51,18 +74,20 @@ export class MarketTrackRenderer {
     height: number,
     reducedMotion: boolean = false,
     _asset: AssetSymbol = 'BNB',
-    // 0..1, decaying — the win boom. Warms every layer below rather than
-    // drawing a shape on top, so the background itself reads as reacting
-    // instead of something being overlaid on an unchanged scene.
+    // 0..1, decaying — the win boom. Tints every layer below toward lucky
+    // rather than drawing a shape on top, so the stage itself reads as
+    // reacting instead of something being overlaid on an unchanged scene.
     boom: number = 0
   ) {
     this.time += 0.016;
+    this.reduced = reducedMotion;
+    const step = boomStep(boom);
 
-    // 1. Deep Cosmic Void Gradient — warms toward gold/emerald on a win
+    // 1. Lobby gradient — starts on the header's lobby blue so the frame has no seam
     const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
-    bgGrad.addColorStop(0, `rgb(${4 + boom * 44}, ${7 + boom * 26}, ${17 - boom * 6})`);
-    bgGrad.addColorStop(0.55, `rgb(${7 + boom * 18}, ${11 + boom * 40}, ${25 + boom * 8})`);
-    bgGrad.addColorStop(1, `rgb(${14 + boom * 10}, ${21 + boom * 46}, ${46 + boom * 12})`);
+    bgGrad.addColorStop(0, STAGE.top[step]);
+    bgGrad.addColorStop(STAGE.midStop, STAGE.mid[step]);
+    bgGrad.addColorStop(1, STAGE.bottom[step]);
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, width, height);
 
@@ -81,7 +106,7 @@ export class MarketTrackRenderer {
         Math.min(1, (star.alpha + twinkle * 0.25) * starAlphaMul)
       );
 
-      ctx.fillStyle = boom > 0.15 ? '#FFF3D6' : '#FFFFFF';
+      ctx.fillStyle = boom > 0.15 ? STAGE.star : star.tint;
       ctx.globalAlpha = currentAlpha;
       ctx.beginPath();
       ctx.arc(star.x * width, star.y * height, star.size * starSizeMul, 0, Math.PI * 2);
@@ -101,26 +126,17 @@ export class MarketTrackRenderer {
       glowY,
       glowRadius
     );
-    ambientGrad.addColorStop(
-      0,
-      `rgba(${boom * 240}, ${240 - boom * 55}, ${255 - boom * 100}, ${0.05 + boom * 0.22})`
-    );
-    ambientGrad.addColorStop(
-      0.5,
-      `rgba(${boom * 240}, ${255 - boom * 4}, ${163 - boom * 80}, ${0.02 + boom * 0.12})`
-    );
-    ambientGrad.addColorStop(1, 'transparent');
+    ambientGrad.addColorStop(0, STAGE.ambientCore[step]);
+    ambientGrad.addColorStop(0.5, STAGE.ambientEdge[step]);
+    ambientGrad.addColorStop(1, CLEAR);
     ctx.fillStyle = ambientGrad;
     ctx.beginPath();
     ctx.arc(glowX, glowY, glowRadius, 0, Math.PI * 2);
     ctx.fill();
 
-    // 4. Subtle horizontal celestial grid lines — faint gold wash on a win,
+    // 4. Horizontal grid lines — a faint lucky wash on a win,
     //    so the boom reaches every layer of the background stack
-    ctx.strokeStyle =
-      boom > 0.05
-        ? `rgba(240, 185, 11, ${0.025 + boom * 0.05})`
-        : 'rgba(255, 255, 255, 0.025)';
+    ctx.strokeStyle = boom > 0.05 ? STAGE.gridBoom.a(0.025 + boom * 0.05) : STAGE.grid;
     ctx.lineWidth = 1;
     const gridStep = height / 6;
     for (let y = gridStep; y < height; y += gridStep) {
@@ -209,14 +225,14 @@ export class MarketTrackRenderer {
   }
 
   /**
-   * Renders the glowing continuous spline track
+   * Renders the continuous spline track
    */
   public renderTrack(
     ctx: CanvasRenderingContext2D,
     points: { x: number; y: number }[],
     _width: number,
     height: number,
-    colorScheme: { stroke: string; glow: string; fill: string }
+    colorScheme: TrackScheme
   ) {
     if (points.length < 2) return;
 
@@ -241,11 +257,11 @@ export class MarketTrackRenderer {
 
     const fillGrad = ctx.createLinearGradient(0, 0, 0, height);
     fillGrad.addColorStop(0, colorScheme.fill);
-    fillGrad.addColorStop(0.8, 'transparent');
+    fillGrad.addColorStop(0.8, CLEAR);
     ctx.fillStyle = fillGrad;
     ctx.fill();
 
-    // 2. Glowing Neon Spline Stroke
+    // 2. Spline stroke
     ctx.beginPath();
     ctx.moveTo(points[0].x, points[0].y);
 
@@ -258,7 +274,7 @@ export class MarketTrackRenderer {
     }
     ctx.lineTo(last.x, last.y);
 
-    // Outer neon glow
+    // Outer glow
     ctx.strokeStyle = colorScheme.glow;
     ctx.lineWidth = 6;
     ctx.lineCap = 'round';
@@ -273,9 +289,44 @@ export class MarketTrackRenderer {
     ctx.restore();
   }
 
+  private zoneLabel(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    color: string,
+    x: number,
+    baseline: number,
+    pointsUp: boolean
+  ) {
+    this.haloText(ctx, text, x + ZONE_TRI * 2 + 6, baseline, color);
+
+    const cx = x + ZONE_TRI;
+    const cy = baseline - 5;
+    ctx.beginPath();
+    if (pointsUp) {
+      ctx.moveTo(cx - ZONE_TRI, cy + ZONE_TRI * 0.8);
+      ctx.lineTo(cx + ZONE_TRI, cy + ZONE_TRI * 0.8);
+      ctx.lineTo(cx, cy - ZONE_TRI * 0.8);
+    } else {
+      ctx.moveTo(cx - ZONE_TRI, cy - ZONE_TRI * 0.8);
+      ctx.lineTo(cx + ZONE_TRI, cy - ZONE_TRI * 0.8);
+      ctx.lineTo(cx, cy + ZONE_TRI * 0.8);
+    }
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  private haloText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, color: string) {
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = TEXT_HALO;
+    ctx.strokeText(text, x, y);
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+  }
+
   /**
    * Renders Pre-Trade / Live Trade markers:
-   * Profit Zone, Loss Zone, Entry Radar Crosshair, Target Destination Planet, Stop Loss Singularity, and Live Delta
+   * Profit Zone, Stop Zone, Entry line and tag, Target beacon, Stop marker, and Live Delta
    */
   public renderMarkers(
     ctx: CanvasRenderingContext2D,
@@ -290,12 +341,14 @@ export class MarketTrackRenderer {
     rocketX: number,
     rocketY: number,
     direction: PositionDirection = 'LONG',
-    currentPnl: number = 0
+    currentPnl: number = 0,
+    labels?: MarkerLabels
   ) {
     ctx.save();
-    ctx.font = 'bold 10px "JetBrains Mono", monospace';
+    ctx.font = LABEL_FONT;
+    ctx.textBaseline = 'alphabetic';
 
-    // 1. Shaded PROFIT ZONE & LOSS ZONE
+    // 1. Shaded PROFIT ZONE & STOP ZONE
     const isLong = direction === 'LONG';
     const profitTop = Math.min(entryY, targetY);
     const profitBottom = Math.max(entryY, targetY);
@@ -305,38 +358,33 @@ export class MarketTrackRenderer {
     const lossBottom = Math.max(entryY, stopLossY);
     const lossHeight = Math.max(2, lossBottom - lossTop);
 
-    // Render Profit Zone (Emerald Neon Glow)
     const profitGrad = ctx.createLinearGradient(
       0,
       isLong ? profitTop : profitBottom,
       0,
       isLong ? profitBottom : profitTop
     );
-    profitGrad.addColorStop(0, 'rgba(0, 255, 163, 0.14)');
-    profitGrad.addColorStop(1, 'rgba(0, 255, 163, 0.02)');
+    profitGrad.addColorStop(0, MARKER.profitZoneNear);
+    profitGrad.addColorStop(1, MARKER.profitZoneFar);
     ctx.fillStyle = profitGrad;
     ctx.fillRect(0, profitTop, width, profitHeight);
 
-    ctx.fillStyle = 'rgba(0, 255, 163, 0.55)';
-    ctx.fillText('▲ +PROFIT ZONE', width - 110, isLong ? profitTop + 14 : profitBottom - 6);
-
-    // Render Loss Zone (Crimson Glow)
     const lossGrad = ctx.createLinearGradient(
       0,
       isLong ? lossBottom : lossTop,
       0,
       isLong ? lossTop : lossBottom
     );
-    lossGrad.addColorStop(0, 'rgba(255, 0, 85, 0.14)');
-    lossGrad.addColorStop(1, 'rgba(255, 0, 85, 0.02)');
+    lossGrad.addColorStop(0, MARKER.stopZoneNear);
+    lossGrad.addColorStop(1, MARKER.stopZoneFar);
     ctx.fillStyle = lossGrad;
     ctx.fillRect(0, lossTop, width, lossHeight);
 
-    ctx.fillStyle = 'rgba(255, 0, 85, 0.55)';
-    ctx.fillText('▼ -STOP LOSS', width - 96, isLong ? lossBottom - 6 : lossTop + 14);
+    this.zoneLabel(ctx, 'PROFIT ZONE', MARKER.profitLabel, ZONE_LABEL_X, (profitTop + profitBottom) / 2 + 5, isLong);
+    this.zoneLabel(ctx, 'STOP ZONE', MARKER.stopLabel, ZONE_LABEL_X, (lossTop + lossBottom) / 2 + 5, !isLong);
 
-    // 2. High-Contrast ENTRY Baseline & Radar Beacon
-    ctx.strokeStyle = 'rgba(0, 240, 255, 0.75)';
+    // 2. ENTRY baseline, ring and tag
+    ctx.strokeStyle = MARKER.entryLine;
     ctx.setLineDash([5, 4]);
     ctx.lineWidth = 1.5;
     ctx.beginPath();
@@ -345,34 +393,33 @@ export class MarketTrackRenderer {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Entry radar beacon crosshair
-    ctx.fillStyle = '#FFD21E';
+    ctx.fillStyle = MARKER.entry;
     ctx.beginPath();
     ctx.arc(22, entryY, 3.5, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(0, 240, 255, 0.5)';
+    ctx.strokeStyle = MARKER.entryRing;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.arc(22, entryY, 7, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Entry price tag
-    ctx.fillStyle = '#070b19';
-    ctx.strokeStyle = '#FFD21E';
+    const entry = this.entryTag.update(ctx, entryPrice, LABEL_FONT);
+    ctx.fillStyle = MARKER.tagBg;
+    ctx.strokeStyle = MARKER.entry;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.roundRect(32, entryY - 9, 105, 18, 4);
+    ctx.roundRect(32, entryY - TAG_HEIGHT / 2, entry.width + TAG_PAD_X * 2, TAG_HEIGHT, TAG_RADIUS);
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = '#FFD21E';
-    ctx.fillText(`ENTRY $${entryPrice.toFixed(2)}`, 38, entryY + 4);
+    ctx.fillStyle = MARKER.tagText;
+    ctx.fillText(entry.text, 32 + TAG_PAD_X, entryY + 4.5);
 
-    // 3. Dynamic Live Vertical Delta Measurement Bracket
+    // 3. Live vertical delta bracket
     const deltaHeight = Math.abs(rocketY - entryY);
     if (deltaHeight > 4) {
       const isProfit = currentPnl >= 0;
-      const deltaColor = isProfit ? '#00E89A' : '#FF3B6B';
+      const deltaColor = isProfit ? MARKER.profit : MARKER.loss;
 
       ctx.save();
       ctx.strokeStyle = deltaColor;
@@ -393,34 +440,37 @@ export class MarketTrackRenderer {
       ctx.stroke();
 
       const badgeY = (entryY + rocketY) / 2;
-      const badgeX = Math.min(width - 95, rocketX + 16);
+      if (Math.abs(badgeY - (rocketY - PNL_TRACKER_LIFT)) >= TRACKER_CLEARANCE) {
+        const delta = this.deltaTag.update(ctx, currentPnl, LABEL_FONT);
+        const badgeW = delta.width + TAG_PAD_X * 2;
+        const badgeX = Math.min(width - badgeW - 8, rocketX + 12);
 
-      ctx.fillStyle = '#070b19';
-      ctx.strokeStyle = deltaColor;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.roundRect(badgeX - 4, badgeY - 11, 88, 20, 6);
-      ctx.fill();
-      ctx.stroke();
+        ctx.fillStyle = MARKER.tagBg;
+        ctx.strokeStyle = deltaColor;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(badgeX, badgeY - TAG_HEIGHT / 2, badgeW, TAG_HEIGHT, TAG_RADIUS);
+        ctx.fill();
+        ctx.stroke();
 
-      ctx.fillStyle = deltaColor;
-      ctx.fillText(
-        `${isProfit ? '+' : ''}$${currentPnl.toFixed(2)} ${isProfit ? '▲' : '▼'}`,
-        badgeX,
-        badgeY + 3
-      );
+        ctx.fillStyle = deltaColor;
+        ctx.fillText(delta.text, badgeX + TAG_PAD_X, badgeY + 4.5);
+      }
       ctx.restore();
     }
 
-    // 4. Target Level Beacon
+    // 4. Target beacon
     const isClose = targetProgressPct >= 75;
     const isVeryClose = targetProgressPct >= 90;
     const isLock = targetProgressPct >= 98;
 
-    const pulseScale = isVeryClose ? 1 + Math.sin(this.time * 18) * 0.35 : 1 + Math.sin(this.time * 6) * 0.15;
-    const targetColor = isClose ? '#00E89A' : '#F0B90B';
+    const pulseScale = this.reduced
+      ? 1
+      : isVeryClose
+        ? 1 + Math.sin(this.time * 18) * 0.35
+        : 1 + Math.sin(this.time * 6) * 0.15;
 
-    ctx.strokeStyle = `${targetColor}88`;
+    ctx.strokeStyle = isClose ? MARKER.targetLineClose : MARKER.targetLine;
     ctx.setLineDash([6, 4]);
     ctx.lineWidth = 1.5;
     ctx.beginPath();
@@ -429,27 +479,24 @@ export class MarketTrackRenderer {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Sleek Target Beacon Ring at right edge
     const beaconX = width - 40;
-    ctx.save();
-    ctx.strokeStyle = targetColor;
+    ctx.strokeStyle = MARKER.target;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(beaconX, targetY, 8 * pulseScale, 0, Math.PI * 2);
     ctx.stroke();
 
-    ctx.fillStyle = targetColor;
+    ctx.fillStyle = MARKER.target;
     ctx.beginPath();
     ctx.arc(beaconX, targetY, 3, 0, Math.PI * 2);
     ctx.fill();
-    ctx.restore();
 
-    ctx.fillStyle = targetColor;
-    ctx.fillText(`TARGET WIN +$18.40 ($${targetPrice.toFixed(2)})`, 20, targetY - 6);
+    const targetText = labels ? labels.target : this.targetFallback.update(ctx, targetPrice, LABEL_FONT).text;
+    this.haloText(ctx, targetText, 20, targetY - 8, MARKER.target);
 
     // 98% Proximity Lock Beam
     if (isLock) {
-      ctx.strokeStyle = '#00E89A';
+      ctx.strokeStyle = MARKER.target;
       ctx.setLineDash([2, 3]);
       ctx.lineWidth = 1.5;
       ctx.beginPath();
@@ -459,8 +506,8 @@ export class MarketTrackRenderer {
       ctx.setLineDash([]);
     }
 
-    // 5. Stop Loss Line & Clean Dot Marker
-    ctx.strokeStyle = 'rgba(255, 0, 85, 0.7)';
+    // 5. Stop line & dot marker
+    ctx.strokeStyle = MARKER.stopLine;
     ctx.setLineDash([4, 4]);
     ctx.lineWidth = 1.5;
     ctx.beginPath();
@@ -469,13 +516,13 @@ export class MarketTrackRenderer {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = '#FF3B6B';
+    ctx.fillStyle = MARKER.stop;
     ctx.beginPath();
     ctx.arc(beaconX, stopLossY, 4, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = '#FF3B6B';
-    ctx.fillText(`STOP LOSS -$10.00 ($${stopLossPrice.toFixed(2)})`, 20, stopLossY + 12);
+    const stopText = labels ? labels.stop : this.stopFallback.update(ctx, stopLossPrice, LABEL_FONT).text;
+    this.haloText(ctx, stopText, 20, stopLossY + 18, MARKER.stop);
 
     ctx.restore();
   }
@@ -491,7 +538,7 @@ export class MarketTrackRenderer {
   ) {
     ctx.save();
     const isLong = direction === 'LONG';
-    const color = isLong ? '#00E89A' : '#FF3B6B';
+    const color = isLong ? MARKER.pathLong : MARKER.pathShort;
     const angle = isLong ? -0.28 : 0.28;
 
     ctx.strokeStyle = color;
@@ -526,24 +573,21 @@ export class MarketTrackRenderer {
     summary: LastRoundSummary
   ) {
     const isWin = summary.outcome === 'win' || summary.pnl >= 0;
-    const color = isWin ? '#00E89A' : '#FF3B6B';
+    const color = isWin ? MARKER.profit : MARKER.loss;
 
     ctx.save();
-    // Glowing pulse ring
-    ctx.strokeStyle = `${color}66`;
+    ctx.strokeStyle = isWin ? MARKER.lastWinRing : MARKER.lastLossRing;
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.arc(x, y, 9, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Solid core dot
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.arc(x, y, 4, 0, Math.PI * 2);
     ctx.fill();
 
-    // Vertical dashed connector line to tag
-    ctx.strokeStyle = `${color}99`;
+    ctx.strokeStyle = isWin ? MARKER.lastWinStem : MARKER.lastLossStem;
     ctx.setLineDash([2, 2]);
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -552,31 +596,23 @@ export class MarketTrackRenderer {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // Callout pill badge
-    const badgeW = 104;
-    const badgeH = 22;
+    const tag = this.lastPlayTag.update(ctx, summary.pnl, LABEL_FONT);
+    const badgeW = tag.width + TAG_PAD_X * 2;
+    const badgeH = TAG_HEIGHT + 2;
     const badgeX = x - badgeW / 2;
     const badgeY = y - 20 - badgeH;
 
-    ctx.fillStyle = 'rgba(7, 11, 25, 0.92)';
+    ctx.fillStyle = MARKER.tagBgSoft;
     ctx.strokeStyle = color;
     ctx.lineWidth = 1.5;
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 10;
     ctx.beginPath();
-    ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 6);
+    ctx.roundRect(badgeX, badgeY, badgeW, badgeH, TAG_RADIUS);
     ctx.fill();
     ctx.stroke();
-    ctx.shadowBlur = 0;
 
-    ctx.font = 'bold 9px "JetBrains Mono", monospace';
     ctx.fillStyle = color;
-    ctx.textAlign = 'center';
-    ctx.fillText(
-      `YOUR PLAY: ${summary.pnl >= 0 ? '+' : ''}$${summary.pnl.toFixed(2)}`,
-      x,
-      badgeY + 14
-    );
+    ctx.textAlign = 'left';
+    ctx.fillText(tag.text, badgeX + TAG_PAD_X, badgeY + badgeH / 2 + 4.5);
 
     ctx.restore();
   }

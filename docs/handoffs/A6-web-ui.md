@@ -1,4 +1,4 @@
-# A6 — Web UI & motion (W2)
+# A6 — Web UI & motion (starts after the Lucky re-skin merges)
 
 **Branch:** `feat/a6-web-ui` · **Worktree:** `…/Tagei-worktrees/a6-web-ui` · **Owns:** `src/App.tsx`, `src/components/**`, `src/canvas/**`, `src/ui/**`, `src/index.css`, `test/ui/**`
 
@@ -48,5 +48,5 @@
 
 ## Constraints
 
-- Before starting, A0 confirms that the other Claude session working on the main checkout ("fix-hold-launch-trade-again") has its changes merged into `integration`. You edit the same files.
+- **Start condition:** the Lucky re-skin (`feat/lucky-reskin`, see `docs/reskin/` once merged) is merged into `integration`. You wire logic into the **re-skinned** components; any new UI (ConnectSheet, tier chips' "Coming soon", void/failed states) follows the Lucky design system (`src/ui/lucky`, `docs/reskin/lucky-ds`). Visual parity is measured against the re-skin's screenshots, not the v0.2 baseline.
 - Never edit `src/services/**`, `src/types/**` or `src/web3/**` (A5). Request API changes through the final report.

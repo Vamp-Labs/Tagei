@@ -32,6 +32,7 @@
 6. **`src/game/fx.ts`**: `fxPnl` normalisation (at $10 stake with M 2.84 and no fee it must be **identical** to today's P&L), used by the canvas and PIX thresholds.
 7. **`src/types`**: extend `ActiveTradeRound`/`TradeResult`/`UserSettings` per the plan (`roundId`, tier, `endSec`, mode, voided …) without breaking existing consumers.
 8. **`main.tsx`**: `WagmiProvider` + `QueryClientProvider`.
+9. **Env typing:** do not create `src/vite-env.d.ts` (the re-skin track owns it). Read `import.meta.env` through a typed helper in `src/api/env.ts`.
 
 ## Definition of done
 

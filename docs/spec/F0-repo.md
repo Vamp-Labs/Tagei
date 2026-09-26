@@ -67,3 +67,28 @@ Agents never edit A0 paths. Put the request in your final report as: file, the c
 | Forks of chain 97 | `https://bsc-testnet-rpc.publicnode.com` (archive state) |
 | Testnet hot wallets | `~/.config/bnbplay/testnet.env` (chmod 600, outside the repo). **A0 only.** M1 runs entirely on anvil; agents never read, print or commit these keys |
 | Public addresses (for docs and config) | deployer `0xcA5391C789fdabf872BdB447d73D9739bBF006f3` · relayer `0x18E82917289AF4E518AC7dd705008033870d6410` · recorder `0xB9Bf2913bfc2C8eE30Ab7CBa539B21c500963C71` · ops `0xeeC1c0a3044b8554430ad9139686b192b1DE0005` |
+
+## Coexistence with the Lucky re-skin track (another session)
+
+A separate session runs a UI re-skin in its own worktrees: `reskin/*` branches, `feat/lucky-reskin`, worktrees `Tagei-worktrees/reskin-*`, rules in `docs/reskin/OWNERSHIP.md` on that branch.
+
+| Side | Owns |
+|---|---|
+| Re-skin (look only) | `src/index.css`, `index.html`, `gallery.html`, `public/**`, `src/ui/**`, `src/dev/**`, `scripts/**`, `src/vite-env.d.ts`, `src/components/**` (visuals), `src/canvas/**` (visuals), `docs/reskin/**`, plus specific `src/App.tsx` regions |
+| This track | services, types, `main.tsx`, `test/**`, the server, contracts, shared, all root configs |
+
+- The re-skin leaves logic, state machines, services and the App fallbacks to us (A6).
+- **A6 starts only after the re-skin is merged into `integration`.** A6 then wires logic into the re-skinned components and follows the Lucky design system for any new UI.
+- Never touch `reskin-*` worktrees or branches. A5 must not create `src/vite-env.d.ts` (re-skin E0b owns it); read `import.meta.env` through a typed helper in `src/api/env.ts`.
+
+## Heavy-command mutex (≈ 4 GB free RAM on this machine)
+
+Every heavy command runs under the lock shared with the re-skin track:
+
+```bash
+flock -w 1800 /tmp/bnbplay-heavy.lock <cmd>
+```
+
+- **Heavy** = `pnpm typecheck*`, `pnpm test*`, `vite build`, `forge build`/`forge test` (especially fuzz/invariant), Playwright.
+- **Not heavy** = editing, `git`, `anvil`, a single dev server.
+- Long-running processes (anvil, dev servers) use your own port and are killed by PID when you finish. Never `pkill`, `killall` or `fuser -k`.

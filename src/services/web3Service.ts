@@ -178,6 +178,24 @@ export class Web3Service {
   }
 
   /**
+   * A guest's first session triggers an auto-drip on the server, but that endpoint returns
+   * immediately without waiting for it (`onFirstGuestSession` is fire-and-forget) — the drip
+   * still has to be sent, mined and picked up by the indexer before `/v1/me/balance` (a live
+   * on-chain read) reflects it. A single refreshBalances() right after connecting can land in
+   * that window and read a real `0`, which then reads as "not enough credits" even though
+   * funds are already on the way. Poll a few times until a positive balance is observed (or a
+   * `balance` SSE push updates it independently — either way this exits as soon as it does),
+   * so a fresh guest's own first refresh doesn't race their own faucet drip.
+   */
+  private async pollForFunds(attempts = 6, delayMs = 1_000): Promise<void> {
+    for (let attempt = 0; attempt < attempts; attempt++) {
+      const state = await this.refreshBalances().catch(() => null);
+      if (state && (state.creditsUsd ?? 0) > 0) return;
+      if (attempt < attempts - 1) await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+
+  /**
    * Executes the BNB Chain settlement checkpoint sequence (PRD §27)
    */
   public async executeSettlement(
@@ -268,7 +286,7 @@ export class Web3Service {
     this.notify();
     if (!changed) return;
     getStream().setPlayer(account.address);
-    if (isGuest) void this.ensureSession().catch(() => undefined).then(() => this.refreshBalances());
+    if (isGuest) void this.ensureSession().catch(() => undefined).then(() => this.pollForFunds());
     else void this.refreshBalances().catch(() => undefined);
   }
 

@@ -31,6 +31,11 @@ const winChildVariants: Variants = {
   visible: { opacity: 1, y: 0, scale: 1, transition: POP },
 };
 
+const winMultiplierVariants: Variants = {
+  hidden: { opacity: 0, y: 10, scale: 0.6 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: POP },
+};
+
 const CARD_CLASS = 'lg-card relative flex flex-col items-center bg-sheet shadow-lift px-8 py-6 text-center';
 
 export const OutcomeBannerOverlay: React.FC<OutcomeBannerOverlayProps> = ({
@@ -42,6 +47,7 @@ export const OutcomeBannerOverlay: React.FC<OutcomeBannerOverlayProps> = ({
   const isVisible = (gameStage === 'TARGET_HIT' || gameStage === 'LOSS_HIT') && pnl !== null;
   const isWin = gameStage === 'TARGET_HIT';
   const childVariants = reduced ? undefined : winChildVariants;
+  const multiplierVariants = reduced ? undefined : winMultiplierVariants;
 
   return (
     <AnimatePresence>
@@ -82,18 +88,22 @@ export const OutcomeBannerOverlay: React.FC<OutcomeBannerOverlayProps> = ({
                 </motion.div>
                 <motion.p
                   variants={childVariants}
-                  className="mt-3 text-label font-extrabold uppercase tracking-[0.08em] text-lucky"
+                  className="mt-3 text-label font-bold uppercase tracking-[0.08em] text-lucky"
                 >
                   TARGET HIT
                 </motion.p>
-                <motion.p variants={childVariants} className="mt-1">
-                  <SignedAmount value={pnl ?? 0} className="text-display" />
-                </motion.p>
                 {multiplier !== null && (
-                  <motion.p variants={childVariants} className="mt-1 text-caption tabular-nums text-ink-soft">
-                    {formatMultiplier(multiplier)} payout
+                  <motion.p
+                    variants={multiplierVariants}
+                    className="mt-1 text-display tabular-nums text-lucky"
+                    aria-label={`${formatMultiplier(multiplier)} payout multiplier`}
+                  >
+                    {formatMultiplier(multiplier)}
                   </motion.p>
                 )}
+                <motion.p variants={childVariants} className="mt-2">
+                  <SignedAmount value={pnl ?? 0} className="text-amount" />
+                </motion.p>
               </div>
             </motion.div>
           ) : (

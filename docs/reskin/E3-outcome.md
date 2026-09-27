@@ -29,8 +29,8 @@ The hot CTA on the result screen appears only when P&L ≥ 0.
 - [x] **E3-1 Win banner** (`OutcomeBannerOverlay.tsx:39-115`)
   - Card: `.lg-card` (`bg-sheet` at about 92%, `frame-muted` outline, `radius-xl`, `lift`), replacing `glass-panel`.
   - `ART['reward-crown']` as the first stagger child.
-  - "TARGET HIT" in `lucky` (no "!"), "+2.16 USDT" as a `display` `SignedAmount`, and a "1.22x payout" caption.
-  - Keep HERO, the 0.07/0.05 stagger and the 0.32s pop; add `role="status"`.
+  - "TARGET HIT" in `lucky` (no "!"), the multiplier ("1.22x") as the hero number in `display`, and "+2.16 USDT" as an `amount` `SignedAmount` below it, per PRD §20's "TARGET HIT / +3.2x" mock. (`reskin/win-multiplier` promoted the multiplier from a small `caption` "1.22x payout" line to this hero position; the P&L moved from `display` to `amount`.)
+  - Keep HERO, the 0.07/0.05 stagger and the 0.32s pop (the multiplier gets its own slightly deeper pop, `winMultiplierVariants`, same POP transition); add `role="status"`.
 - [x] **E3-2 Loss banner** (lines 116-157)
   - "ROUND COMPLETE" in `ink-soft`, with no ShieldAlert and no glow.
   - The amount "−1.62 USDT" in `loss`, with the caption "Stop loss reached as planned."

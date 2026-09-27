@@ -91,8 +91,9 @@ export const HomeHeroOverlay: React.FC<HomeHeroOverlayProps> = ({
   if (!isWalletConnected) {
     return (
       <div className="relative flex flex-col items-center text-center gap-2 pb-2 select-none pointer-events-auto">
+        <img src="/brand/tagei-logo.png" alt="" width={96} height={96} className="h-24 w-24" />
         <h1 className="text-display text-ink">
-          Welcome to <span className="text-brand whitespace-nowrap">BNB PLAY</span>
+          Welcome to <span className="text-brand whitespace-nowrap">Tagei</span>
         </h1>
         <p className="text-caption text-ink-soft max-w-[280px]">
           Connect your wallet to start your first mission

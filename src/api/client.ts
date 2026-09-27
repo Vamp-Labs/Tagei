@@ -233,7 +233,7 @@ export class ApiClient {
   }
 
   private async send(path: string, options: RequestOptions & { acceptStatuses?: number[] }): Promise<Response> {
-    if (this.baseUrl === null) throw new ApiError('API_DISABLED', 'The BNB PLAY API is not configured.');
+    if (this.baseUrl === null) throw new ApiError('API_DISABLED', 'The Tagei API is not configured.');
     const headers: Record<string, string> = { Accept: 'application/json' };
     if (options.body !== undefined) headers['Content-Type'] = 'application/json';
     if (options.auth) {

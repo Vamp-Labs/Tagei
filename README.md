@@ -1,4 +1,4 @@
-# BNB PLAY
+# Tagei
 
 Live markets, played like a game, settled on BNB Chain.
 
@@ -30,7 +30,7 @@ node tools/smoke-live.mjs
 
 ## Why this exists
 
-Trading UIs assume the player already understands candles, order books and leverage. BNB PLAY turns the same underlying data into something a first-time player reads instantly — a rocket going up or down — while keeping every outcome provably tied to a real price and a real settlement transaction. See `bnb_play_prd_v0_2_ui_motion.md` for the full product spec.
+Trading UIs assume the player already understands candles, order books and leverage. Tagei turns the same underlying data into something a first-time player reads instantly — a rocket going up or down — while keeping every outcome provably tied to a real price and a real settlement transaction. See `bnb_play_prd_v0_2_ui_motion.md` for the full product spec.
 
 ## Architecture
 

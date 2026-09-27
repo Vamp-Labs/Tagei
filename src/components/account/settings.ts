@@ -30,7 +30,7 @@ export const HAND_ITEMS: readonly SegmentedTabsItem<Hand>[] = [
 
 export function practiceToggleCopy(modeLocked: boolean, liveAvailable: boolean): string {
   if (modeLocked) return 'Finish the current round to switch';
-  if (!liveAvailable) return 'Live play needs the BNB PLAY backend';
+  if (!liveAvailable) return 'Live play needs the Tagei backend';
   return 'Mock market, not on-chain, earns no XP';
 }
 

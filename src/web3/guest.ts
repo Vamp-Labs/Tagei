@@ -176,7 +176,7 @@ export function createGuestProvider({ getAccount, forward, chainId = CHAIN_ID }:
 
   const handle = async (method: string, params: unknown): Promise<unknown> => {
     if (GASLESS_METHODS.has(method)) {
-      throw new GuestProviderError(PROVIDER_ERROR.unsupportedMethod, `${method} is not supported: BNB PLAY guests are gasless`);
+      throw new GuestProviderError(PROVIDER_ERROR.unsupportedMethod, `${method} is not supported: Tagei guests are gasless`);
     }
     switch (method) {
       case 'eth_chainId':

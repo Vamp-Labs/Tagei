@@ -49,9 +49,9 @@ export async function loadWalletConnectConnector(projectId: string): Promise<Cre
     projectId,
     showQrModal: true,
     metadata: {
-      name: 'BNB PLAY',
+      name: 'Tagei',
       description: 'Ride the live market on BNB Smart Chain Testnet.',
-      url: typeof window === 'undefined' ? 'https://bnbplay.local' : window.location.origin,
+      url: typeof window === 'undefined' ? 'https://tagei.local' : window.location.origin,
       icons: [],
     },
   });

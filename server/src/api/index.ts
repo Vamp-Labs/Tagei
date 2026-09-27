@@ -126,6 +126,7 @@ export function createA4(deps: A4Deps) {
     faucetAddress,
     enabled: config.FAUCET_ENABLED,
     amountUsd: config.FAUCET_AMOUNT_USD,
+    ipDailyCap: config.FAUCET_IP_DAILY_CAP,
     ledger,
     encodeDrip: deps.encodeDrip,
     turnstileSecret: config.TURNSTILE_SECRET_KEY,

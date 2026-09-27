@@ -41,6 +41,8 @@ export interface FaucetServiceDeps {
   fetch?: typeof fetch;
   now?: () => number;
   log?: Logger;
+  /** Overrides FAUCET_IP_DAILY_CAP (default 3) — see server/src/config.ts. */
+  ipDailyCap?: number;
 }
 
 export class FaucetService {
@@ -48,12 +50,14 @@ export class FaucetService {
   private readonly now: () => number;
   private readonly log: Logger;
   private readonly amount: bigint;
+  private readonly ipDailyCap: number;
   private readonly locks = new Map<string, Promise<unknown>>();
 
   constructor(deps: FaucetServiceDeps) {
     this.deps = deps;
     this.now = deps.now ?? Date.now;
     this.log = deps.log ?? silentLogger;
+    this.ipDailyCap = deps.ipDailyCap ?? FAUCET_IP_DAILY_CAP;
     this.amount = BigInt(Math.round(deps.amountUsd * 100)) * 10n ** 16n;
   }
 
@@ -104,7 +108,7 @@ export class FaucetService {
           retryAfterMs: last.createdAtMs + FAUCET_COOLDOWN_MS - now,
         });
       }
-      if ((await this.deps.store.countByIpSince(ipHash, now - FAUCET_COOLDOWN_MS)) >= FAUCET_IP_DAILY_CAP) {
+      if ((await this.deps.store.countByIpSince(ipHash, now - FAUCET_COOLDOWN_MS)) >= this.ipDailyCap) {
         throw new ApiError('FAUCET_COOLDOWN', 'Daily claim limit reached for this network.', { retryAfterMs: 3_600_000 });
       }
       if ((await this.deps.store.countSince(now - 3_600_000)) >= FAUCET_GLOBAL_HOURLY_CAP) {

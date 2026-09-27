@@ -56,6 +56,9 @@ const EnvSchema = z.object({
 
   FAUCET_ENABLED: bool(true),
   FAUCET_AMOUNT_USD: z.coerce.number().default(100),
+  // Default 3/day is the spec (F1b). Raised for demo days where many judges can share one
+  // venue network/NAT and would otherwise collide on the same IP hash.
+  FAUCET_IP_DAILY_CAP: z.coerce.number().int().default(3),
   TURNSTILE_SECRET_KEY: z.string().optional(),
 
   ANTHROPIC_API_KEY: z.string().optional(),

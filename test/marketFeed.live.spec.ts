@@ -174,6 +174,58 @@ describe('MarketFeedService — live mode (hub + Binance fallback)', () => {
     backend.dispose();
   });
 
+  it('reconcileWithKnownPrice re-seeds a synthetic feed around the given price', () => {
+    const { feed } = setup();
+    feed.setAsset('ETH', true);
+    feed.setAsset('BNB', true); // hub configured, no round/snapshot sent yet: still synthetic
+    feed.reconcileWithKnownPrice(772.5, START);
+    const history = feed.getHistory();
+    expect(history).toHaveLength(41);
+    expect(history.every((tick) => tick.price === 772.5)).toBe(true);
+    expect(history[1].timestamp - history[0].timestamp).toBe(400);
+    expect(feed.getCurrentPrice()).toBe(772.5);
+    feed.cleanup();
+  });
+
+  it('reconcileWithKnownPrice is a no-op once seedFromHub has run', () => {
+    const { feed, snapshot } = setup();
+    feed.setAsset('ETH', true);
+    feed.setAsset('BNB', true);
+    const nowSec = Math.floor(START / 1000);
+    snapshot(Array.from({ length: 30 }, (_, i) => 600 + i * 0.1), nowSec - 29);
+    const before = feed.getHistory();
+    feed.reconcileWithKnownPrice(1);
+    expect(feed.getHistory()).toEqual(before);
+    expect(feed.getCurrentPrice()).toBeCloseTo(602.9, 9);
+    feed.cleanup();
+  });
+
+  it('a subsequent seedFromHub still fully replaces a reconciled seed with real hub data', () => {
+    const { feed, snapshot } = setup();
+    feed.setAsset('ETH', true);
+    feed.setAsset('BNB', true);
+    feed.reconcileWithKnownPrice(772.5, START); // stand-in, before any real hub data
+    const nowSec = Math.floor(START / 1000);
+    snapshot(Array.from({ length: 30 }, (_, i) => 600 + i * 0.1), nowSec - 29);
+    const history = feed.getHistory();
+    expect(history).toHaveLength(100);
+    expect(history[history.length - 1].price).toBeCloseTo(602.9, 9);
+    expect(feed.getCurrentPrice()).toBeCloseTo(602.9, 9);
+    feed.cleanup();
+  });
+
+  it('reconcileWithKnownPrice ignores a non-finite or non-positive price', () => {
+    const { feed } = setup();
+    feed.setAsset('ETH', true);
+    feed.setAsset('BNB', true);
+    const before = feed.getHistory();
+    feed.reconcileWithKnownPrice(Number.NaN);
+    feed.reconcileWithKnownPrice(0);
+    feed.reconcileWithKnownPrice(-5);
+    expect(feed.getHistory()).toEqual(before);
+    feed.cleanup();
+  });
+
   it('uses the mock walk when neither the hub nor WebSocket is available', () => {
     const offline: StreamLike = {
       on: () => () => undefined,

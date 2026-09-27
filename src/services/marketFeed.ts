@@ -157,6 +157,26 @@ export class MarketFeedService {
     return this.currentPrice;
   }
 
+  /**
+   * Re-seeds the feed around a known-real price (e.g. a round's on-chain entry price)
+   * while the feed is still on its synthetic placeholder seed. This closes the gap that
+   * opens on resume/reload: roundService can present a real entry/target/stop the instant
+   * the `hello` SSE event lands, before this feed's own hub connection has delivered its
+   * first round. It is a no-op once real hub/Binance data has arrived (`synthetic` is
+   * false), so it can never override or fight real data — a subsequent seedFromHub() still
+   * fully replaces this seed, since it never flips `synthetic` itself.
+   */
+  public reconcileWithKnownPrice(price: number, atMs: number = this.now()): void {
+    if (!this.synthetic || !Number.isFinite(price) || price <= 0) return;
+    this.history = Array.from({ length: MOCK_SEED_POINTS }, (_, index) => ({
+      price,
+      timestamp: atMs - (MOCK_SEED_POINTS - 1 - index) * MOCK_SEED_SPACING_MS,
+      change24h: this.change24h(price),
+    }));
+    this.currentPrice = price;
+    this.interpolator.reset(price, atMs);
+  }
+
   public getDisplayPrice(): number {
     const last = this.history[this.history.length - 1];
     return last ? last.price : this.currentPrice;

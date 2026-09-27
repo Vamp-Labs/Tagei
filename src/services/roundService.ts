@@ -128,6 +128,8 @@ export interface RoundServiceDeps {
   storage: KeyValueStorage;
   ensureSession?: (signer: IntentSigner) => Promise<void>;
   setLevels?: (levels: readonly number[] | null) => void;
+  /** Reconciles the display feed's price around a newly known-real entry price (see marketFeed.reconcileWithKnownPrice). */
+  reconcilePrice?: (price: number) => void;
   launchTimeoutMs?: number;
 }
 
@@ -550,6 +552,7 @@ export class RoundService {
     this.entryPrice18 = entryPrice18;
     this.path.set(entrySec, entryPrice18);
     this.state.entryPrice = fromPrice18(entryPrice18);
+    this.deps.reconcilePrice?.(this.state.entryPrice);
     const barriers = barrierPrices(this.terms.direction, entryPrice18, this.terms.targetPpm, this.terms.stopPpm);
     this.deps.setLevels?.([fromPrice18(barriers.target), fromPrice18(barriers.stop)]);
     this.state.view = activeRoundView(this.state.round, entryPrice18, null, this.terms.endSec);
@@ -741,6 +744,7 @@ export interface FakeRoundServiceOptions {
   signer?: IntentSigner;
   storage?: KeyValueStorage;
   setLevels?: (levels: readonly number[] | null) => void;
+  reconcilePrice?: (price: number) => void;
   launchTimeoutMs?: number;
 }
 
@@ -758,6 +762,7 @@ export class FakeRoundService extends RoundService {
       readNonce: backend.readNonce,
       storage: options.storage ?? createMemoryStorage(),
       setLevels: options.setLevels,
+      reconcilePrice: options.reconcilePrice,
       launchTimeoutMs: options.launchTimeoutMs,
     });
     this.backend = backend;
@@ -772,6 +777,7 @@ export class FakeRoundService extends RoundService {
 
 function createDefaultRoundService(): RoundService {
   const setLevels = (levels: readonly number[] | null) => marketFeed.setLevels(levels);
+  const reconcilePrice = (price: number) => marketFeed.reconcileWithKnownPrice(price);
   if (isFakeMode()) {
     const backend = getFakeBackend();
     return new RoundService({
@@ -781,6 +787,7 @@ function createDefaultRoundService(): RoundService {
       readNonce: backend.readNonce,
       storage: browserStorage(),
       setLevels,
+      reconcilePrice,
     });
   }
   return new RoundService({
@@ -791,6 +798,7 @@ function createDefaultRoundService(): RoundService {
     readNonce: (player, arena) => web3Service.readOpenNonce(player, arena),
     storage: browserStorage(),
     setLevels,
+    reconcilePrice,
   });
 }
 

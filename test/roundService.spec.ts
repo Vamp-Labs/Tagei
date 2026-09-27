@@ -34,7 +34,13 @@ type EventOf<T extends RoundEvent['type']> = Extract<RoundEvent, { type: T }>;
 function harness(scenario: FakeScenario, storage = createMemoryStorage()) {
   const backend = new FakeBackend({ scenario, random: seeded() });
   const levels: (readonly number[] | null)[] = [];
-  const service = new FakeRoundService({ backend, storage, setLevels: (value) => levels.push(value) });
+  const reconciled: number[] = [];
+  const service = new FakeRoundService({
+    backend,
+    storage,
+    setLevels: (value) => levels.push(value),
+    reconcilePrice: (price) => reconciled.push(price),
+  });
   const events: RoundEvent[] = [];
   service.subscribe((event) => events.push(event));
   const all = <T extends RoundEvent['type']>(type: T) => events.filter((event): event is EventOf<T> => event.type === type);
@@ -44,7 +50,7 @@ function harness(scenario: FakeScenario, storage = createMemoryStorage()) {
     return found;
   };
   const phases = () => all('phase').map((event) => event.phase);
-  return { backend, service, events, levels, storage, all, first, phases, dispose: () => (service.dispose(), backend.dispose()) };
+  return { backend, service, events, levels, reconciled, storage, all, first, phases, dispose: () => (service.dispose(), backend.dispose()) };
 }
 
 const run = (ms: number) => vi.advanceTimersByTimeAsync(ms);
@@ -73,6 +79,7 @@ describe('RoundService against the fake SSE backend', () => {
     expect(locked.view).toMatchObject({ mode: 'live', asset: 'BNB', direction: 'LONG', stake: 10, tierLabel: 'CRUISE', durationSeconds: 30 });
     expect(locked.view.targetPrice).toBeGreaterThan(locked.entryPrice);
     expect(h.levels[0]).toEqual([locked.view.targetPrice, locked.view.stopLossPrice]);
+    expect(h.reconciled[0]).toBe(locked.entryPrice);
 
     const touches = h.all('touch');
     expect(touches).toHaveLength(1);
@@ -191,6 +198,7 @@ describe('RoundService against the fake SSE backend', () => {
     expect(resume.target).toBe('LIVE_TRADE');
     expect(resume.snapshot.phase).toBe('live');
     expect(resume.snapshot.view?.entryPrice).toBeGreaterThan(0);
+    expect(h.reconciled[0]).toBe(resume.snapshot.view?.entryPrice);
     await run(35_000);
     expect(h.first('settled').result.outcome).toBe('timeout');
     h.dispose();

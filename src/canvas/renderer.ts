@@ -205,8 +205,8 @@ export class MarketTrackRenderer {
     }
 
     if (activeRound) {
-      minPrice = Math.min(minPrice, activeRound.stopLossPrice, activeRound.targetPrice);
-      maxPrice = Math.max(maxPrice, activeRound.stopLossPrice, activeRound.targetPrice);
+      minPrice = Math.min(minPrice, activeRound.stopLossPrice, activeRound.targetPrice, activeRound.entryPrice);
+      maxPrice = Math.max(maxPrice, activeRound.stopLossPrice, activeRound.targetPrice, activeRound.entryPrice);
     }
 
     const span = priceSpan(minPrice, maxPrice);
@@ -245,8 +245,8 @@ export class MarketTrackRenderer {
     }
 
     if (activeRound) {
-      minPrice = Math.min(minPrice, activeRound.stopLossPrice, activeRound.targetPrice);
-      maxPrice = Math.max(maxPrice, activeRound.stopLossPrice, activeRound.targetPrice);
+      minPrice = Math.min(minPrice, activeRound.stopLossPrice, activeRound.targetPrice, activeRound.entryPrice);
+      maxPrice = Math.max(maxPrice, activeRound.stopLossPrice, activeRound.targetPrice, activeRound.entryPrice);
     }
 
     const span = priceSpan(minPrice, maxPrice);

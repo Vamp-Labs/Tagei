@@ -24,6 +24,7 @@ import { ConnectSheet } from './components/ConnectSheet';
 import { Menu } from './components/Menu';
 import { PixChat } from './components/PixChat';
 import { PositionDetails } from './components/PositionDetails';
+import { Leaderboard } from './components/Leaderboard';
 import { useLiveRound } from './components/game/useLiveRound';
 import { usePracticeRound, type PracticeLaunch } from './components/game/usePracticeRound';
 import { liveTierOptions, pickTier, practiceTierOptions, clampStake } from './components/game/tiers';
@@ -63,7 +64,7 @@ import {
   UserProgression,
   UserSettings,
 } from './types/game';
-type ActiveSheet = 'none' | 'menu' | 'asset-selector' | 'pix-chat' | 'position-details';
+type ActiveSheet = 'none' | 'menu' | 'asset-selector' | 'pix-chat' | 'position-details' | 'leaderboard';
 
 const DEFAULT_STAKE = 10;
 const IDLE_STAGES: ReadonlySet<GameStage> = new Set<GameStage>(['HOME', 'PRE_TRADE']);
@@ -613,6 +614,7 @@ export const App: React.FC = () => {
                 setActiveSheet('none');
                 setIsSettingsOpen(true);
               }}
+              onOpenLeaderboard={() => setActiveSheet('leaderboard')}
               onDisconnect={handleDisconnect}
             />
           )}
@@ -633,6 +635,10 @@ export const App: React.FC = () => {
           {activeSheet === 'pix-chat' && (
             <PixChat currentAsset={currentAsset} change24h={latestTick ? latestTick.change24h : 0} onClose={() => setActiveSheet('none')} />
           )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {activeSheet === 'leaderboard' && <Leaderboard ownAddress={address} onClose={() => setActiveSheet('none')} />}
         </AnimatePresence>
 
         <AnimatePresence>

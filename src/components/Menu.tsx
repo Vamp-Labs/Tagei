@@ -14,6 +14,7 @@ interface MenuProps {
   onClose: () => void;
   onOpenProfile: () => void;
   onOpenSettings: () => void;
+  onOpenLeaderboard: () => void;
   onDisconnect: () => void;
 }
 
@@ -58,12 +59,14 @@ export const Menu: React.FC<MenuProps> = ({
   onClose,
   onOpenProfile,
   onOpenSettings,
+  onOpenLeaderboard,
   onDisconnect,
 }) => {
   const streakDays = progression.streakDays ?? 0;
   const rows: RowProps[] = [
     { label: 'Positions', badge: openPositions, disabled: true },
     { label: 'History', disabled: true },
+    { label: 'Leaderboard', onClick: onOpenLeaderboard },
     { label: 'Profile', onClick: onOpenProfile },
     { label: 'Settings', onClick: onOpenSettings },
     { label: 'Help & Support', disabled: true },

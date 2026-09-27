@@ -13,7 +13,7 @@ import type { AssetSymbol } from '../types/market';
 
 type Setter<T> = Dispatch<SetStateAction<T>>;
 
-export type DevSheet = 'none' | 'menu' | 'asset-selector' | 'pix-chat' | 'position-details';
+export type DevSheet = 'none' | 'menu' | 'asset-selector' | 'pix-chat' | 'position-details' | 'leaderboard';
 
 export interface DevSceneContext {
   setStage: Setter<GameStage>;

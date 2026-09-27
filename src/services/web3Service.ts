@@ -196,6 +196,20 @@ export class Web3Service {
   }
 
   /**
+   * A real wallet has no server-side auto-drip (onFirstGuestSession only fires for guests —
+   * server/src/auth/service.ts checks `player.kind === 'guest'`), so without this a freshly
+   * connected wallet has $0 credits forever: the client never calls the faucet endpoint on its
+   * own. This mirrors the guest flow with the one manual endpoint that already exists for it
+   * (claimFaucet, previously unused by the UI) — the server only grants it below a $5 balance,
+   * so it's a safe no-op to attempt unconditionally; any rejection (already funded, cooldown,
+   * faucet disabled) is expected and ignored the same way autoDrip's own failures are.
+   */
+  private async claimAndPollForFunds(): Promise<void> {
+    await apiClient.claimFaucet().catch(() => undefined);
+    await this.pollForFunds();
+  }
+
+  /**
    * Executes the BNB Chain settlement checkpoint sequence (PRD §27)
    */
   public async executeSettlement(
@@ -287,7 +301,11 @@ export class Web3Service {
     if (!changed) return;
     getStream().setPlayer(account.address);
     if (isGuest) void this.ensureSession().catch(() => undefined).then(() => this.pollForFunds());
-    else void this.refreshBalances().catch(() => undefined);
+    // A wallet's session is otherwise only created lazily inside roundService.launch(), which
+    // would surface the wallet's very first sign-in prompt in the middle of an already-committed
+    // launch attempt. Establishing it here instead means that prompt happens once, right after
+    // connecting, and lets a first-time wallet actually get funded before the player tries to play.
+    else void this.ensureSession().catch(() => undefined).then(() => this.claimAndPollForFunds());
   }
 
   private notify() {

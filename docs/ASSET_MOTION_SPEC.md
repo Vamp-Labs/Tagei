@@ -1,4 +1,4 @@
-# BNB PLAY — 3D Asset & Motion Specification
+# Tagei — 3D Asset & Motion Specification
 
 ## Art direction
 All hero assets use one consistent style:

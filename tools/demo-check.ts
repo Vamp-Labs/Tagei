@@ -20,7 +20,7 @@ async function getJson(url: string) {
 }
 
 async function main() {
-  console.log(`BNB PLAY demo-check — ${new Date().toISOString()}\n`);
+  console.log(`Tagei demo-check — ${new Date().toISOString()}\n`);
 
   console.log('web');
   {

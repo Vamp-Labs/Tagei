@@ -1,6 +1,6 @@
-# BNB PLAY → Lucky Games re-skin
+# Tagei → Lucky Games re-skin
 
-This re-skin rebuilds every BNB PLAY screen in the **Lucky Games** design system: dark navy surfaces, one lucky green, and a single hot button per screen. Parallel agents do the work, and each one owns a separate slice of the app.
+This re-skin rebuilds every Tagei screen in the **Lucky Games** design system: dark navy surfaces, one lucky green, and a single hot button per screen. Parallel agents do the work, and each one owns a separate slice of the app.
 
 - **Design system:** https://claude.ai/artifact/TzSE6W1gGY81UCvB7iHCbT. A local copy lives in [`lucky-ds/`](lucky-ds/):
   - `README.md` (brand book) and `tokens.json`;
@@ -36,7 +36,7 @@ This re-skin rebuilds every BNB PLAY screen in the **Lucky Games** design system
 - **Home CTA:** a hot "PLAY NOW!" button that opens the trade sheet (`onOpenTradeSheet`).
 - **After a loss:** a secondary "Trade again" button with no pulse, plus a "Review round" link. After a win or a profitable cash-out, a hot "TRADE AGAIN!".
 - **Profile stats:** the invented numbers ("68%", "2.84x") are replaced with real progression values: streak, rounds today, level.
-- **Header wordmark:** "BNB PLAY" with a small gold BNB disc. Lucky's clover logo is not used.
+- **Header wordmark:** "Tagei" with a small gold BNB disc. Lucky's clover logo is not used.
 - **PIX's face:** a simple SVG face in a disc with a mood ring, drawn in code.
 - **Canvas:** the idle track line is `ink-soft`.
 - **Font:** Figtree is vendored as woff2 under `public/fonts/`. It has tabular figures (`tnum`) and U+2212 but no ▲/▼, so draw those as SVG `Icon`s.

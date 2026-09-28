@@ -1,6 +1,6 @@
-# BNB PLAY — agent instructions
+# Tagei — agent instructions
 
-BNB PLAY turns a live crypto price into a playable "Market Track": the player picks LONG or SHORT for a ~30 s round, a rocket rides the real price, and the round settles on **BNB Smart Chain Testnet (chainId 97)** from Supra DORA-2 oracle checkpoints recorded every second.
+Tagei turns a live crypto price into a playable "Market Track": the player picks LONG or SHORT for a ~30 s round, a rocket rides the real price, and the round settles on **BNB Smart Chain Testnet (chainId 97)** from Supra DORA-2 oracle checkpoints recorded every second.
 
 Read before working: `docs/spec/F0-repo.md` (layout, ownership, tooling), then the spec for your area (F1a contracts v2, F1b API/SSE, F1c stage machine, F1d progression, F1e lanes) and your handoff in `docs/handoffs/`. The product source of truth is `bnb_play_prd_v0_2_ui_motion.md`; UI/motion specs live in `docs/*.md`.
 

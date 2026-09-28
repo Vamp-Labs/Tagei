@@ -1,6 +1,6 @@
-# BNB PLAY: design tokens (Lucky Games)
+# Tagei: design tokens (Lucky Games)
 
-This file is the source of truth for BNB PLAY's look.
+This file is the source of truth for Tagei's look.
 
 - **The re-skin program:** [`docs/reskin/`](reskin/README.md). It covers the decisions, the epics and the rubric.
 - **The shared primitives and their props:** [`docs/reskin/CONTRACTS.md`](reskin/CONTRACTS.md).

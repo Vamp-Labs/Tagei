@@ -22,7 +22,7 @@ Scenes: `landing`, `home`, `home-active`, `asset-selector`.
 
 ## Tasks
 - [x] **E1-1 Landing** (`HomeHeroOverlay.tsx:122-153`)
-  - Two-tone display title: "Welcome to" in `ink`, **"BNB PLAY"** in `lucky`. The sub-line is a `caption` in `ink-soft`.
+  - Two-tone display title: "Welcome to" in `ink`, **"Tagei"** in `lucky`. The sub-line is a `caption` in `ink-soft`.
   - The CTA becomes a full-width hot `Button`: "CONNECT WALLET!". While busy it shows "CONNECTING…", is disabled and has `aria-busy`. Drop the Rocket icon.
   - "Explore first" becomes a `ghost` text button, 16px, `ink-secondary`, at least 44px tall.
   - Connect confetti: `useConfetti().burst('connect')`, replacing the hardcoded array at lines 50-55.

@@ -1,4 +1,4 @@
-# PRD — BNB PLAY
+# PRD — Tagei
 
 **Version:** 0.2  
 **Status:** Product / UI / Motion Specification  
@@ -135,7 +135,7 @@ The major difference is:
 ### Header
 
 ```text
-[menu]   BNB PLAY                [notifications] [profile]
+[menu]   Tagei                [notifications] [profile]
 ```
 
 Below or integrated into the live HUD:
@@ -1459,7 +1459,7 @@ Interaction + progression
 
         =
 
-BNB PLAY
+Tagei
 ```
 
 ---

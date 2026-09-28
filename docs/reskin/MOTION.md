@@ -1,4 +1,4 @@
-## Motion spec: BNB PLAY on Lucky Games
+## Motion spec: Tagei on Lucky Games
 
 **Personality:** glossy game show, run with a calm fintech hand (80/20).
 The sheets glide and the numbers stay steady. Only the hot CTA and the few real payoff moments get any bounce.

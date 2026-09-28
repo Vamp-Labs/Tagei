@@ -1,4 +1,4 @@
-# BNB PLAY contracts
+# Tagei contracts
 
 Foundry project: solc 0.8.30, EVM cancun, **via-IR**, optimizer **800** runs (F1a says 1000; at 1000 the Arena is 24.8 kB, over EIP-170; at 800 it is 23.4 kB).
 Dependencies come from Soldeer (`forge-std` 1.16.2, `@openzeppelin-contracts` 5.7.0), with no git submodules.

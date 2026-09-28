@@ -1,4 +1,4 @@
-# BNB PLAY — UI/UX Screen Specification
+# Tagei — UI/UX Screen Specification
 
 ## 1. Landing / Connect Wallet
 
@@ -8,7 +8,7 @@ Welcome new users and move them into the product without filling the screen with
 ### Layout
 ```text
 ┌────────────────────────────┐
-│ BNB PLAY        Wallet  ☰  │
+│ Tagei           Wallet  ☰  │
 │                            │
 │         live chart         │
 │       ╱╲   ╱╲       🚀     │
@@ -17,7 +17,7 @@ Welcome new users and move them into the product without filling the screen with
 │        PIX / subtle        │
 │                            │
 │      Welcome to            │
-│       BNB PLAY             │
+│       Tagei                │
 │                            │
 │ Connect your wallet to     │
 │ start your first mission   │
@@ -51,7 +51,7 @@ The background is **not a full illustration**. Use:
 Give the user a clean market view and one obvious action: begin a trade.
 
 ```text
-BNB PLAY                      ◉  ☰
+Tagei                         ◉  ☰
 
                 BNB ▾
               $605.60
@@ -133,7 +133,7 @@ LEVERAGE
 Turn the trade into a mission.
 
 ```text
-BNB PLAY                      ◉  ☰
+Tagei                         ◉  ☰
 
 ● LIVE    00:20
 

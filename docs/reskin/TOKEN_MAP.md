@@ -1,4 +1,4 @@
-# Token map: legacy BNB PLAY → Lucky Games
+# Token map: legacy Tagei → Lucky Games
 
 E0a keeps every legacy token alive through a **bridge**: blocks marked `LEGACY BRIDGE — deleted in E0-final` in `src/index.css`. The whole app therefore re-tints the moment E0a lands, and nothing breaks.
 

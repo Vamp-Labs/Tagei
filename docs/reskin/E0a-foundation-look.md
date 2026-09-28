@@ -5,7 +5,7 @@
 | done | `feat/lucky-reskin` | `Tagei-worktrees/reskin-integrate` | 5180 | `00b1c44` + docs commit |
 
 ## Goal
-Replace BNB PLAY's token layer, fonts and shared UI primitives with the Lucky Games system. Every screen shifts palette the moment this lands, and the six feature epics can then rebuild their screens from ready-made, typed parts. This runs at the same time as E0b (tooling), so don't touch E0b's files (see OWNERSHIP.md).
+Replace Tagei's token layer, fonts and shared UI primitives with the Lucky Games system. Every screen shifts palette the moment this lands, and the six feature epics can then rebuild their screens from ready-made, typed parts. This runs at the same time as E0b (tooling), so don't touch E0b's files (see OWNERSHIP.md).
 
 ## Owned files
 Owned:
@@ -167,7 +167,7 @@ App.tsx, only in these regions:
 
 ### 7. Header and SimulationBar
 - [x] **`Header.tsx`:** keep the same elements in the same order (the wallet session will merge into this file later) and change classes only.
-  - Wordmark "BNB PLAY" in uppercase 800, with a small gold disc mark between the words.
+  - Wordmark "Tagei" in uppercase 800, with a small gold disc mark between the words.
   - Status dot: lucky with a lucky-tint ring when connected, `control-ring` when not.
   - Menu: `buttonClass('icon', 'md')` + `Icon name="grid"`, 48px.
   - No hot anywhere in the header.

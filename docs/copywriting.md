@@ -6,8 +6,9 @@ page, pitch deck, social posts, a pitch — can pull from real mechanisms instea
 crypto-app language. Every claim below cites the file it comes from, so it can be fact-checked
 against the current spec rather than memory.
 
-Use **Tagei** as the product name everywhere. (Most internal docs still say the old name,
-"BNB PLAY" — that's pre-rebrand and safe to ignore.)
+Use **Tagei** as the product name everywhere. (The PRD file is still named
+`bnb_play_prd_v0_2_ui_motion.md` — that's a pre-rebrand filename, its content already says
+"Tagei"; safe to ignore.)
 
 ---
 

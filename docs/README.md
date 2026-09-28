@@ -1,7 +1,7 @@
-# BNB PLAY — UI/UX Product Spec
+# Tagei — UI/UX Product Spec
 
 ## Product direction
-BNB PLAY is a **gamified trading experience** built around a simple mission loop:
+Tagei is a **gamified trading experience** built around a simple mission loop:
 
 1. Connect wallet
 2. Pick an asset

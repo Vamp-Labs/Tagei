@@ -87,3 +87,24 @@ export function splitNotice(copy: string): { title: string; body: string } {
   const at = copy.indexOf(' · ');
   return at < 0 ? { title: copy, body: '' } : { title: copy.slice(0, at), body: copy.slice(at + 3) };
 }
+
+const SHARE_APP_URL = 'https://bnb-play.vercel.app';
+
+export function shareText(result: Pick<TradeResult, 'asset' | 'pnl' | 'outcome' | 'voided'>): string {
+  const kind = resultKind(result);
+  const pnl = formatAmount(result.pnl);
+  const line =
+    kind === 'voided'
+      ? `Round voided on ${result.asset} — stake returned, settled on-chain.`
+      : kind === 'win'
+        ? `Target hit on ${result.asset} — ${pnl}, settled on-chain.`
+        : kind === 'cashed_out'
+          ? `Cashed out ${pnl} on ${result.asset}, settled on-chain.`
+          : `Round complete on ${result.asset}, ${pnl}, settled on-chain.`;
+  return `${line} Playing Tagei, a market game settled on BNB Chain.`;
+}
+
+export function shareTweetUrl(result: Pick<TradeResult, 'asset' | 'pnl' | 'outcome' | 'voided'>): string {
+  const params = new URLSearchParams({ text: shareText(result), url: SHARE_APP_URL });
+  return `https://twitter.com/intent/tweet?${params.toString()}`;
+}

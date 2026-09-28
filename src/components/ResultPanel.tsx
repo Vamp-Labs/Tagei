@@ -48,6 +48,7 @@ import {
   isLaneRound,
   leverageText,
   resultKind,
+  shareTweetUrl,
 } from './game/roundDisplay';
 
 interface ResultPanelProps {
@@ -172,6 +173,7 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({
   const lane = isLaneRound(result);
   const duration = durationText(result.durationSec);
   const txUrl = !practice && result.txHash ? (result.explorerUrl ?? explorerTxUrl(result.txHash)) : null;
+  const tweetUrl = txUrl ? shareTweetUrl(result) : null;
 
   const rows: StatRow[] = [
     {
@@ -364,18 +366,32 @@ export const ResultPanel: React.FC<ResultPanelProps> = ({
             icon={<Icon name="home" size={FOOTER_GLYPH_PX} />}
           />
 
-          {txUrl && (
-            <a
-              href={txUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="View settlement on BscScan testnet"
-              title="Settled on BNB Chain testnet — view on BscScan"
-              className={cn(buttonClass('icon', 'md'), 'text-ink-secondary')}
-            >
-              <Icon name="shield-check" size={FOOTER_GLYPH_PX} />
-            </a>
-          )}
+          <div className="flex items-center gap-2">
+            {tweetUrl && (
+              <a
+                href={tweetUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Share result on X"
+                title="Share this result on X"
+                className={cn(buttonClass('icon', 'md'), 'text-ink-secondary')}
+              >
+                <Icon name="x-logo" size={FOOTER_GLYPH_PX} />
+              </a>
+            )}
+            {txUrl && (
+              <a
+                href={txUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="View settlement on BscScan testnet"
+                title="Settled on BNB Chain testnet — view on BscScan"
+                className={cn(buttonClass('icon', 'md'), 'text-ink-secondary')}
+              >
+                <Icon name="shield-check" size={FOOTER_GLYPH_PX} />
+              </a>
+            )}
+          </div>
         </div>
       </motion.div>
     </Scrim>

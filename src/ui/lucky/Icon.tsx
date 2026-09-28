@@ -24,7 +24,8 @@ export type IconName =
   | 'key'
   | 'broadcast'
   | 'clock'
-  | 'rocket';
+  | 'rocket'
+  | 'x-logo';
 
 export interface IconProps {
   name: IconName;
@@ -33,7 +34,7 @@ export interface IconProps {
   className?: string;
 }
 
-const STROKE_PATHS: Record<Exclude<IconName, 'grid' | 'tri-up' | 'tri-down'>, string> = {
+const STROKE_PATHS: Record<Exclude<IconName, 'grid' | 'tri-up' | 'tri-down' | 'x-logo'>, string> = {
   back: 'M19 12H5m6-6-6 6 6 6',
   plus: 'M12 5v14M5 12h14',
   minus: 'M5 12h14',
@@ -90,6 +91,17 @@ export const Icon: React.FC<IconProps> = ({ name, size = 24, strokeWidth = 2.4, 
     return (
       <svg {...common}>
         <path d={TRIANGLES[name]} fill="currentColor" stroke="currentColor" strokeWidth={2} strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  if (name === 'x-logo') {
+    return (
+      <svg {...common}>
+        <path
+          fill="currentColor"
+          d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"
+        />
       </svg>
     );
   }

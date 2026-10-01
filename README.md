@@ -2,6 +2,8 @@
 
 Live markets, played like a game, settled on BNB Chain.
 
+**Pick a side. Hold. Ride.**
+
 Pick BNB / BTC / ETH / SOL / DOGE, go LONG or SHORT, and ride a real price for ~30 s. A rocket flies the actual market; PIX (an AI co-pilot) explains what happened; the round settles on **BNB Smart Chain Testnet (chainId 97)** from an on-chain, second-by-second record of a real price feed — not a black box, not a simulated RNG.
 
 - **Live app:** https://bnb-play.vercel.app
@@ -9,6 +11,30 @@ Pick BNB / BTC / ETH / SOL / DOGE, go LONG or SHORT, and ride a real price for ~
 - **Arena contract:** [`0x8F1E4A377372E7E1d9fb10185c4bb038cF54e439`](https://testnet.bscscan.com/address/0x8F1E4A377372E7E1d9fb10185c4bb038cF54e439) on BSC testnet
 
 No wallet, no faucet, no gas needed to play: tap **Play as Guest** and go. Real wallets (MetaMask, WalletConnect) are also supported.
+
+## The trade in three touches
+
+Asset, stake and tier all have defaults, so direction is the only real decision:
+
+1. Tap **PLAY NOW**
+2. Tap **LONG** or **SHORT**
+3. **Hold** the launch button
+
+The same hold cashes out. On touch it is a 700 ms press with a haptic tick at each quarter, so a thumb stretching across the screen cannot fire it by accident. A mouse click or Enter / Space commits instantly. The launch button stays locked until a direction is chosen. See `src/ui/HoldButton.tsx`.
+
+## Hackathon submission
+
+Everything for the submission form lives in [`docs/hackathon/`](docs/hackathon/):
+
+| File | What |
+|---|---|
+| [`problem-statement.md`](docs/hackathon/problem-statement.md) | The problem, in the form's words |
+| [`solution.md`](docs/hackathon/solution.md) | The solution and why BNB Chain |
+| [`project-detail.md`](docs/hackathon/project-detail.md) | Full write-up with six Mermaid diagrams, contract addresses, the trust model and an honest status |
+| [`pitch-kit.md`](docs/hackathon/pitch-kit.md) | Catch lines, hooks, 30 s / 60 s / 3 min pitches, demo script, social copy, judge Q&A |
+| [`assets/`](docs/hackathon/assets/) | Current app screenshots |
+
+There is also an original song and music video, *Ride the Market* (2:27), built from real gameplay captures.
 
 ## What's real here
 
@@ -71,6 +97,7 @@ Trading UIs assume the player already understands candles, order books and lever
 | `docs/spec/` | Frozen specs (F0 repo/tooling, F1a contracts, F1b API/SSE, F1c stage machine, F1d progression, F1e lanes) |
 | `docs/security/` | `G1-contracts-review.md` — the pre-deploy security review and its fixes |
 | `docs/handoffs/` | Per-workstream build briefs |
+| `docs/hackathon/` | Submission pack: problem, solution, project detail (Mermaid), pitch kit, screenshots |
 | `tools/` | `demo-check.ts` (pre-demo health gate), `smoke-live.mjs` (live E2E proof), `abi-sync.ts` |
 
 ## Running it locally
